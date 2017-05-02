@@ -19,7 +19,7 @@ struct State {
     void resetLights(){
         light.ambient = Vector(0.1f,0.1f,0.1f,1);
         
-        light.dir[0] = Vector(1,0,0,1);
+        light.dir[0] = Vector(-1,0.3,0,1);
         light.dir[1] = Vector(-1,0.4,0,1);
         light.dir[2] = Vector(0,0,0,1);
         

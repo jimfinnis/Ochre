@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170502.2036>
+//  Last Modified : <170502.2113>
 //
 //  Description	
 //
@@ -45,11 +45,10 @@ EffectManager *EffectManager::instance = NULL;
  */
 
 EffectManager::EffectManager(){
-    untex = new Effect("media/mesh.shr",
-                         EDA_POS|EDA_NORM|
-                         EDU_WORLDVIEWPROJ|EDU_NORMMAT|EDU_DIFFUSECOL|
-                         EDU_DIFFLIGHTS|EDU_AMBLIGHT|EDU_FOG|
-                         EDA_TEXCOORDS|EDU_SAMPLER);
+    untex = new Effect("media/mesh_untex.shr",
+                       EDA_POS|EDA_NORM|
+                       EDU_WORLDVIEWPROJ|EDU_NORMMAT|EDU_DIFFUSECOL|
+                       EDU_DIFFLIGHTS|EDU_AMBLIGHT|EDU_FOG);
     
     untex->init();
 }
@@ -317,6 +316,7 @@ bool Effect::begin(){
         glUseProgram(program);
         ERRCHK;
         setUniforms();
+        ERRCHK;
         mCurEffect = this;
         return true;
     }
@@ -448,8 +448,10 @@ void Effect::setWorldMatrix(Matrix *world){
 void Effect::setUniforms(){
     State *s = StateManager::getInstance()->get();
     
-    if(has(EDU_AMBLIGHT))
+    if(has(EDU_AMBLIGHT)){
         glUniform4fv(AmbientColIdx,1,(float *)&s->light.ambient);
+        ERRCHK;
+    }
     
     if(has(EDU_FOG)){
         glUniform4fv(FogColIdx,1,(float *)&s->fog.color);

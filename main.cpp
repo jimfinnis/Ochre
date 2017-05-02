@@ -8,6 +8,8 @@
 
 #include "gfx.h"
 #include "effect.h"
+#include "state.h"
+#include "obj.h"
 
 // Shader sources
 const GLchar* vertexSource =
@@ -43,40 +45,29 @@ int main(int argc, char** argv)
 
     auto rdr = SDL_CreateRenderer(
         wnd, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-/*
+    
+    
     // Create Vertex Array Object
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-
-    // Create a Vertex Buffer Object and copy the vertex data to it
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-
-    GLfloat vertices[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Create and compile the vertex shader
-    GLuint vertexShader = loadShaderFromText(GL_VERTEX_SHADER,vertexSource);
-
-    // Create and compile the fragment shader
-    GLuint fragmentShader = loadShaderFromText(GL_FRAGMENT_SHADER,fragmentSource);
-
-    // Link the vertex and fragment shader into a shader program
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    // glBindFragDataLocation(shaderProgram, 0, "outColor");
-    glLinkProgram(shaderProgram);
-    glUseProgram(shaderProgram);
-
-    // Specify the layout of the vertex data
-    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-*/    
+    
+    // initialise GL state and projection
+    Matrix::setProjection(90,1,2000,640.0/480.0);
+    Matrix::setProjectionOrtho(0,5,
+                               5,5,
+                               0,10);
+   
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    
+    // load the effects by starting the effect manager
+    EffectManager::getInstance();
+    
+    // load meshes
+    ObjMesh *test = new ObjMesh("media/meshes/ico","ico.obj");
+    
     while(1)
     {
         SDL_Event e;
@@ -86,13 +77,28 @@ int main(int argc, char** argv)
         }
 
 
-        // Clear the screen to black
-        glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // Draw a triangle from the 3 vertices
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
+        /* Clear the color and depth buffers. */
+        glClearColor(0,0,1,0);
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        
+        // reset the state manager
+        StateManager *sm = StateManager::getInstance();
+        sm->reset();
+        
+        // draw here!
+        MatrixStack *ms = StateManager::getInstance()->getx();
+        ms->push();
+        
+        Matrix m=Matrix::IDENTITY;
+        m.setTranslation(0,0,-2);
+        ms->mul(&m);
+        {
+            test->render(sm->getx()->top());
+        }
+        ms->pop();
+        
+        
+        
         SDL_GL_SwapWindow(wnd);
     };
 

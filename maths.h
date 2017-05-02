@@ -792,6 +792,7 @@ struct Matrix
     
     /// set the projection matrix
     static void setProjection(float fov,float znear,float zfar,float faspect);
+    static void setProjectionOrtho(float left, float right, float top, float bottom, float near, float far);
     
     
     /// return a pointer to the first float in the matrix

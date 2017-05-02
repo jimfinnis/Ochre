@@ -275,7 +275,7 @@ void ObjMesh::render(Matrix *world){
             col[3] = s->alpha;
         else
             col[3] = 1.0;
-        //            eff->setMaterial(col,t);
+        eff->setMaterial(col,NULL);
         glDrawElements(GL_TRIANGLES,it->count,GL_UNSIGNED_INT,
                        (void *)(it->start*sizeof(GLuint)));
         ERRCHK;

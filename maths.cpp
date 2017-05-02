@@ -103,6 +103,31 @@ void Matrix::setProjection(float fov,float znear,float zfar,float aspect){
     Projection.mf[15] = 0;
 }
 
+void Matrix::setProjectionOrtho(float left, float right, float top, float bottom, float near, float far){
+    Projection.mf[0]  = 2.0f/(right-left);
+    Projection.mf[1]  = 0;
+    Projection.mf[2]  = 0;
+    Projection.mf[3]  = -(right+left)/(right-left);
+    
+    Projection.mf[4]  = 0;
+    Projection.mf[5]  = 2.0f/(top-bottom);
+    Projection.mf[6]  = 0;
+    Projection.mf[7]  = -(top+bottom)/(top-bottom);
+    
+    Projection.mf[8]  = 0;
+    Projection.mf[9]  = 0;
+    Projection.mf[10] = 2.0f/(far-near);
+    Projection.mf[11] = -(far+near)/(far-near);
+    
+    Projection.mf[12] = 0;
+    Projection.mf[13] = 0;
+    Projection.mf[14] = 0;
+    Projection.mf[15] = 1;
+    
+//    Matrix m = Projection;
+//    Projection.transpose(m);
+}
+
 
 float Matrix::det() const
 {
