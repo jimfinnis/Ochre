@@ -1,0 +1,32 @@
+%%vertex
+
+uniform mat4 matWorldViewProj;
+uniform mat3 matNormal;
+uniform vec4 colDiffuse;
+
+#include <media/uniforms.inc>
+
+attribute vec3 aNormal;
+attribute vec4 aPosition;
+
+varying vec4 vCol;
+varying float vFog;
+
+void main()
+{
+    gl_Position = matWorldViewProj * aPosition;
+#include <media/lightcalc.inc>
+}
+
+%%fragment
+
+uniform vec4 uFogCol;
+varying vec4 vCol;
+varying float vFog;
+
+void main()
+{
+    vec4 col = vec4(vCol.x,vCol.y,vCol.z,1.0);
+    gl_FragColor = mix(col,uFogCol,vFog);
+}
+

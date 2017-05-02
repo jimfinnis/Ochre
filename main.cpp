@@ -52,13 +52,17 @@ int main(int argc, char** argv)
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     
-    // initialise GL state and projection
-    Matrix::setProjection(90,1,2000,640.0/480.0);
-    Matrix::setProjectionOrtho(0,5,
-                               5,5,
-                               0,10);
-   
-    glEnable(GL_CULL_FACE);
+    
+    EffectManager::projection = glm::perspective(glm::radians(45.0f),
+                                                 640.0f/480.0f,
+                                                 0.1f,100.0f);
+    
+    EffectManager::projection = 
+          glm::ortho(-2.0f,2.0f,  -2.0f,2.0f,  -2.0f,2.0f) *
+          glm::rotate(glm::mat4(),glm::radians(-35.264f),glm::vec3(1.0f, 0.0f, 0.0f))*
+          glm::rotate(glm::mat4(),glm::radians(-45.0f),glm::vec3(0.0f,1.0f,0.0f));
+    
+//    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     
@@ -66,7 +70,7 @@ int main(int argc, char** argv)
     EffectManager::getInstance();
     
     // load meshes
-    ObjMesh *test = new ObjMesh("media/meshes/ico","ico.obj");
+    ObjMesh *test = new ObjMesh("media/meshes/plane","plane.obj");
     
     while(1)
     {
@@ -75,7 +79,8 @@ int main(int argc, char** argv)
         {
             if(e.type == SDL_QUIT) std::terminate();
         }
-
+        
+        printf("foo\n");
 
         /* Clear the color and depth buffers. */
         glClearColor(0,0,1,0);
@@ -85,18 +90,14 @@ int main(int argc, char** argv)
         StateManager *sm = StateManager::getInstance();
         sm->reset();
         
-        // draw here!
-        MatrixStack *ms = StateManager::getInstance()->getx();
+        MatrixStack *ms = sm->getx();
         ms->push();
         
-        Matrix m=Matrix::IDENTITY;
-        m.setTranslation(0,0,-2);
-        ms->mul(&m);
-        {
-            test->render(sm->getx()->top());
-        }
-        ms->pop();
+        ms->mul(glm::translate(glm::mat4(),glm::vec3(0.0f,-0.0f,-0.0f)));
         
+        // draw here!
+        test->render(sm->getx()->top());
+        ms->pop();
         
         
         SDL_GL_SwapWindow(wnd);

@@ -23,15 +23,12 @@ class ObjMesh {
     GLuint buffers[2];
     std::vector<Transition> transitions;
     
-    void renderTex(Matrix *world);
-    void renderUntex(Matrix *world);
-    
 public:
     ObjMesh(const char *dir,const char *name);
     virtual ~ObjMesh();
     
     // standard render method
-    virtual void render(Matrix *world);
+    virtual void render(glm::mat4 *world);
 };
 
 #endif /* __OBJ_H */

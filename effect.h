@@ -22,7 +22,7 @@ public:
     /// set general uniforms ready for running
     void setUniforms();
     /// set the transformation uniforms
-    void setWorldMatrix(Matrix *world);
+    void setWorldMatrix(glm::mat4 *world);
     /// set material uniforms
     void setMaterial(float *diffuse,class Texture *texture);
     /// set envmap colour and alpha
@@ -152,6 +152,8 @@ class EffectManager {
     static EffectManager *instance;
     
 public:
+    static glm::mat4 projection;
+    
     static EffectManager *getInstance(){
         if(instance==NULL)
             instance = new EffectManager();

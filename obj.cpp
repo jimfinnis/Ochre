@@ -226,6 +226,7 @@ ObjMesh::ObjMesh(const char *dir,const char *name){
     
     
     chdir(wd);
+    printf("Loaded OK\n");
 }
 
 ObjMesh::~ObjMesh(){
@@ -237,7 +238,7 @@ static Material defaultMat = {
     NULL,{0,0,0,1}};
 
 
-void ObjMesh::render(Matrix *world){
+void ObjMesh::render(glm::mat4 *world){
     State *s = StateManager::getInstance()->get();
     
     // start the effect

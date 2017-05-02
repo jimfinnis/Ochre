@@ -17,20 +17,19 @@
 struct State {
     
     void resetLights(){
-        light.ambient = Vector(0.1f,0.1f,0.1f,1);
+        light.ambient = Colour(0.1f,0.1f,0.1f,1);
         
-        light.dir[0] = Vector(-1,0.3,0,1);
-        light.dir[1] = Vector(-1,0.4,0,1);
-        light.dir[2] = Vector(0,0,0,1);
+        light.dir[0] = glm::vec3(-1,0.3,0);
+        light.dir[1] = glm::vec3(-1,0.4,0);
+        light.dir[2] = glm::vec3(0,0,0);
         
-        light.col[0] = Vector(1,1,1,1);
-        light.col[1] = Vector(1,1,1,1);
-        light.col[2] = Vector(0.0,0,0,1);
+        light.col[0] = Colour(1,1,1,1);
+        light.col[1] = Colour(1,1,1,1);
+        light.col[2] = Colour(0.0,0,0,1);
     }
     
     void resetView(){
-        view=Matrix::IDENTITY;
-        view.setTranslation(0,0,-5);
+        view=glm::translate(glm::mat4(),glm::vec3(0,0,0));
     }
         
     
@@ -39,10 +38,10 @@ struct State {
         resetLights();
         resetView();
         fog.enabled = false;
-        fog.color = Vector(0,0,0,1);
+        fog.colour = Colour(0,0,0,1);
         fog.neardist = 10000;
         fog.fardist = 20000;
-        diffuse2 = Vector(1,1,1,1);
+        diffuse2 = Colour(1,1,1,1);
         texture = NULL;
         texture2 = NULL;
         overrides = 0;
@@ -53,23 +52,23 @@ struct State {
     /// LIGHT states
     struct
     {
-        Vector ambient;
-        Vector col[3];
-        Vector dir[3];
+        Colour ambient;
+        Colour col[3];
+        glm::vec3 dir[3];
     } light;
     
     
     /// FOG states
     struct
     {
-        Vector color;
+        Colour colour;
         float neardist; // these two are processed as a float[2] array.
         float fardist;  // so don't reorder or separate them
         bool enabled;
     } fog;
     
     /// view matrix
-    Matrix view;
+    glm::mat4 view;
     
     // texture if any (overrides material)
     class Texture *texture;
@@ -77,7 +76,7 @@ struct State {
     
     // extra stuff
     class Texture *texture2;
-    Vector diffuse2;
+    Colour diffuse2;
     
     // other overrides are determined by some flags
     
@@ -88,7 +87,7 @@ struct State {
 // other booleans
 #define STM_ADDITIVE 1
     int modes;
-    Vector diffuse; // w is ignored; it gets overwritten by alpha
+    Colour diffuse; // w is ignored; it gets overwritten by alpha
     float alpha;
     
 };

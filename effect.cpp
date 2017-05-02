@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170502.2113>
+//  Last Modified : <170502.2230>
 //
 //  Description	
 //
@@ -34,11 +34,15 @@
 
 #include "effect.h"
 #include "state.h"
+#include <glm/gtc/matrix_inverse.hpp>
 
 #include <stdio.h>
 
 StateManager *StateManager::instance = NULL;
 EffectManager *EffectManager::instance = NULL;
+
+
+glm::mat4 EffectManager::projection;
 
 /**
  * Effect manager initialisation - shader loading
@@ -392,35 +396,30 @@ void Effect::getAttributes(){
         mWorldViewIdx = getUniform("matWorldView");
 }
 
-void Effect::setWorldMatrix(Matrix *world){
-    Matrix modelview,worldviewproj;
+void Effect::setWorldMatrix(glm::mat4 *world){
+    glm::mat4 modelview,worldviewproj;
     
     State *s = StateManager::getInstance()->get();
     
     // these have to be FULL multiplies!
-    
-    modelview.mulF(*world,s->view);
-    worldviewproj.mulF(modelview,Matrix::Projection);
+    modelview = s->view * (*world);
+    worldviewproj = EffectManager::projection * modelview;
     
     if(has(EDU_WORLDVIEWPROJ))
         glUniformMatrix4fv(mWorldViewProjIdx,1,
-                       GL_FALSE,(float *)&worldviewproj);
+                       GL_FALSE,&worldviewproj[0][0]);
     
     if(has(EDU_WORLDVIEW)){
         glUniformMatrix4fv(mWorldViewIdx,1,
-                           GL_FALSE,(float *)&modelview);
+                           GL_FALSE,&modelview[0][0]);
     
     }
     
     // set up the normal matrix
     
     if(has(EDU_NORMMAT)){
-        Matrix m,m2;
-        m=modelview;
-        m.invert(modelview);
-        float arr[9];
-        m.copyRotToFloatArrayTrans(arr);
-        glUniformMatrix3fv(mNormalMatIdx,1,GL_FALSE,arr);
+        glm::mat3 m = glm::inverseTranspose(glm::mat3(modelview));
+        glUniformMatrix3fv(mNormalMatIdx,1,GL_FALSE,&m[0][0]);
     }
     
     if(has(EDU_DIFFLIGHTS)){
@@ -430,18 +429,16 @@ void Effect::setWorldMatrix(Matrix *world){
     
         // transform light into view space
     
-        Vector v;
-        Matrix m = s->view;
-        m.setTranslation(0,0,0);
+        glm::vec3 v;
+        glm::mat3 m = glm::mat3(s->view);
+        
+        v = m*s->light.dir[0];
+        glUniform3fv(LightDir1Idx,1,&v[0]);
+        v = m*s->light.dir[1];
+        glUniform3fv(LightDir2Idx,1,&v[0]);
+        v = m*s->light.dir[2];
+        glUniform3fv(LightDir3Idx,1,&v[0]);
     
-        v.transform(s->light.dir[0],m);
-        glUniform3fv(LightDir1Idx,1,(float *)&v);
-    
-        v.transform(s->light.dir[1],m);
-        glUniform3fv(LightDir2Idx,1,(float *)&v);
-    
-        v.transform(s->light.dir[2],m);
-        glUniform3fv(LightDir3Idx,1,(float *)&v);
     }
 }
 
@@ -454,7 +451,7 @@ void Effect::setUniforms(){
     }
     
     if(has(EDU_FOG)){
-        glUniform4fv(FogColIdx,1,(float *)&s->fog.color);
+        glUniform4fv(FogColIdx,1,(float *)&s->fog.colour);
         glUniform2fv(FogDistIdx,1,(float *)&s->fog.neardist);
     }
     if(has(EDU_DIFFUSE2)){
