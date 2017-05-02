@@ -7,6 +7,10 @@
 #ifndef __EXCEPTION_H
 #define __EXCEPTION_H
 
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+#include "gfx.h"
 #include <exception>
 
 class Exception : public std::exception {

@@ -7,7 +7,7 @@
 #include <exception>
 
 #include "gfx.h"
-#include "shader.h"
+#include "effect.h"
 
 // Shader sources
 const GLchar* vertexSource =
@@ -27,7 +27,7 @@ const GLchar* fragmentSource =
 
 int main(int argc, char** argv)
 {
-    // SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO);
 
     auto wnd(
         SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
     auto rdr = SDL_CreateRenderer(
         wnd, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-
+/*
     // Create Vertex Array Object
     GLuint vao;
     glGenVertexArrays(1, &vao);
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
     GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    
+*/    
     while(1)
     {
         SDL_Event e;
