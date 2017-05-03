@@ -13,6 +13,7 @@
 #include "font.h"
 
 #include "screen.h"
+#include "grid.h"
 
 #define VERSION "Ochre 0.0 pre-alpha0"
 

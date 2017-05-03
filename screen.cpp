@@ -10,7 +10,7 @@
 
 Screen *Screen::instance = NULL;
 
-#define FULLSCREEN 1
+#define FULLSCREEN 0
 Screen::Screen(int ww,int hh){
     if(instance)
         FATAL("cannot create multiple screens");
