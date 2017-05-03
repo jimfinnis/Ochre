@@ -1,0 +1,2 @@
+- mipmap generation on textures
+- speed up quad rendering with queueing
