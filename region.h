@@ -20,6 +20,8 @@ struct Region {
         x=-1; y=-1;w=1;h=1;
     }
     
+    static Region *current;
+    
     virtual void resize(int xx,int yy,int ww,int hh){
         x=xx;y=yy;w=ww;h=hh;
     }

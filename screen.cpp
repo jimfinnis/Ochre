@@ -6,8 +6,15 @@
 
 #include "gfx.h"
 #include "screen.h"
+#include "exception.h"
+
+Screen *Screen::instance = NULL;
 
 Screen::Screen(int ww,int hh){
+    if(instance)
+        FATAL("cannot create multiple screens");
+    instance = this;
+    
     SDL_Init(SDL_INIT_VIDEO);
     
     wnd = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, 

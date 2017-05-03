@@ -8,10 +8,13 @@
 #include "region.h"
 #include "effect.h"
 
+Region *Region::current = NULL;
+
 void Region::setvp(){
     glViewport(x,y,w,h);
     glScissor(x,y,w,h);
     glEnable(GL_SCISSOR_TEST);
+    current = this;
 }
 
 void Region::set(){

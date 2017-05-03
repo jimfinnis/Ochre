@@ -14,12 +14,21 @@
  */
 
 class Screen {
+    friend class Font;
+    
+    SDL_Renderer *rdr;
     SDL_Window *wnd;
     SDL_GLContext glc;
-    SDL_Renderer *rdr;
     int w,h;
     
+    static Screen *instance;
+    
 public:
+    
+    static Screen *getInstance(){
+        return instance;
+    }
+    
     /// status bar across the top
     Region stat;
     /// toolbar on the left
