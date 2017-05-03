@@ -25,6 +25,12 @@ const GLchar* fragmentSource =
     "  gl_FragColor = vec4 (1.0, 1.0, 1.0, 1.0 );\n"
     "}                                            \n";
 
+void setViewport(int x,int y,int w,int h){
+    glViewport(x,y,w,h);
+    glScissor(x,y,w,h);
+    glEnable(GL_SCISSOR_TEST);
+}
+    
 
 
 int main(int argc, char** argv)
@@ -40,12 +46,14 @@ int main(int argc, char** argv)
     SDL_GL_SetSwapInterval(0);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
+    
     auto glc = SDL_GL_CreateContext(wnd);
 
     auto rdr = SDL_CreateRenderer(
         wnd, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
     
+    // set the viewport
+    setViewport(0,0,320,240);
     
     // Create Vertex Array Object
     GLuint vao;
@@ -72,6 +80,7 @@ int main(int argc, char** argv)
     // load meshes
     ObjMesh *test = new ObjMesh("media/meshes/plane","plane.obj");
     
+
     while(1)
     {
         SDL_Event e;
