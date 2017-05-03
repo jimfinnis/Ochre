@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170502.2230>
+//  Last Modified : <170503.1626>
 //
 //  Description	
 //
@@ -53,8 +53,13 @@ EffectManager::EffectManager(){
                        EDA_POS|EDA_NORM|
                        EDU_WORLDVIEWPROJ|EDU_NORMMAT|EDU_DIFFUSECOL|
                        EDU_DIFFLIGHTS|EDU_AMBLIGHT|EDU_FOG);
-    
     untex->init();
+    
+    flattex = new Effect("media/flattex.shr",
+                         EDA_POS|EDA_TEXCOORDS|
+                         EDU_SAMPLER|EDU_WORLDVIEWPROJ|EDU_DIFFUSECOL);
+    
+    flattex->init();
 }
 
 
@@ -77,6 +82,7 @@ static int loadShader(GLenum type,const char *src)
     ERRCHK;
     if(!shader)
         return 0;
+    printf("---------------------\n%s\n------------------\n",src);
     glShaderSource(shader,1,&src,NULL);
     glCompileShader(shader);
     glGetShaderiv(shader,GL_COMPILE_STATUS,&compiled);
@@ -239,8 +245,9 @@ void Effect::initFromFile(){
     long size = ftell(a);
     fseek(a,0,SEEK_SET);
     
-    char *str = (char *)malloc(size);
+    char *str = (char *)malloc(size+1);
     fread(str,size,1,a);
+    str[size]=0;
     fclose(a);
     
     char *vshad,*fshad,*gshad=NULL;
@@ -405,14 +412,15 @@ void Effect::setWorldMatrix(glm::mat4 *world){
     modelview = s->view * (*world);
     worldviewproj = EffectManager::projection * modelview;
     
-    if(has(EDU_WORLDVIEWPROJ))
+    if(has(EDU_WORLDVIEWPROJ)){
         glUniformMatrix4fv(mWorldViewProjIdx,1,
-                       GL_FALSE,&worldviewproj[0][0]);
-    
+                           GL_FALSE,&worldviewproj[0][0]);
+        ERRCHK;
+    }
     if(has(EDU_WORLDVIEW)){
         glUniformMatrix4fv(mWorldViewIdx,1,
                            GL_FALSE,&modelview[0][0]);
-    
+        ERRCHK;
     }
     
     // set up the normal matrix
@@ -420,6 +428,7 @@ void Effect::setWorldMatrix(glm::mat4 *world){
     if(has(EDU_NORMMAT)){
         glm::mat3 m = glm::inverseTranspose(glm::mat3(modelview));
         glUniformMatrix3fv(mNormalMatIdx,1,GL_FALSE,&m[0][0]);
+        ERRCHK;
     }
     
     if(has(EDU_DIFFLIGHTS)){
@@ -459,23 +468,42 @@ void Effect::setUniforms(){
         ERRCHK;
     }
     if(has(EDU_SAMPLER2)){
-        // tell sampler to use unit 1 with this texture
-//        s->texture2->use(mSampler2Idx,1);
+        glActiveTexture(GL_TEXTURE1);
+        SDL_GL_BindTexture(s->texID1,NULL,NULL);
+        glUniform1i(mSampler2Idx,1);
         ERRCHK;
     }
 }    
 
-void Effect::setMaterial(float *diffuse,class Texture *texture)
+void Effect::setMaterial(const float *diffuse,SDL_Texture *texture)
 {
     State *s = StateManager::getInstance()->get();
     if(has(EDU_DIFFUSECOL)){
+        float col[4];
+        if(s->overrides & STO_DIFFUSE)
+            diffuse = (float *)(&s->diffuse);
+        if(s->overrides & STO_ALPHA){
+            col[0]=diffuse[0];
+            col[1]=diffuse[1];
+            col[2]=diffuse[2];
+            col[3]=s->alpha;
+            diffuse = col;
+        }
+                  
         glUniform4fv(mDiffuseIdx,1,diffuse);
         ERRCHK;
     }
     
     if(has(EDU_SAMPLER) && texture){
-//        texture->use(mSamplerIdx,0); // tell sampler to use unit 0, with the given texture
+        if(s->texID0)texture=s->texID0; // texture override
+        glActiveTexture(GL_TEXTURE0);
         ERRCHK;
+        SDL_GL_BindTexture(texture,NULL,NULL);
+        ERRCHK;
+        glUniform1i(mSamplerIdx,0);
+        ERRCHK;
+        glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     }
     if(s->modes & STM_ADDITIVE)
         glBlendFunc(GL_SRC_ALPHA,GL_ONE);
@@ -491,17 +519,18 @@ void Effect::setMaterial(float *diffuse,class Texture *texture)
  * 
  ****************************************************************************/
 
-void Effect::setArrayPointersPrelit(PRELITVERTEX *v)
+void Effect::setArrayOffsetsPrelit()
 {
-    float *p = (float *)v;
     // sets array *values*
     if(has(EDA_POS)){
-        glVertexAttribPointer(mPosIdx,3,GL_FLOAT,GL_FALSE,sizeof(PRELITVERTEX),p); // attr, size, type, norm, stride, ptr
+        glVertexAttribPointer(mPosIdx,3,GL_FLOAT,GL_FALSE,
+                              sizeof(PRELITVERTEX),(const void *)offsetof(PRELITVERTEX,x));
         glEnableVertexAttribArray(mPosIdx);
     }
     
     if(has(EDA_TEXCOORDS)){
-        glVertexAttribPointer(mTexCoordIdx,2,GL_FLOAT,GL_FALSE,sizeof(PRELITVERTEX),p+3); // attr, size, type, norm, stride, ptr
+        glVertexAttribPointer(mTexCoordIdx,2,GL_FLOAT,GL_FALSE,
+                              sizeof(PRELITVERTEX),(const void *)offsetof(PRELITVERTEX,u));
         glEnableVertexAttribArray(mTexCoordIdx);
     }
 }

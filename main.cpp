@@ -10,12 +10,15 @@
 #include "effect.h"
 #include "state.h"
 #include "obj.h"
+#include "font.h"
 
 #include "screen.h"
 
+#define VERSION "Ochre 0.0 pre-alpha0"
+
 int main(int argc, char** argv)
 {
-    Screen scr(640,480);
+    Screen scr(800,600);
     
 //    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
@@ -24,18 +27,25 @@ int main(int argc, char** argv)
     // load the effects by starting the effect manager
     EffectManager::getInstance();
     
+    Font::init();
+    
     // load meshes
     ObjMesh *test = new ObjMesh("media/meshes/plane","plane.obj");
     
-
-    while(1)
+    Font *font = new Font("media/fonts/Quicksand-Regular.otf",100);
+    
+    bool running=true;
+    while(running)
     {
         SDL_Event e;
         while(SDL_PollEvent(&e))
         {
             switch(e.type){
             case SDL_QUIT:
-                std::terminate();
+                running = false;
+                break;
+            case SDL_KEYDOWN:
+                if(e.key.keysym.sym=='q')running = false;
                 break;
             case SDL_WINDOWEVENT:
                 switch(e.window.event){
@@ -47,8 +57,6 @@ int main(int argc, char** argv)
                 break;
             }
         }
-        
-        printf("foo\n");
         
         /* Clear the color and depth buffers. */
         glDisable(GL_SCISSOR_TEST);
@@ -65,6 +73,11 @@ int main(int argc, char** argv)
         StateManager *sm = StateManager::getInstance();
         sm->reset();
         
+        scr.stat.set();
+        font->render(10,20,30,VERSION);
+        
+        scr.game.set();
+        
         MatrixStack *ms = sm->getx();
         ms->push();
         
@@ -73,6 +86,7 @@ int main(int argc, char** argv)
         // draw here!
         test->render(sm->getx()->top());
         ms->pop();
+        
         
         scr.swap();
         

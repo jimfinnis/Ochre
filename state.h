@@ -10,6 +10,7 @@
 #ifndef __STATE_H
 #define __STATE_H
 
+#include "gfx.h"
 #include "maths.h"
 
 /// the current state
@@ -42,8 +43,7 @@ struct State {
         fog.neardist = 10000;
         fog.fardist = 20000;
         diffuse2 = Colour(1,1,1,1);
-        texture = NULL;
-        texture2 = NULL;
+        texID0 = texID1 = NULL;
         overrides = 0;
         modes = 0;
         effect = NULL;
@@ -70,8 +70,8 @@ struct State {
     /// view matrix
     glm::mat4 view;
     
-    // texture if any (overrides material)
-    class Texture *texture;
+    // texture if any (texID0 overrides material)
+    SDL_Texture *texID0,*texID1;
     class Effect *effect;
     
     // extra stuff

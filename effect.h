@@ -24,14 +24,12 @@ public:
     /// set the transformation uniforms
     void setWorldMatrix(glm::mat4 *world);
     /// set material uniforms
-    void setMaterial(float *diffuse,class Texture *texture);
+    void setMaterial(const float *diffuse,SDL_Texture* texture=NULL);
     /// set envmap colour and alpha
     void setMapCol(float *col);
     
-    /// set up the GL array pointers for prelit data
-    /// NOT USED - might never be, and would be changed
-    /// to offsets anyway.
-    void setArrayPointersPrelit(PRELITVERTEX *v);
+    /// set up the array offsets for lit vertices
+    void setArrayOffsetsPrelit();
     
     /// set up the array offsets for unlit vertices
     void setArrayOffsetsUnlit();
@@ -161,6 +159,7 @@ public:
     }
     
     Effect *untex; // untextured mesh, to be lit
+    Effect *flattex; // prelit textured surface (for text rendering etc.)
 };
 
 

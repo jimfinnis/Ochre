@@ -12,8 +12,10 @@
 
 /// a region of the screen which can be set to a GL viewport;
 /// setting it will set a pixel-space ortho projection
+/// flipped so topleft = 0,0
+
 struct Region {
-    int x,y,w,h;
+    float x,y,w,h;
     
     Region(){
         // initially invalid
@@ -45,6 +47,8 @@ struct Region {
     /// set and clear the region to a colour (also the depth buffer).
     void setAndClear(const Colour& c);
     
+    /// render a quad into the region using its coordinates (not for iso!)
+    void renderQuad(float x,float y,float w,float h,SDL_Texture *tex);
 };
 
 /// as above, but sets an isometric projection

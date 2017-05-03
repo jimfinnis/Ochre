@@ -19,7 +19,8 @@ void Region::setvp(){
 
 void Region::set(){
     setvp();
-    EffectManager::projection = glm::ortho(0,w,0,h,-1,1);
+    EffectManager::projection = glm::ortho(0.0f,w,h,0.0f,-1.0f,1.0f);
+//    EffectManager::projection = glm::ortho(0.0f,w,0.0f,h,-1.0f,1.0f);
 }
 
 void Region::setAndClear(const Colour& c){
@@ -29,6 +30,51 @@ void Region::setAndClear(const Colour& c){
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
 }
+
+static const float whiteCol[] = {1,1,1,1};
+static PRELITVERTEX quad[] = {
+    {0,0,0, 0,0},
+    {0,1,0, 0,1},
+    {1,1,0, 1,1},
+    {1,1,0, 1,1},
+    {1,0,0, 1,0},
+    {0,0,0, 0,0},
+};
+        
+void Region::renderQuad(float x,float y,float w,float h,SDL_Texture *tex){
+    EffectManager *em = EffectManager::getInstance();
+    em->flattex->begin();
+    glm::mat4 id;
+    em->flattex->setWorldMatrix(&id);
+    em->flattex->setMaterial(whiteCol,tex);
+    
+    PRELITVERTEX *p = quad;
+    p->x = x;	p->y = y;  p++;
+    p->x = x;	p->y = y+h;p++;
+    p->x = x+w;	p->y = y+h;p++;
+    p->x = x+w;	p->y = y+h;p++;
+    p->x = x+w;	p->y = y  ;p++;
+    p->x = x;	p->y = y;
+    
+    GLuint vbo;
+    glGenBuffers(1,&vbo);
+    ERRCHK;
+    glBindBuffer(GL_ARRAY_BUFFER,vbo);
+    ERRCHK;
+    glBufferData(GL_ARRAY_BUFFER,sizeof(PRELITVERTEX)*6,&quad[0],GL_STATIC_DRAW);
+    ERRCHK;
+    
+    em->flattex->setArrayOffsetsPrelit();
+    
+    glDrawArrays(GL_TRIANGLES,0,6);
+    ERRCHK;
+    
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+    glDeleteBuffers(1,&vbo);
+    
+    em->flattex->end();
+}
+
 
 void IsoRegion::set(){
     setvp();

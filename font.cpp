@@ -5,7 +5,6 @@
  */
 
 #include "gfx.h"
-#include <SDL2/SDL_ttf.h>
 #include <stdarg.h>
 
 #include "screen.h"
@@ -17,6 +16,10 @@ Font::Font(const char *file,int size){
     if(!font)
         throw Exception().set("Cannot open %s at size %d",file,size);
 }
+
+void Font::init(){
+    TTF_Init();
+}    
 
 static const SDL_Color textcol = {255,255,255,255};
 
@@ -35,7 +38,17 @@ void Font::render(float x,float y,float h,const char *s,...){
         FATAL("texture blend mode not supported");
     SDL_FreeSurface(tmp);
     
+    int ww,hh;
+    if(TTF_SizeUTF8(font,buf,&ww,&hh))
+        FATAL("cannot get string size");
+    float texw=ww,texh=hh;
+        
+    ERRCHK;
     
-    // and render it...
+    float r = texw/texh;
+    
+    Region::current->renderQuad(x,y,h*r,h,tex);
+    
+    SDL_DestroyTexture(tex);
     
 }
