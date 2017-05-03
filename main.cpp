@@ -10,48 +10,12 @@
 #include "effect.h"
 #include "state.h"
 #include "obj.h"
-
-// Shader sources
-const GLchar* vertexSource =
-    "attribute vec4 position;    \n"
-    "void main()                  \n"
-    "{                            \n"
-    "   gl_Position = vec4(position.xyz, 1.0);  \n"
-    "}                            \n";
-const GLchar* fragmentSource =
-//    "precision mediump float;\n"
-    "void main()                                  \n"
-    "{                                            \n"
-    "  gl_FragColor = vec4 (1.0, 1.0, 1.0, 1.0 );\n"
-    "}                                            \n";
-
+#include "screen.h"
 
 
 int main(int argc, char** argv)
 {
-    SDL_Init(SDL_INIT_VIDEO);
-
-    auto wnd(
-        SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-            640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN));
-
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    SDL_GL_SetSwapInterval(0);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
-    auto glc = SDL_GL_CreateContext(wnd);
-
-    auto rdr = SDL_CreateRenderer(
-        wnd, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-    
-    
-    // Create Vertex Array Object
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    
+    Screen scr(640,480);
     
     EffectManager::projection = glm::perspective(glm::radians(45.0f),
                                                  640.0f/480.0f,
@@ -77,7 +41,19 @@ int main(int argc, char** argv)
         SDL_Event e;
         while(SDL_PollEvent(&e))
         {
-            if(e.type == SDL_QUIT) std::terminate();
+            switch(e.type){
+            case SDL_QUIT:
+                std::terminate();
+                break;
+            case SDL_WINDOWEVENT:
+                switch(e.window.event){
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    scr.resize(e.window.data1,
+                               e.window.data2);
+                    break;
+                }
+                break;
+            }
         }
         
         printf("foo\n");
@@ -99,8 +75,8 @@ int main(int argc, char** argv)
         test->render(sm->getx()->top());
         ms->pop();
         
+        scr.swap();
         
-        SDL_GL_SwapWindow(wnd);
     };
 
     return 0;
