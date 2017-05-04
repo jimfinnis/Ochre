@@ -12,19 +12,22 @@
 #include "obj.h"
 #include "font.h"
 
+#include "context.h"
 #include "screen.h"
 #include "grid.h"
 #include "meshes.h"
 #include "time.h"
+#include "globals.h"
 
-#define VERSION "Ochre 0.0 pre-alpha0"
+#include "gamescreen.h"
+
 bool debugtoggle=false;
 
-Grid *grid;
+Screen *curscreen;
 
 int main(int argc, char** argv)
 {
-    Screen scr(800,600);
+    Context context(800,600);
     
 //    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
@@ -35,8 +38,9 @@ int main(int argc, char** argv)
     Time::init();
     Font::init();
     
-    Font *font = new Font("media/fonts/Quicksand-Regular.otf",100);
-    grid = new Grid();
+    globals::init();
+    
+    curscreen = new GameScreen();
     
     mesh::load();
     
@@ -52,7 +56,10 @@ int main(int argc, char** argv)
                 break;
             case SDL_KEYDOWN:
                 if(e.key.keysym.sym=='q')running = false;
-                if(e.key.keysym.sym=='t'){delete grid;grid = new Grid();}
+                if(e.key.keysym.sym=='t'){
+                    delete globals::grid;
+                    globals::grid = new Grid();
+                }
                 if(e.key.keysym.sym=='d')debugtoggle=!debugtoggle;
                 break;
             case SDL_MOUSEMOTION:
@@ -62,8 +69,8 @@ int main(int argc, char** argv)
             case SDL_WINDOWEVENT:
                 switch(e.window.event){
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    scr.resize(e.window.data1,
-                               e.window.data2);
+                    context.resize(e.window.data1,
+                                   e.window.data2);
                     break;
                 }
                 break;
@@ -75,21 +82,20 @@ int main(int argc, char** argv)
         glClearColor(0,0,1,0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         
-        // draw regions
-        scr.stat.setAndClear(Colour(0,0.5,0,1));
-        scr.tool.setAndClear(Colour(0,0,0.5,1));
-        
-        
         // reset the state manager
         StateManager *sm = StateManager::getInstance();
         sm->reset();
         
-        scr.stat.set();
-        font->render(10,20,30,VERSION);
+        // draw regions
+//        scr.stat.setAndClear(Colour(0,0.5,0,1));
+//        scr.tool.setAndClear(Colour(0,0,0.5,1));
         
-        scr.game.render();
         
-        scr.swap();
+//        scr.stat.set();
+        
+        curscreen->render();
+        
+        context.swap();
         
     };
 

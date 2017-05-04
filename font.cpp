@@ -7,7 +7,7 @@
 #include "gfx.h"
 #include <stdarg.h>
 
-#include "screen.h"
+#include "context.h"
 #include "font.h"
 #include "exception.h"
 
@@ -33,7 +33,7 @@ void Font::render(float x,float y,float h,const char *s,...){
     
     SDL_Surface *tmp = TTF_RenderUTF8_Blended(font,buf,textcol);
     
-    SDL_Texture *tex = SDL_CreateTextureFromSurface(Screen::getInstance()->rdr,tmp);
+    SDL_Texture *tex = SDL_CreateTextureFromSurface(Context::getInstance()->rdr,tmp);
     if(SDL_SetTextureBlendMode(tex,SDL_BLENDMODE_BLEND))
         FATAL("texture blend mode not supported");
     SDL_FreeSurface(tmp);

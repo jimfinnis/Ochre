@@ -23,12 +23,14 @@ public:
     float x,y,w,h;
     
     static void notifyMouseMove(int x,int y);
+    static void notifyResize();
     
     Region(const char *nm);
     virtual ~Region();
     
     static Region *current;
     
+    // called both on resize and initialisation
     virtual void resize(int xx,int yy,int ww,int hh){
         x=xx;y=yy;w=ww;h=hh;
     }

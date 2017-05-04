@@ -6,7 +6,7 @@
 
 #include "gfx.h"
 #include "region.h"
-#include "screen.h"
+#include "context.h"
 #include "effect.h"
 
 Region *Region::current = NULL;
@@ -14,9 +14,9 @@ Region *Region::current = NULL;
 std::vector<Region *> Region::regions;
 
 void Region::notifyMouseMove(int x,int y){
-    Screen *scr = Screen::getInstance();
+    Context *c = Context::getInstance();
     // first switch to GL device coords (sigh)
-    y = scr->h - y;
+    y = c->h - y;
     // then go through the regions
     
     std::vector<Region *>::iterator i;

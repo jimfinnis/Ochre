@@ -6,12 +6,12 @@
 #include "gameregion.h"
 #include "state.h"
 #include "grid.h"
+#include "globals.h"
 
 void GameRegion::onMouseMove(int x,int y){
 }
 
 void GameRegion::render(){
-    extern Grid *grid;
     setAndClear(Colour(0,0,0.2,1));
     
     // reset the state manager
@@ -23,9 +23,9 @@ void GameRegion::render(){
     
     ms->mul(glm::translate(glm::mat4(),glm::vec3(0.0f,0.0f,-0.0f)));
     
-    grid->genTriangles(20,20,8);
-    grid->render(sm->getx()->top());
-    grid->renderHighlight(20,20);
+    globals::grid->genTriangles(20,20,8);
+    globals::grid->render(sm->getx()->top());
+    globals::grid->renderHighlight(20,20);
     
     ms->pop();
     
