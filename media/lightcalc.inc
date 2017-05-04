@@ -7,6 +7,9 @@
     col += uLight3Col * max(dot(normal,uLight3Dir),0.0);
     vCol = colDiffuse * col + uAmbient;
     
+    
+    vCol.w = col.w;
+    
     vCol = min(vCol,1.0);
     
     float eyedist = gl_Position.z;

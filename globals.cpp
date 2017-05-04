@@ -14,5 +14,5 @@ int globals::cursorx,globals::cursory;
 
 // initialise those globals which need it
 void globals::init(){
-    font = new Font("media/fonts/Quicksand-Regular.otf",100);
+    font = new Font("media/fonts/Quicksand-Regular.otf",20);
 }

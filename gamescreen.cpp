@@ -44,10 +44,11 @@ void GameScreen::onKeyDown(int k){
         globals::cursorx++;break;
     case SDLK_LEFT:
         globals::cursorx--;break;
+        // these are backwards because right-handed coord system: +ve z is into the screen
     case SDLK_UP:
-        globals::cursory++;break;
-    case SDLK_DOWN:
         globals::cursory--;break;
+    case SDLK_DOWN:
+        globals::cursory++;break;
     default:
         printf("%d\n",k);
     }

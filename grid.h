@@ -29,9 +29,9 @@ class Grid {
             FATAL("Too many verts in grid!");
         
         UNLITVERTEX *vv = verts+(vertct++);
-        vv->x = x*scaleFactor;
-        vv->y = y*heightFactor*scaleFactor;
-        vv->z = z*scaleFactor;
+        vv->x = x;
+        vv->y = y*heightFactor;
+        vv->z = z;
         vv->u = u;
         vv->v = v;
         return vv;
@@ -43,7 +43,6 @@ class Grid {
     
 public:
     
-    float scaleFactor;  // all coords are multiplied by this
     float heightFactor; // y is also multiplied by this
     
     Grid();

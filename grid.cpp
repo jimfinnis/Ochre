@@ -18,7 +18,6 @@
 #include <glm/gtx/normal.hpp>
 
 Grid::Grid(){
-    scaleFactor = 0.3f;
     heightFactor = 0.2f;
     vbo=0;
     
@@ -95,15 +94,15 @@ void Grid::genTriangles(int cx,int cy,int range){
 #define BASE -10
             if(abs(ox)+abs(oy)==range-1){
                 if(ox==0){
-                    if(oy<0){
+                    if(oy>0){
                         // add base poly for front wedge
-                        v0 = addvert(x0,h01,y1,0,0);
-                        v1 = addvert(x1,h11,y1,1,0);
-                        v2 = addvert(x0,BASE,y1,1,0);
+                        v0 = addvert(x0,BASE,y0,1,0);
+                        v1 = addvert(x1,h10,y0,1,0);
+                        v2 = addvert(x0,h00,y0,0,0);
                         calcnormal(v0,v1,v2);
-                        v2 = addvert(x0,BASE,y1,1,0);
-                        v1 = addvert(x1,BASE,y1,1,0);
-                        v0 = addvert(x1,h11,y1,0,0);
+                        v0 = addvert(x0,BASE,y0,1,0);
+                        v1 = addvert(x1,BASE,y0,1,0);
+                        v2 = addvert(x1,h10,y0,0,0);
                         calcnormal(v0,v1,v2);
                     }
                 }
@@ -114,21 +113,21 @@ void Grid::genTriangles(int cx,int cy,int range){
                         v1 = addvert(x1,h11,y1,1,1);
                         v2 = addvert(x1,h10,y0,1,0);
                         calcnormal(v0,v1,v2);
-                        // base polys
-                        v0 = addvert(x0,h01,y1,0,1);
-                        v1 = addvert(x1,h10,y0,1,1);
-                        v2 = addvert(x1,BASE,y0,1,0);
-                        calcnormal(v0,v1,v2);
-                        v0 = addvert(x0,BASE,y1,0,0);
-                        v1 = addvert(x0,h01,y1,0,1);
-                        v2 = addvert(x1,BASE,y0,1,0);
-                        calcnormal(v0,v1,v2);
+                        // no base polys in these cases; they would be hidden
                     } else {
                         v0 = addvert(x0,h00,y0,0,0);
                         v1 = addvert(x1,h11,y1,1,1);
                         v2 = addvert(x1,h10,y0,1,0);
                         calcnormal(v0,v1,v2);
-                        // no base polys in these cases; they would be hidden
+                        // base polys
+                        v0 = addvert(x1,BASE,y1,1,0);
+                        v1 = addvert(x1,h11,y1,1,1);
+                        v2 = addvert(x0,h00,y0,0,1);
+                        calcnormal(v0,v1,v2);
+                        v0 = addvert(x1,BASE,y1,1,0);
+                        v1 = addvert(x0,h00,y0,0,1);
+                        v2 = addvert(x0,BASE,y0,0,0);
+                        calcnormal(v0,v1,v2);
                     }
                 } else {
                     if(oy==0){}
@@ -137,21 +136,21 @@ void Grid::genTriangles(int cx,int cy,int range){
                         v1 = addvert(x0,h01,y1,0,1);
                         v2 = addvert(x1,h11,y1,1,1);
                         calcnormal(v0,v1,v2);
-                        // base polys
-                        v0 = addvert(x0,h00,y0,0,1);
-                        v1 = addvert(x1,h11,y1,1,1);
-                        v2 = addvert(x1,BASE,y1,1,0);
-                        calcnormal(v0,v1,v2);
-                        v0 = addvert(x0,h00,y0,0,1);
-                        v1 = addvert(x1,BASE,y1,1,0);
-                        v2 = addvert(x0,BASE,y0,0,0);
-                        calcnormal(v0,v1,v2);
+                        // no base polys in these cases; they would be hidden
                     } else {
                         v0 = addvert(x0,h00,y0,0,0);
                         v1 = addvert(x0,h01,y1,0,1);
                         v2 = addvert(x1,h10,y0,1,0);
                         calcnormal(v0,v1,v2);
-                        // no base polys in these cases; they would be hidden
+                        // base polys
+                        v0 = addvert(x1,BASE,y0,1,0);
+                        v1 = addvert(x1,h10,y0,1,1);
+                        v2 = addvert(x0,h01,y1,0,1);
+                        calcnormal(v0,v1,v2);
+                        v0 = addvert(x0,BASE,y1,0,0);
+                        v1 = addvert(x1,BASE,y0,1,0);
+                        v2 = addvert(x0,h01,y1,0,1);
+                        calcnormal(v0,v1,v2);
                     }
                 }
             } else {
@@ -244,9 +243,9 @@ void Grid::renderCursor(int x,int y){
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
     
-    float xx = (((float)(x-centrex)-0.5))*scaleFactor;
-    float yy = ((float)get(x,y))*heightFactor*scaleFactor;
-    float zz = (((float)(y-centrey)))*scaleFactor;
+    float xx = ((float)(x-centrex))-0.5;
+    float yy = ((float)get(x,y))*heightFactor;
+    float zz = (float)(y-centrey);
     
     State *s = sm->push();
     s->light.col[0] = Colour(1,1,1,1);
@@ -254,7 +253,7 @@ void Grid::renderCursor(int x,int y){
     s->light.ambient = Colour(0.7,0.7,0.7,1);
     ms->push();
     ms->translate(xx,yy,zz);
-    ms->scale(0.3*scaleFactor);
+    ms->scale(0.3);
     ms->rotY(Time::now()*2.0f);
     mesh::cursor->render(sm->getx()->top());
     ms->pop();
