@@ -14,7 +14,7 @@
 #include "screen.h"
 #include "grid.h"
 #include "meshes.h"
-
+#include "time.h"
 #include <glm/gtx/normal.hpp>
 
 Grid::Grid(){
@@ -255,6 +255,7 @@ void Grid::renderHighlight(int x,int y){
     s->light.col[1] = Colour(1,1,1,1);
     s->light.ambient = Colour(0.7,0.7,0.7,1);
     ms->push();
+    ms->mul(glm::rotate(glm::mat4(),(float)Time::now()*0.1f,glm::vec3(0.0f,1.0f,0.0f)));
     ms->mul(glm::scale(glm::mat4(),glm::vec3(0.1*scaleFactor)));
     ms->mul(glm::translate(glm::mat4(),glm::vec3(xx,yy,zz)));
     mesh::ico->render(sm->getx()->top());

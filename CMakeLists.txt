@@ -13,7 +13,8 @@ pkg_search_module(SD2_TTF REQUIRED sdl2)
 find_package(OpenGL)
 find_package(SDL2TTF)
 
-add_executable(${PROJECT_NAME} main.cpp state.cpp screen.cpp region.cpp font.cpp
+add_executable(${PROJECT_NAME} main.cpp state.cpp screen.cpp
+    region.cpp font.cpp time.cpp
     effect.cpp obj.cpp maths.cpp grid.cpp meshes.cpp)
 
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2TTF_INCLUDE_DIRS}

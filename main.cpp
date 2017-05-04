@@ -15,6 +15,7 @@
 #include "screen.h"
 #include "grid.h"
 #include "meshes.h"
+#include "time.h"
 
 #define VERSION "Ochre 0.0 pre-alpha0"
 bool debugtoggle=false;
@@ -28,7 +29,7 @@ int main(int argc, char** argv)
     
     // load the effects by starting the effect manager
     EffectManager::getInstance();
-    
+    Time::init();
     Font::init();
     
     Font *font = new Font("media/fonts/Quicksand-Regular.otf",100);

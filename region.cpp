@@ -81,8 +81,11 @@ void IsoRegion::set(){
     
     static const float pitch = -25;
     static const float yaw = 0;
+    
+    float aspect = w/h;
+    
     EffectManager::projection = 
-          glm::ortho(-2.0f,2.0f,  -2.0f,2.0f,  -10.0f,10.0f) *
+          glm::ortho(-2.0f*aspect,2.0f*aspect,  -2.0f,2.0f,  -10.0f,10.0f) *
           glm::rotate(glm::mat4(),glm::radians(pitch),glm::vec3(1.0f, 0.0f, 0.0f))*
           glm::rotate(glm::mat4(),glm::radians(yaw),glm::vec3(0.0f,1.0f,0.0f));
 }
