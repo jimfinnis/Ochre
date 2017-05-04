@@ -255,9 +255,9 @@ void Grid::renderHighlight(int x,int y){
     s->light.col[1] = Colour(1,1,1,1);
     s->light.ambient = Colour(0.7,0.7,0.7,1);
     ms->push();
-    ms->mul(glm::rotate(glm::mat4(),(float)Time::now()*2.0f,glm::vec3(0.0f,1.0f,0.0f)));
-    ms->mul(glm::scale(glm::mat4(),glm::vec3(0.2*scaleFactor)));
-    ms->mul(glm::translate(glm::mat4(),glm::vec3(xx,yy,zz)));
+    ms->rotY(Time::now()*2.0f);
+    ms->scale(0.3*scaleFactor);
+    ms->translate(xx,yy,zz);
     mesh::cursor->render(sm->getx()->top());
     ms->pop();
     sm->pop();

@@ -20,7 +20,6 @@ void Region::setvp(){
 void Region::set(){
     setvp();
     EffectManager::projection = glm::ortho(0.0f,w,h,0.0f,-1.0f,1.0f);
-//    EffectManager::projection = glm::ortho(0.0f,w,0.0f,h,-1.0f,1.0f);
 }
 
 void Region::setAndClear(const Colour& c){

@@ -255,6 +255,25 @@ public:
     void pop(); // pops stack and discards
     void mul(const glm::mat4 &m); // top = m*top
     void mulBack(const glm::mat4 &m); // top = top * m
+    
+    // these aren't ideal.
+    void translate(float x,float y,float z){
+        stack[ct] = glm::translate(glm::mat4(),glm::vec3(x,y,z))*stack[ct];
+    }
+    void rotX(float a){
+        stack[ct] = glm::rotate(glm::mat4(),a,glm::vec3(1.0f,0.0f,0.0f))*stack[ct];
+    }
+    void rotY(float a){
+        stack[ct] = glm::rotate(glm::mat4(),a,glm::vec3(0.0f,1.0f,0.0f))*stack[ct];
+    }
+    void rotZ(float a){
+        stack[ct] = glm::rotate(glm::mat4(),a,glm::vec3(0.0f,0.0f,1.0f))*stack[ct];
+    }
+    
+    void scale(float s){
+        stack[ct] = glm::scale(glm::mat4(),glm::vec3(s))*stack[ct];
+    }
+    
     glm::mat4 *top(); // get top
     void identity(); // loads into top slot
 };
