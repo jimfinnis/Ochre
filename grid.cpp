@@ -17,13 +17,19 @@
 #include <glm/gtx/normal.hpp>
 
 Grid::Grid(){
-    scaleFactor = 0.5f;
-    heightFactor = 0.25f;
+    scaleFactor = 0.3f;
+    heightFactor = 0.2f;
+    vbo=0;
+    
     memset(grid,1,GRIDSIZE*GRIDSIZE);
+    grid[20][20]=0;
+    grid[20][21]=0;
+    grid[21][20]=0;
+    grid[21][21]=0;
+//    return;
     for(int x=0;x<GRIDSIZE;x++)
         for(int y=0;y<GRIDSIZE;y++)
             grid[x][y] = rand()%2;
-    vbo=0;
 }
 
 Grid::~Grid(){
@@ -31,16 +37,20 @@ Grid::~Grid(){
 }
 
 
-static glm::vec3 calcnormal(UNLITVERTEX *v0,UNLITVERTEX *v1,UNLITVERTEX *v2){
+static void calcnormal(UNLITVERTEX *v0,UNLITVERTEX *v1,UNLITVERTEX *v2){
     glm::tvec3<float> *vv0 = reinterpret_cast<glm::tvec3<float>*>(&v0->x);
     glm::tvec3<float> *vv1 = reinterpret_cast<glm::tvec3<float>*>(&v1->x);
     glm::tvec3<float> *vv2 = reinterpret_cast<glm::tvec3<float>*>(&v2->x);
     
-    return glm::triangleNormal(*vv0,*vv1,*vv2);
+    glm::vec3 norm = glm::triangleNormal(*vv0,*vv1,*vv2);
+    v0->nx = v1->nx = v2->nx = norm.x;
+    v0->ny = v1->ny = v2->ny = norm.y;
+    v0->nz = v1->nz = v2->nz = norm.z;
     
 }
 
 void Grid::genTriangles(int cx,int cy,int range){
+    extern bool debugtoggle;
     // First we need to make the vertex data. One useful thing is that we know
     // that each node in the grid cannot be more than 1 different from each of
     // its 8-neighbours. Given that constraint, there are only a few possible
@@ -53,59 +63,121 @@ void Grid::genTriangles(int cx,int cy,int range){
     // in order so there's no point even having an index buffer.
     
     initGridVerts();
-    for(int x=cx-range;x<cx+range;x++){
-        for(int y=cy-range;y<cy+range;y++){
+    for(int ox=-range;ox<range;ox++){
+        for(int oy=-range;oy<range;oy++){
+            
+            if(abs(ox)+abs(oy)>=range)continue;
+            
+            int x = cx+ox;
+            int y = cy+oy;
+            
             int h00 = get(x,y);
             int h10 = get(x+1,y);
             int h11 = get(x+1,y+1);
             int h01 = get(x,y+1);
             
-            float x0 = (float)(x-cx);
-            float x1 = (float)(x-cx+1);
-            float y0 = (float)(y-cy);
-            float y1 = (float)(y-cy+1);
+            // get the vertex coords (adding correction)
+            float x0 = (float)ox-0.5;
+            float x1 = (float)(ox+0.5);
+            float y0 = (float)oy;
+            float y1 = (float)(oy+1);
             
             glm::vec3 norm;
             UNLITVERTEX *v0,*v1,*v2;
             
 //            printf("%d %d %d %d\n",h00,h01,h10,h11);
-            // different triangulations for the two kinds of split
-            if(h00==h11){
-                // first triangle
-                v0 = addvert(x0,h00,y0,0,0);
-                v1 = addvert(x1,h11,y1,1,1);
-                v2 = addvert(x1,h10,y0,1,0);
-                norm = calcnormal(v0,v1,v2);
-                v0->nx = v1->nx = v2->nx = norm.x;
-                v0->ny = v1->ny = v2->ny = norm.y;
-                v0->nz = v1->nz = v2->nz = norm.z;
-//                v0->dump();v1->dump();v2->dump();
-                // second triangle
-                v0 = addvert(x0,h00,y0,0,0);
-                v1 = addvert(x0,h01,y1,0,1);
-                v2 = addvert(x1,h11,y1,1,1);
-                norm = calcnormal(v0,v1,v2);
-                v0->nx = v1->nx = v2->nx = norm.x;
-                v0->ny = v1->ny = v2->ny = norm.y;
-                v0->nz = v1->nz = v2->nz = norm.z;
-//                v0->dump();v1->dump();v2->dump();printf("\n");
+            
+            // deal with edges
+            
+#define BASE -10
+            if(abs(ox)+abs(oy)==range-1){
+                if(ox==0){
+                    if(oy<0){
+                        // add base poly for front wedge
+                        v0 = addvert(x0,h01,y1,0,0);
+                        v1 = addvert(x1,h11,y1,1,0);
+                        v2 = addvert(x0,BASE,y1,1,0);
+                        calcnormal(v0,v1,v2);
+                        v0 = addvert(x1,h11,y1,0,0);
+                        v1 = addvert(x1,BASE,y1,1,0);
+                        v2 = addvert(x0,BASE,y1,1,0);
+                        calcnormal(v0,v1,v2);
+                    }
+                }
+                else if(ox<0){
+                    if(oy==0){}
+                    else if(oy<0){
+                        v0 = addvert(x0,h01,y1,0,1);
+                        v1 = addvert(x1,h11,y1,1,1);
+                        v2 = addvert(x1,h10,y0,1,0);
+                        calcnormal(v0,v1,v2);
+                        // base polys
+                        v0 = addvert(x0,h01,y1,0,1);
+                        v1 = addvert(x1,h10,y0,1,1);
+                        v2 = addvert(x1,BASE,y0,1,0);
+                        calcnormal(v0,v1,v2);
+                        v2 = addvert(x1,BASE,y0,1,0);
+                        v0 = addvert(x0,BASE,y1,0,0);
+                        v1 = addvert(x0,h01,y1,0,1);
+                        calcnormal(v0,v1,v2);
+                    } else {
+                        v0 = addvert(x0,h00,y0,0,0);
+                        v1 = addvert(x1,h11,y1,1,1);
+                        v2 = addvert(x1,h10,y0,1,0);
+                        calcnormal(v0,v1,v2);
+                        // no base polys in these cases; they would be hidden
+                    }
+                } else {
+                    if(oy==0){}
+                    else if(oy<0){
+                        v0 = addvert(x0,h00,y0,0,0);
+                        v1 = addvert(x0,h01,y1,0,1);
+                        v2 = addvert(x1,h11,y1,1,1);
+                        calcnormal(v0,v1,v2);
+                        // base polys
+                        v0 = addvert(x0,h00,y0,0,1);
+                        v1 = addvert(x1,h11,y1,1,1);
+                        v2 = addvert(x1,BASE,y1,1,0);
+                        calcnormal(v0,v1,v2);
+                        v0 = addvert(x0,h00,y0,0,1);
+                        v1 = addvert(x1,BASE,y1,1,0);
+                        v2 = addvert(x0,BASE,y0,0,0);
+                        calcnormal(v0,v1,v2);
+                    } else {
+                        v0 = addvert(x0,h00,y0,0,0);
+                        v1 = addvert(x0,h01,y1,0,1);
+                        v2 = addvert(x1,h10,y0,1,0);
+                        calcnormal(v0,v1,v2);
+                        // no base polys in these cases; they would be hidden
+                    }
+                }
             } else {
-                // first triangle
-                v0 = addvert(x0,h00,y0,0,0);
-                v1 = addvert(x0,h01,y1,0,1);
-                v2 = addvert(x1,h10,y0,1,0);
-                norm = calcnormal(v0,v1,v2);
-                v0->nx = v1->nx = v2->nx = norm.x;
-                v0->ny = v1->ny = v2->ny = norm.y;
-                v0->nz = v1->nz = v2->nz = norm.z;
-                // second triangle
-                v0 = addvert(x0,h01,y1,0,1);
-                v1 = addvert(x1,h11,y1,1,1);
-                v2 = addvert(x1,h10,y0,1,0);
-                norm = calcnormal(v0,v1,v2);
-                v0->nx = v1->nx = v2->nx = norm.x;
-                v0->ny = v1->ny = v2->ny = norm.y;
-                v0->nz = v1->nz = v2->nz = norm.z;
+                // different triangulations for the two kinds of split
+                if(h00==h11){
+                    // first triangle
+                    v0 = addvert(x0,h00,y0,0,0);
+                    v1 = addvert(x1,h11,y1,1,1);
+                    v2 = addvert(x1,h10,y0,1,0);
+                    calcnormal(v0,v1,v2);
+                    //                v0->dump();v1->dump();v2->dump();
+                    // second triangle
+                    v0 = addvert(x0,h00,y0,0,0);
+                    v1 = addvert(x0,h01,y1,0,1);
+                    v2 = addvert(x1,h11,y1,1,1);
+                    calcnormal(v0,v1,v2);
+                    //                v0->dump();v1->dump();v2->dump();printf("\n");
+                } else {
+                    // first triangle
+                    v0 = addvert(x0,h00,y0,0,0);
+                    v1 = addvert(x0,h01,y1,0,1);
+                    v2 = addvert(x1,h10,y0,1,0);
+                    calcnormal(v0,v1,v2);
+                    // second triangle
+                    v0 = addvert(x0,h01,y1,0,1);
+                    v1 = addvert(x1,h11,y1,1,1);
+                    v2 = addvert(x1,h10,y0,1,0);
+                    calcnormal(v0,v1,v2);
+                }
             }
         }
     }
@@ -144,12 +216,19 @@ void Grid::render(glm::mat4 *world){
     // tell them about offsets
     eff->setArrayOffsetsUnlit();
     
-    static const float grayCol[] = {0.5,0.5,0.5,1};
-    static const float whiteCol[] = {1,1,1,1};
     
+    static const float whiteCol[] = {1,1,1,1};
+#if 0
+    static const float greyCol[] = {0.7,0.7,0.7,1};
+    eff->setMaterial(greyCol,NULL);
+    glDrawArrays(GL_TRIANGLES,0,vertct);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    eff->setMaterial(whiteCol,NULL);
+    glDrawArrays(GL_LINES,0,vertct);
+#else
     eff->setMaterial(whiteCol,NULL);
     glDrawArrays(GL_TRIANGLES,0,vertct);
-    glClear( GL_DEPTH_BUFFER_BIT );
+#endif
     
     glBindBuffer(GL_ARRAY_BUFFER,0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);

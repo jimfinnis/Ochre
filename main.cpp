@@ -16,7 +16,7 @@
 #include "grid.h"
 
 #define VERSION "Ochre 0.0 pre-alpha0"
-
+bool debugtoggle=false;
 int main(int argc, char** argv)
 {
     Screen scr(800,600);
@@ -34,7 +34,6 @@ int main(int argc, char** argv)
     ObjMesh *test = new ObjMesh("media/meshes/plane","plane.obj");
     Grid *grid = new Grid();
     
-    grid->genTriangles(20,20,4);
     bool running=true;
     while(running)
     {
@@ -48,6 +47,7 @@ int main(int argc, char** argv)
             case SDL_KEYDOWN:
                 if(e.key.keysym.sym=='q')running = false;
                 if(e.key.keysym.sym=='t')grid = new Grid();
+                if(e.key.keysym.sym=='d')debugtoggle=!debugtoggle;
                 break;
             case SDL_WINDOWEVENT:
                 switch(e.window.event){

@@ -7,14 +7,14 @@
 #include "state.h"
 
 void State::resetLights(){
-    light.ambient = Colour(0.1f,0.1f,0.1f,1);
+    light.ambient = Colour(0.1f,0.1f,0.2f,1);
     
-    light.dir[0] = glm::normalize(glm::vec3(-1,1,1));
-    light.dir[1] = glm::normalize(glm::vec3(1,0.4,1));
+    light.dir[0] = glm::normalize(glm::vec3(1,0.4,-1));
+    light.dir[1] = glm::normalize(glm::vec3(1,1,-1));
     light.dir[2] = glm::vec3(0,0,0);
     
-    light.col[0] = Colour(0.7,1,1,1);
-    light.col[1] = Colour(0.2,0.2,0.7,1);
+    light.col[0] = Colour(0.5,0.0,  0.0,1);
+    light.col[1] = Colour(0.5,0.3,  0.0,1);
     light.col[2] = Colour(0,0,0,1);
 }
 

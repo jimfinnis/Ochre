@@ -79,11 +79,11 @@ void Region::renderQuad(float x,float y,float w,float h,SDL_Texture *tex){
 void IsoRegion::set(){
     setvp();
     
+    static const float pitch = -25;
+    static const float yaw = 0;
     EffectManager::projection = 
           glm::ortho(-2.0f,2.0f,  -2.0f,2.0f,  -10.0f,10.0f) *
-          // the angle here determines the pitch
-          glm::rotate(glm::mat4(),glm::radians(-25.264f),glm::vec3(1.0f, 0.0f, 0.0f))*
-          // and this determines the yaw (45 for strict isometric)
-          glm::rotate(glm::mat4(),glm::radians(45.0f),glm::vec3(0.0f,1.0f,0.0f));
+          glm::rotate(glm::mat4(),glm::radians(pitch),glm::vec3(1.0f, 0.0f, 0.0f))*
+          glm::rotate(glm::mat4(),glm::radians(yaw),glm::vec3(0.0f,1.0f,0.0f));
 }
 

@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170504.1054>
+//  Last Modified : <170504.1542>
 //
 //  Description	
 //
@@ -49,7 +49,7 @@ glm::mat4 EffectManager::projection;
  */
 
 EffectManager::EffectManager(){
-    untex = new Effect("media/mesh_untex.shr",
+    untex = new Effect("media/untex.shr",
                        EDA_POS|EDA_NORM|
                        EDU_WORLDVIEWPROJ|EDU_NORMMAT|EDU_DIFFUSECOL|
                        EDU_DIFFLIGHTS|EDU_AMBLIGHT|EDU_FOG);
