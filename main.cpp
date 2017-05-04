@@ -14,6 +14,7 @@
 
 #include "screen.h"
 #include "grid.h"
+#include "meshes.h"
 
 #define VERSION "Ochre 0.0 pre-alpha0"
 bool debugtoggle=false;
@@ -31,8 +32,9 @@ int main(int argc, char** argv)
     Font::init();
     
     Font *font = new Font("media/fonts/Quicksand-Regular.otf",100);
-    ObjMesh *test = new ObjMesh("media/meshes/plane","plane.obj");
     Grid *grid = new Grid();
+    
+    mesh::load();
     
     bool running=true;
     while(running)
@@ -85,10 +87,9 @@ int main(int argc, char** argv)
         
         ms->mul(glm::translate(glm::mat4(),glm::vec3(0.0f,0.0f,-0.0f)));
         
-        // draw here!
-        //test->render(sm->getx()->top());
         grid->genTriangles(20,20,8);
         grid->render(sm->getx()->top());
+        grid->renderHighlight(20,20);
         ms->pop();
         
         

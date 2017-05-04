@@ -13,6 +13,7 @@
 
 #include "screen.h"
 #include "grid.h"
+#include "meshes.h"
 
 #include <glm/gtx/normal.hpp>
 
@@ -63,6 +64,8 @@ void Grid::genTriangles(int cx,int cy,int range){
     // in order so there's no point even having an index buffer.
     
     initGridVerts();
+    centrex=cx;centrey=cy;
+    
     for(int ox=-range;ox<range;ox++){
         for(int oy=-range;oy<range;oy++){
             
@@ -233,4 +236,29 @@ void Grid::render(glm::mat4 *world){
     glBindBuffer(GL_ARRAY_BUFFER,0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
     eff->end();
+    
+    
+}
+
+void Grid::renderHighlight(int x,int y){
+    // render any highlight
+    
+    StateManager *sm = StateManager::getInstance();
+    MatrixStack *ms = sm->getx();
+    
+    float xx = (((float)(x-centrex)-0.5))*scaleFactor;
+    float yy = ((float)get(x,y))*heightFactor*scaleFactor;
+    float zz = (((float)(y-centrey)))*scaleFactor;
+    
+    State *s = sm->push();
+    s->light.col[0] = Colour(1,1,1,1);
+    s->light.col[1] = Colour(1,1,1,1);
+    s->light.ambient = Colour(0.7,0.7,0.7,1);
+    ms->push();
+    ms->mul(glm::scale(glm::mat4(),glm::vec3(0.1*scaleFactor)));
+    ms->mul(glm::translate(glm::mat4(),glm::vec3(xx,yy,zz)));
+    mesh::ico->render(sm->getx()->top());
+    ms->pop();
+    sm->pop();
+    
 }

@@ -36,6 +36,8 @@ class Grid {
     
     GLuint vbo; // vertex buffer object
     
+    int centrex,centrey; // current centre point
+    
 public:
     
     float scaleFactor;  // all coords are multiplied by this
@@ -55,7 +57,7 @@ public:
     void genTriangles(int cx,int cy,int range);
     
     void render(glm::mat4 *world);
-        
+    void renderHighlight(int x,int y);
 };
 
 

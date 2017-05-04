@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170504.1542>
+//  Last Modified : <170504.1641>
 //
 //  Description	
 //
@@ -330,9 +330,12 @@ bool Effect::begin(){
         ERRCHK;
         mCurEffect = this;
         return true;
-    }
-    else
+    } else {
+        setUniforms();
+        ERRCHK;
+        
         return false;
+    }
 }
 
 void Effect::end(){
