@@ -8,25 +8,31 @@
 #define __REGION_H
 
 #include "types.h"
-
+#include <vector>
+#include <algorithm>
 
 /// a region of the screen which can be set to a GL viewport;
 /// setting it will set a pixel-space ortho projection
 /// flipped so topleft = 0,0
 
-struct Region {
+class Region {
+    static std::vector<Region *> regions;
+    const char *name;
+public:
     float x,y,w,h;
     
-    Region(){
-        // initially invalid
-        x=-1; y=-1;w=1;h=1;
-    }
+    
+    Region(const char *nm);
+    virtual ~Region();
     
     static Region *current;
     
     virtual void resize(int xx,int yy,int ww,int hh){
         x=xx;y=yy;w=ww;h=hh;
     }
+    
+    static void notifyMouseMove(int x,int y);
+    virtual void onMouseMove(int x, int y);
     
     /// convert a 0-1 into region coords - only used where appropriate
     int getx(float xx){
@@ -53,6 +59,7 @@ struct Region {
 
 /// as above, but sets an isometric projection
 struct IsoRegion : public Region{
+    IsoRegion(const char *nm) : Region(nm){}
     /// set the viewport for OpenGL, and the projection (to isometric)
     virtual void set();
 };

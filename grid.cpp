@@ -261,5 +261,4 @@ void Grid::renderHighlight(int x,int y){
     mesh::cursor->render(sm->getx()->top());
     ms->pop();
     sm->pop();
-    
 }

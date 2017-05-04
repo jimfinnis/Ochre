@@ -19,11 +19,11 @@ class Screen {
     SDL_Renderer *rdr;
     SDL_Window *wnd;
     SDL_GLContext glc;
-    int w,h;
     
     static Screen *instance;
     
 public:
+    int w,h;
     
     static Screen *getInstance(){
         return instance;

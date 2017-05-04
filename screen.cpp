@@ -11,7 +11,7 @@
 Screen *Screen::instance = NULL;
 
 #define FULLSCREEN 0
-Screen::Screen(int ww,int hh){
+Screen::Screen(int ww,int hh) : stat("stat"), tool("tool"), game("game"){
     if(instance)
         FATAL("cannot create multiple screens");
     instance = this;
@@ -57,7 +57,7 @@ void Screen::resize(int ww,int hh){
     h = hh;
     
     if(ww<640 || hh<480){
-        // UGLY HACK because setwindowsize doesn't always work.
+        // UGLY HACK because setminimumwindowsize doesn't always work.
         SDL_SetWindowSize(wnd,640,480);
         return;
     }

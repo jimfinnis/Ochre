@@ -6,9 +6,42 @@
 
 #include "gfx.h"
 #include "region.h"
+#include "screen.h"
 #include "effect.h"
 
 Region *Region::current = NULL;
+
+std::vector<Region *> Region::regions;
+
+void Region::notifyMouseMove(int x,int y){
+    Screen *scr = Screen::getInstance();
+    // first switch to GL device coords (sigh)
+    y = scr->h - y;
+    // then go through the regions
+    
+    std::vector<Region *>::iterator i;
+    for(i=regions.begin();i!=regions.end();++i){
+        Region *r = *i;
+        if(x >= r->x && x<r->x+r->w && y>=r->y && y<r->y+r->h)
+            r->onMouseMove(x-r->x,y-r->y);
+    }
+    
+}
+
+Region::Region(const char *nm){
+    // initially invalid
+    name = nm;
+    x=-1; y=-1;w=1;h=1;
+    regions.push_back(this);
+}
+Region::~Region(){
+    regions.erase(std::remove(regions.begin(),regions.end(),this),regions.end());
+}
+
+void Region::onMouseMove(int x, int y){
+    printf("%s: %d,%d\n",name,x,y);
+}
+
 
 void Region::setvp(){
     glViewport(x,y,w,h);
@@ -16,6 +49,7 @@ void Region::setvp(){
     glEnable(GL_SCISSOR_TEST);
     current = this;
 }
+
 
 void Region::set(){
     setvp();
