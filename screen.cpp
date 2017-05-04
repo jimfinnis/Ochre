@@ -10,3 +10,8 @@
 Screen::Screen(){
     Context::getInstance()->curscreen = this;
 }
+
+void Screen::onKeyDown(int k){
+    printf("Keycode: %d\n",k);
+}
+

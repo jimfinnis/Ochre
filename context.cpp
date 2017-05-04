@@ -47,6 +47,10 @@ Context::Context(int ww,int hh) : stat("stat"), tool("tool") {
     rdr = SDL_CreateRenderer(wnd, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 //    glEnable(GL_MULTISAMPLE);
 //    SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1" );
+    
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
 }
 
 void Context::resize(int ww,int hh){

@@ -60,7 +60,7 @@ public:
     void genTriangles(int cx,int cy,int range);
     
     void render(glm::mat4 *world);
-    void renderHighlight(int x,int y);
+    void renderCursor(int x,int y);
 };
 
 

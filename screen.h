@@ -15,6 +15,7 @@ public:
         
     virtual void render()=0;
     virtual void resize(int w,int h)=0;
+    virtual void onKeyDown(int k);
 };
 
 #endif /* __SCREEN_H */

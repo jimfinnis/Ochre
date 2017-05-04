@@ -29,9 +29,6 @@ int main(int argc, char** argv)
 {
     Context context(800,600);
     
-//    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
     
     // load the effects by starting the effect manager
     EffectManager::getInstance();
@@ -44,23 +41,24 @@ int main(int argc, char** argv)
     
     mesh::load();
     
-    bool running=true;
-    while(running)
+    while(globals::running)
     {
         SDL_Event e;
         while(SDL_PollEvent(&e))
         {
             switch(e.type){
             case SDL_QUIT:
-                running = false;
+                globals::running = false;
                 break;
             case SDL_KEYDOWN:
-                if(e.key.keysym.sym=='q')running = false;
-                if(e.key.keysym.sym=='t'){
-                    delete globals::grid;
-                    globals::grid = new Grid();
+                // Emergency quick quit!
+                switch(e.key.keysym.sym){
+                case 'q':globals::running = false;break;
+                case 'd':debugtoggle=!debugtoggle;break;
+                default:
+                    curscreen->onKeyDown(e.key.keysym.sym);
+                    break;
                 }
-                if(e.key.keysym.sym=='d')debugtoggle=!debugtoggle;
                 break;
             case SDL_MOUSEMOTION:
                 // put the mouse move to all regions

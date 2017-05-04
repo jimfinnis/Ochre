@@ -18,12 +18,16 @@ class GameScreen : public Screen {
     GameRegion game;
     ToolRegion tool;
     StatRegion stat;
+    
+    int hx,hy;
+    
 public:
     GameScreen();
     virtual ~GameScreen();
     
     virtual void resize(int w,int h);
     virtual void render();
+    virtual void onKeyDown(int k);
 };
 
 #endif /* __GAMESCREEN_H */

@@ -97,9 +97,9 @@ void Grid::genTriangles(int cx,int cy,int range){
                 if(ox==0){
                     if(oy<0){
                         // add base poly for front wedge
-                        v2 = addvert(x0,BASE,y1,1,0);
-                        v1 = addvert(x1,h11,y1,1,0);
                         v0 = addvert(x0,h01,y1,0,0);
+                        v1 = addvert(x1,h11,y1,1,0);
+                        v2 = addvert(x0,BASE,y1,1,0);
                         calcnormal(v0,v1,v2);
                         v2 = addvert(x0,BASE,y1,1,0);
                         v1 = addvert(x1,BASE,y1,1,0);
@@ -110,46 +110,46 @@ void Grid::genTriangles(int cx,int cy,int range){
                 else if(ox<0){
                     if(oy==0){}
                     else if(oy<0){
-                        v2 = addvert(x1,h10,y0,1,0);
-                        v1 = addvert(x1,h11,y1,1,1);
                         v0 = addvert(x0,h01,y1,0,1);
+                        v1 = addvert(x1,h11,y1,1,1);
+                        v2 = addvert(x1,h10,y0,1,0);
                         calcnormal(v0,v1,v2);
                         // base polys
-                        v2 = addvert(x1,BASE,y0,1,0);
-                        v1 = addvert(x1,h10,y0,1,1);
                         v0 = addvert(x0,h01,y1,0,1);
-                        calcnormal(v0,v1,v2);
+                        v1 = addvert(x1,h10,y0,1,1);
                         v2 = addvert(x1,BASE,y0,1,0);
-                        v1 = addvert(x0,h01,y1,0,1);
+                        calcnormal(v0,v1,v2);
                         v0 = addvert(x0,BASE,y1,0,0);
+                        v1 = addvert(x0,h01,y1,0,1);
+                        v2 = addvert(x1,BASE,y0,1,0);
                         calcnormal(v0,v1,v2);
                     } else {
-                        v2 = addvert(x1,h10,y0,1,0);
-                        v1 = addvert(x1,h11,y1,1,1);
                         v0 = addvert(x0,h00,y0,0,0);
+                        v1 = addvert(x1,h11,y1,1,1);
+                        v2 = addvert(x1,h10,y0,1,0);
                         calcnormal(v0,v1,v2);
                         // no base polys in these cases; they would be hidden
                     }
                 } else {
                     if(oy==0){}
                     else if(oy<0){
-                        v2 = addvert(x1,h11,y1,1,1);
-                        v1 = addvert(x0,h01,y1,0,1);
                         v0 = addvert(x0,h00,y0,0,0);
+                        v1 = addvert(x0,h01,y1,0,1);
+                        v2 = addvert(x1,h11,y1,1,1);
                         calcnormal(v0,v1,v2);
                         // base polys
-                        v2 = addvert(x1,BASE,y1,1,0);
+                        v0 = addvert(x0,h00,y0,0,1);
                         v1 = addvert(x1,h11,y1,1,1);
-                        v0 = addvert(x0,h00,y0,0,1);
+                        v2 = addvert(x1,BASE,y1,1,0);
                         calcnormal(v0,v1,v2);
-                        v2 = addvert(x0,BASE,y0,0,0);
-                        v1 = addvert(x1,BASE,y1,1,0);
                         v0 = addvert(x0,h00,y0,0,1);
+                        v1 = addvert(x1,BASE,y1,1,0);
+                        v2 = addvert(x0,BASE,y0,0,0);
                         calcnormal(v0,v1,v2);
                     } else {
-                        v2 = addvert(x1,h10,y0,1,0);
-                        v1 = addvert(x0,h01,y1,0,1);
                         v0 = addvert(x0,h00,y0,0,0);
+                        v1 = addvert(x0,h01,y1,0,1);
+                        v2 = addvert(x1,h10,y0,1,0);
                         calcnormal(v0,v1,v2);
                         // no base polys in these cases; they would be hidden
                     }
@@ -158,27 +158,27 @@ void Grid::genTriangles(int cx,int cy,int range){
                 // different triangulations for the two kinds of split
                 if(h00==h11){
                     // first triangle
-                    v2 = addvert(x1,h10,y0,1,0);
-                    v1 = addvert(x1,h11,y1,1,1);
                     v0 = addvert(x0,h00,y0,0,0);
+                    v1 = addvert(x1,h11,y1,1,1);
+                    v2 = addvert(x1,h10,y0,1,0);
                     calcnormal(v0,v1,v2);
                     //                v0->dump();v1->dump();v2->dump();
                     // second triangle
-                    v2 = addvert(x1,h11,y1,1,1);
-                    v1 = addvert(x0,h01,y1,0,1);
                     v0 = addvert(x0,h00,y0,0,0);
+                    v1 = addvert(x0,h01,y1,0,1);
+                    v2 = addvert(x1,h11,y1,1,1);
                     calcnormal(v0,v1,v2);
                     //                v0->dump();v1->dump();v2->dump();printf("\n");
                 } else {
                     // first triangle
-                    v2 = addvert(x1,h10,y0,1,0);
-                    v1 = addvert(x0,h01,y1,0,1);
                     v0 = addvert(x0,h00,y0,0,0);
+                    v1 = addvert(x0,h01,y1,0,1);
+                    v2 = addvert(x1,h10,y0,1,0);
                     calcnormal(v0,v1,v2);
                     // second triangle
-                    v2 = addvert(x1,h10,y0,1,0);
-                    v1 = addvert(x1,h11,y1,1,1);
                     v0 = addvert(x0,h01,y1,0,1);
+                    v1 = addvert(x1,h11,y1,1,1);
+                    v2 = addvert(x1,h10,y0,1,0);
                     calcnormal(v0,v1,v2);
                 }
             }
@@ -240,9 +240,7 @@ void Grid::render(glm::mat4 *world){
     
 }
 
-void Grid::renderHighlight(int x,int y){
-    // render any highlight
-    
+void Grid::renderCursor(int x,int y){
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
     
@@ -255,9 +253,9 @@ void Grid::renderHighlight(int x,int y){
     s->light.col[1] = Colour(1,1,1,1);
     s->light.ambient = Colour(0.7,0.7,0.7,1);
     ms->push();
-    ms->rotY(Time::now()*2.0f);
-    ms->scale(0.3*scaleFactor);
     ms->translate(xx,yy,zz);
+    ms->scale(0.3*scaleFactor);
+    ms->rotY(Time::now()*2.0f);
     mesh::cursor->render(sm->getx()->top());
     ms->pop();
     sm->pop();

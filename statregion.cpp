@@ -19,4 +19,5 @@ void StatRegion::render(){
     sm->reset();
     
     globals::font->render(10,20,30,"Ochre 0.0 pre-alpha0");
+    globals::font->render(10,50,30,"%d %d",globals::cursorx,globals::cursory);
 }

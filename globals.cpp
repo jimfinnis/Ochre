@@ -9,6 +9,8 @@
 
 Font *globals::font = NULL;
 Grid *globals::grid = NULL;
+bool globals::running = true;
+int globals::cursorx,globals::cursory;
 
 // initialise those globals which need it
 void globals::init(){

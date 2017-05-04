@@ -256,22 +256,21 @@ public:
     void mul(const glm::mat4 &m); // top = m*top
     void mulBack(const glm::mat4 &m); // top = top * m
     
-    // these aren't ideal.
     void translate(float x,float y,float z){
-        stack[ct] = glm::translate(glm::mat4(),glm::vec3(x,y,z))*stack[ct];
+        stack[ct] = glm::translate(stack[ct],glm::vec3(x,y,z));
     }
     void rotX(float a){
-        stack[ct] = glm::rotate(glm::mat4(),a,glm::vec3(1.0f,0.0f,0.0f))*stack[ct];
+        stack[ct] = glm::rotate(stack[ct],a,glm::vec3(1.0f,0.0f,0.0f));
     }
     void rotY(float a){
-        stack[ct] = glm::rotate(glm::mat4(),a,glm::vec3(0.0f,1.0f,0.0f))*stack[ct];
+        stack[ct] = glm::rotate(stack[ct],a,glm::vec3(0.0f,1.0f,0.0f));
     }
     void rotZ(float a){
-        stack[ct] = glm::rotate(glm::mat4(),a,glm::vec3(0.0f,0.0f,1.0f))*stack[ct];
+        stack[ct] = glm::rotate(stack[ct],a,glm::vec3(0.0f,0.0f,1.0f));
     }
     
     void scale(float s){
-        stack[ct] = glm::scale(glm::mat4(),glm::vec3(s))*stack[ct];
+        stack[ct] = glm::scale(stack[ct],glm::vec3(s));
     }
     
     glm::mat4 *top(); // get top

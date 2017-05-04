@@ -10,13 +10,15 @@
 
 GameScreen::GameScreen() {
     globals::grid = new Grid();
+    hx=20;
+    hy=20;
 }
 
 GameScreen::~GameScreen(){
 }
 
 #define TOOLWIDTH 200
-#define STATUSHEIGHT 100
+#define STATUSHEIGHT 80
 
 
 void GameScreen::resize(int w,int h){
@@ -31,4 +33,24 @@ void GameScreen::render(){
     game.render();
     
 }
+
+void GameScreen::onKeyDown(int k){
+    switch(k){
+    case 't':
+        delete globals::grid;
+        globals::grid = new Grid();
+        break;
+    case SDLK_RIGHT:
+        globals::cursorx++;break;
+    case SDLK_LEFT:
+        globals::cursorx--;break;
+    case SDLK_UP:
+        globals::cursory++;break;
+    case SDLK_DOWN:
+        globals::cursory--;break;
+    default:
+        printf("%d\n",k);
+    }
+}
+    
 

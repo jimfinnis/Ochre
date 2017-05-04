@@ -11,8 +11,7 @@
 
 class GameRegion : public IsoRegion {
 public:
-    GameRegion() : IsoRegion("game") {
-    }
+    GameRegion();
     
     virtual void onMouseMove(int x,int y);
     virtual void render();
