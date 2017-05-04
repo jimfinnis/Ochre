@@ -11,7 +11,7 @@
 Screen *Screen::instance = NULL;
 
 #define FULLSCREEN 0
-Screen::Screen(int ww,int hh) : stat("stat"), tool("tool"), game("game"){
+Screen::Screen(int ww,int hh) : stat("stat"), tool("tool") {
     if(instance)
         FATAL("cannot create multiple screens");
     instance = this;

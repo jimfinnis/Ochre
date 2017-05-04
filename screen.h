@@ -8,6 +8,7 @@
 #define __SCREEN_H
 
 #include "region.h"
+#include "gameregion.h"
 
 /**
  * The screen is divided into several regions.
@@ -34,14 +35,13 @@ public:
     /// toolbar on the left
     Region tool;
     /// main GL window on the right - with isometric projection
-    IsoRegion game;
+    GameRegion game;
     
     Screen(int w,int h);
     
     void swap();
     
     void resize(int ww,int hh);
-    
 };
 
 #endif /* __SCREEN_H */

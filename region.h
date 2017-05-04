@@ -8,6 +8,7 @@
 #define __REGION_H
 
 #include "types.h"
+#include "gfx.h"
 #include <vector>
 #include <algorithm>
 
@@ -21,6 +22,7 @@ class Region {
 public:
     float x,y,w,h;
     
+    static void notifyMouseMove(int x,int y);
     
     Region(const char *nm);
     virtual ~Region();
@@ -31,7 +33,6 @@ public:
         x=xx;y=yy;w=ww;h=hh;
     }
     
-    static void notifyMouseMove(int x,int y);
     virtual void onMouseMove(int x, int y);
     
     /// convert a 0-1 into region coords - only used where appropriate
@@ -49,6 +50,9 @@ public:
     
     /// set the viewport for OpenGL, and the projection (to pixels)
     virtual void set();
+    
+    /// render the things for this region
+    virtual void render(){};
     
     /// set and clear the region to a colour (also the depth buffer).
     void setAndClear(const Colour& c);

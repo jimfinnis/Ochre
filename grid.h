@@ -7,6 +7,9 @@
 #ifndef __GRID_H
 #define __GRID_H
 
+#include "state.h"
+#include "effect.h"
+
 /// the grid component of the world from which the heightmap is generated.
 
 #define GRIDSIZE 256

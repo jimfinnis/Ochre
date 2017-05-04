@@ -15,7 +15,9 @@ find_package(SDL2TTF)
 
 add_executable(${PROJECT_NAME} main.cpp state.cpp screen.cpp
     region.cpp font.cpp time.cpp
-    effect.cpp obj.cpp maths.cpp grid.cpp meshes.cpp)
+    effect.cpp obj.cpp maths.cpp grid.cpp meshes.cpp
+    gameregion.cpp
+)
 
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2TTF_INCLUDE_DIRS}
      ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS}
