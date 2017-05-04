@@ -40,7 +40,7 @@ class Grid {
     GLuint vbo; // vertex buffer object
     
     int centrex,centrey; // current centre point
-    
+    int modcount; // modifications since last resetModCount()
 public:
     
     float heightFactor; // y is also multiplied by this
@@ -60,6 +60,15 @@ public:
     
     void render(glm::mat4 *world);
     void renderCursor(int x,int y);
+    
+    void resetModCount(){modcount=0;}
+    // return mods since last resetModCount()
+    int getModCount(){return modcount;}
+    
+    // raise up at x,y (and neighbours if necessary)
+    void up(int x,int y);
+    // lower at x,y (and neighbours if necessary)
+    void down(int x,int y);
 };
 
 

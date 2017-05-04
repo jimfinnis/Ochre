@@ -252,10 +252,37 @@ void Grid::renderCursor(int x,int y){
     s->light.col[1] = Colour(1,1,1,1);
     s->light.ambient = Colour(0.7,0.7,0.7,1);
     ms->push();
-    ms->translate(xx,yy,zz);
+    ms->translate(xx,yy-0.1,zz);
     ms->scale(0.3);
     ms->rotY(Time::now()*2.0f);
     mesh::cursor->render(sm->getx()->top());
     ms->pop();
     sm->pop();
+}
+
+void Grid::up(int x,int y){
+    if(x<0 || x>=GRIDSIZE || y<0 || y>=GRIDSIZE)return;
+    
+    grid[x][y]++;
+    int h = grid[x][y];
+    modcount++;
+    for(int xx=x-1;xx<=x+1;xx++){
+        for(int yy=y-1;yy<=y+1;yy++){
+            if(h-get(xx,yy)>1)up(xx,yy); // recursion oh god.
+        }
+    }
+}
+
+void Grid::down(int x,int y){
+    if(x<0 || x>=GRIDSIZE || y<0 || y>=GRIDSIZE)return;
+    if(grid[x][y]==0)return;
+    
+    grid[x][y]--;
+    modcount++;
+    int h = grid[x][y];
+    for(int xx=x-1;xx<=x+1;xx++){
+        for(int yy=y-1;yy<=y+1;yy++){
+            if(get(xx,yy)-h>1)down(xx,yy); // recursion oh god.
+        }
+    }
 }

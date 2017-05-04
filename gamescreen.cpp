@@ -49,6 +49,12 @@ void GameScreen::onKeyDown(int k){
         globals::cursory--;break;
     case SDLK_DOWN:
         globals::cursory++;break;
+    case 'p':
+        globals::grid->up(globals::cursorx,globals::cursory);
+        break;
+    case 'l':
+        globals::grid->down(globals::cursorx,globals::cursory);
+        break;
     default:
         printf("%d\n",k);
     }
