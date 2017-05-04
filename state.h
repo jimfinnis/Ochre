@@ -17,37 +17,11 @@
 
 struct State {
     
-    void resetLights(){
-        light.ambient = Colour(0.1f,0.1f,0.1f,1);
-        
-        light.dir[0] = glm::vec3(-1,0.3,0);
-        light.dir[1] = glm::vec3(-1,0.4,0);
-        light.dir[2] = glm::vec3(0,0,0);
-        
-        light.col[0] = Colour(1,1,1,1);
-        light.col[1] = Colour(1,1,1,1);
-        light.col[2] = Colour(0.0,0,0,1);
-    }
-    
-    void resetView(){
-        view=glm::translate(glm::mat4(),glm::vec3(0,0,0));
-    }
-        
+    void resetLights();
+    void resetView();
     
     /// set to the default - not ctor for speed
-    void setDefault(){
-        resetLights();
-        resetView();
-        fog.enabled = false;
-        fog.colour = Colour(0,0,0,1);
-        fog.neardist = 10000;
-        fog.fardist = 20000;
-        diffuse2 = Colour(1,1,1,1);
-        texID0 = texID1 = NULL;
-        overrides = 0;
-        modes = 0;
-        effect = NULL;
-    }
+    void setDefault();
     
     /// LIGHT states
     struct

@@ -52,6 +52,11 @@ struct UNLITVERTEX
         return true;
     }
     
+    void dump(){
+        printf("%f %f %f - %f %f %f - %f %f\n",
+               x,y,z, nx,ny,nz, u,v);
+    }
+    
 };
 
 

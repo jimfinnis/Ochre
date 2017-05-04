@@ -80,8 +80,10 @@ void IsoRegion::set(){
     setvp();
     
     EffectManager::projection = 
-          glm::ortho(-2.0f,2.0f,  -2.0f,2.0f,  -2.0f,2.0f) *
-          glm::rotate(glm::mat4(),glm::radians(-35.264f),glm::vec3(1.0f, 0.0f, 0.0f))*
-          glm::rotate(glm::mat4(),glm::radians(-45.0f),glm::vec3(0.0f,1.0f,0.0f));
+          glm::ortho(-2.0f,2.0f,  -2.0f,2.0f,  -10.0f,10.0f) *
+          // the angle here determines the pitch
+          glm::rotate(glm::mat4(),glm::radians(-25.264f),glm::vec3(1.0f, 0.0f, 0.0f))*
+          // and this determines the yaw (45 for strict isometric)
+          glm::rotate(glm::mat4(),glm::radians(45.0f),glm::vec3(0.0f,1.0f,0.0f));
 }
 

@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170503.1626>
+//  Last Modified : <170504.1054>
 //
 //  Description	
 //
@@ -521,7 +521,6 @@ void Effect::setMaterial(const float *diffuse,SDL_Texture *texture)
 
 void Effect::setArrayOffsetsPrelit()
 {
-    // sets array *values*
     if(has(EDA_POS)){
         glVertexAttribPointer(mPosIdx,3,GL_FLOAT,GL_FALSE,
                               sizeof(PRELITVERTEX),(const void *)offsetof(PRELITVERTEX,x));
@@ -544,7 +543,6 @@ void Effect::setArrayOffsetsPrelit()
 
 void Effect::setArrayOffsetsUnlit()
 {
-    // sets array *offsets* 
     if(has(EDA_POS)){
         glVertexAttribPointer(mPosIdx,3,GL_FLOAT,GL_FALSE,sizeof(UNLITVERTEX),(const void *)offsetof(UNLITVERTEX,x));
         glEnableVertexAttribArray(mPosIdx);

@@ -30,11 +30,11 @@ int main(int argc, char** argv)
     
     Font::init();
     
-    // load meshes
-    ObjMesh *test = new ObjMesh("media/meshes/plane","plane.obj");
-    
     Font *font = new Font("media/fonts/Quicksand-Regular.otf",100);
+    ObjMesh *test = new ObjMesh("media/meshes/plane","plane.obj");
+    Grid *grid = new Grid();
     
+    grid->genTriangles(20,20,4);
     bool running=true;
     while(running)
     {
@@ -47,6 +47,7 @@ int main(int argc, char** argv)
                 break;
             case SDL_KEYDOWN:
                 if(e.key.keysym.sym=='q')running = false;
+                if(e.key.keysym.sym=='t')grid = new Grid();
                 break;
             case SDL_WINDOWEVENT:
                 switch(e.window.event){
@@ -67,7 +68,7 @@ int main(int argc, char** argv)
         // draw regions
         scr.stat.setAndClear(Colour(0,0.5,0,1));
         scr.tool.setAndClear(Colour(0,0,0.5,1));
-        scr.game.setAndClear(Colour(0,0,0,1));
+        scr.game.setAndClear(Colour(0,0,0.2,1));
         
         
         // reset the state manager
@@ -82,10 +83,12 @@ int main(int argc, char** argv)
         MatrixStack *ms = sm->getx();
         ms->push();
         
-        ms->mul(glm::translate(glm::mat4(),glm::vec3(0.0f,-0.0f,-0.0f)));
+        ms->mul(glm::translate(glm::mat4(),glm::vec3(0.0f,0.0f,-0.0f)));
         
         // draw here!
-        test->render(sm->getx()->top());
+        //test->render(sm->getx()->top());
+        grid->genTriangles(20,20,8);
+        grid->render(sm->getx()->top());
         ms->pop();
         
         

@@ -270,7 +270,7 @@ void ObjMesh::render(glm::mat4 *world){
         it=transitions.begin();it!=transitions.end();it++){
         Material *m = it->matidx < 0 ? &defaultMat : mats+it->matidx;
         
-        eff->setMaterial(m->diffuse,0); // replace with texture if required
+        eff->setMaterial(m->diffuse,NULL); // replace with texture if required
         glDrawElements(GL_TRIANGLES,it->count,GL_UNSIGNED_INT,
                        (void *)(it->start*sizeof(GLuint)));
         ERRCHK;
