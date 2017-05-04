@@ -148,12 +148,18 @@ ObjMesh::ObjMesh(const char *dir,const char *name){
                 // one if it was used before. This combines all the elements
                 // into one.
                 tinyobj::index_t idx = shapes[s].mesh.indices[indexoffset+i];
+                /*
                 v.x = attrib.vertices[3*idx.vertex_index+0]-cx;
                 v.y = attrib.vertices[3*idx.vertex_index+1]-cy;
                 v.z = attrib.vertices[3*idx.vertex_index+2]-cz;
+                 */
+                v.x = attrib.vertices[3*idx.vertex_index+0];
+                v.y = attrib.vertices[3*idx.vertex_index+1];
+                v.z = attrib.vertices[3*idx.vertex_index+2];
                 if(idx.normal_index<0){
                     throw Exception("Shape has no normals, re-export with normals.");
                 }
+                
                 v.nx = attrib.normals[3*idx.normal_index+0];
                 v.ny = attrib.normals[3*idx.normal_index+1];
                 v.nz = attrib.normals[3*idx.normal_index+2];
@@ -280,5 +286,3 @@ void ObjMesh::render(glm::mat4 *world){
     glBindBuffer(GL_ARRAY_BUFFER,0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 }
-
-

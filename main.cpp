@@ -91,6 +91,7 @@ int main(int argc, char** argv)
         grid->genTriangles(20,20,8);
         grid->render(sm->getx()->top());
         grid->renderHighlight(20,20);
+  
         ms->pop();
         
         

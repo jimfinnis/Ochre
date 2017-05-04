@@ -13,7 +13,7 @@ namespace mesh {
 
 void load();
 
-extern class ObjMesh *ico;
+extern class ObjMesh *ico,*cursor;
 
 }
 

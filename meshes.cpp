@@ -8,10 +8,11 @@
 
 namespace mesh {
 
-ObjMesh *ico;
+ObjMesh *ico,*cursor;
 
 void load(){
     ico = new ObjMesh("media/meshes/ico","ico.obj");
+    cursor = new ObjMesh("media/meshes/cursor","cursor.obj");
 }
 
 
