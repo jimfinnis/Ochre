@@ -326,6 +326,7 @@ void Grid::drawHouses(){
     for(int *p = locs;*p>=0;p+=2){
         if(visible[p[0]][p[1]]){
             pushxform(p[0],p[1],0);
+            ms->rotY(glm::radians(45.0f));
             meshes::house1->render(ms->top());
             ms->pop();
         }
