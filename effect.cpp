@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170504.1641>
+//  Last Modified : <170505.0231>
 //
 //  Description	
 //
@@ -547,15 +547,18 @@ void Effect::setArrayOffsetsPrelit()
 void Effect::setArrayOffsetsUnlit()
 {
     if(has(EDA_POS)){
-        glVertexAttribPointer(mPosIdx,3,GL_FLOAT,GL_FALSE,sizeof(UNLITVERTEX),(const void *)offsetof(UNLITVERTEX,x));
+        glVertexAttribPointer(mPosIdx,3,GL_FLOAT,GL_FALSE,sizeof(UNLITVERTEX),
+                              (const void *)offsetof(UNLITVERTEX,x));
         glEnableVertexAttribArray(mPosIdx);
     }
     if(has(EDA_NORM)){
-        glVertexAttribPointer(mNormIdx,3,GL_FLOAT,GL_FALSE,sizeof(UNLITVERTEX),(const void *)offsetof(UNLITVERTEX,nx));
+        glVertexAttribPointer(mNormIdx,3,GL_FLOAT,GL_FALSE,sizeof(UNLITVERTEX),
+                              (const void *)offsetof(UNLITVERTEX,nx));
         glEnableVertexAttribArray(mNormIdx);
     }
     if(has(EDA_TEXCOORDS)){
-        glVertexAttribPointer(mTexCoordIdx,2,GL_FLOAT,GL_FALSE,sizeof(UNLITVERTEX),(const void *)offsetof(UNLITVERTEX,u));
+        glVertexAttribPointer(mTexCoordIdx,2,GL_FLOAT,GL_FALSE,sizeof(UNLITVERTEX),
+                              (const void *)offsetof(UNLITVERTEX,u));
         glEnableVertexAttribArray(mTexCoordIdx);
     }
 }

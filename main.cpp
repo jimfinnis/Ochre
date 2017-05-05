@@ -39,7 +39,7 @@ int main(int argc, char** argv)
     
     curscreen = new GameScreen();
     
-    mesh::load();
+    meshes::load();
     
     while(globals::running)
     {

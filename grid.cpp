@@ -65,6 +65,8 @@ void Grid::genTriangles(int cx,int cy,int range){
     initGridVerts();
     centrex=cx;centrey=cy;
     
+    memset(visible,0,GRIDSIZE*GRIDSIZE);
+    
     for(int ox=-range;ox<range;ox++){
         for(int oy=-range;oy<range;oy++){
             
@@ -95,6 +97,8 @@ void Grid::genTriangles(int cx,int cy,int range){
             if(abs(ox)+abs(oy)==range-1){
                 if(ox==0){
                     if(oy>0){
+                        visible[x][y]=1;
+                        visible[x+1][y]=1;
                         // add base poly for front wedge
                         v0 = addvert(x0,BASE,y0,1,0);
                         v1 = addvert(x1,h10,y0,1,0);
@@ -109,6 +113,9 @@ void Grid::genTriangles(int cx,int cy,int range){
                 else if(ox<0){
                     if(oy==0){}
                     else if(oy<0){
+                        visible[x+1][y]=1;
+                        visible[x][y+1]=1;
+                        visible[x+1][y+1]=1;
                         v0 = addvert(x0,h01,y1,0,1);
                         v1 = addvert(x1,h11,y1,1,1);
                         v2 = addvert(x1,h10,y0,1,0);
@@ -132,12 +139,18 @@ void Grid::genTriangles(int cx,int cy,int range){
                 } else {
                     if(oy==0){}
                     else if(oy<0){
+                        visible[x][y]=1;
+                        visible[x][y+1]=1;
+                        visible[x+1][y+1]=1;
                         v0 = addvert(x0,h00,y0,0,0);
                         v1 = addvert(x0,h01,y1,0,1);
                         v2 = addvert(x1,h11,y1,1,1);
                         calcnormal(v0,v1,v2);
                         // no base polys in these cases; they would be hidden
                     } else {
+                        visible[x][y]=1;
+                        visible[x][y+1]=1;
+                        visible[x+1][y]=1;
                         v0 = addvert(x0,h00,y0,0,0);
                         v1 = addvert(x0,h01,y1,0,1);
                         v2 = addvert(x1,h10,y0,1,0);
@@ -154,6 +167,10 @@ void Grid::genTriangles(int cx,int cy,int range){
                     }
                 }
             } else {
+                visible[x][y]=1;
+                visible[x][y+1]=1;
+                visible[x+1][y]=1;
+                visible[x+1][y+1]=1;
                 // different triangulations for the two kinds of split
                 if(h00==h11){
                     // first triangle
@@ -219,7 +236,7 @@ void Grid::render(glm::mat4 *world){
     eff->setArrayOffsetsUnlit();
     
     
-    static const float whiteCol[] = {1,1,1,1};
+    static const float whiteCol[] = {0.8,0.8,0.8,1};
 #if 0
     static const float greyCol[] = {0.7,0.7,0.7,1};
     eff->setMaterial(greyCol,NULL);
@@ -236,26 +253,21 @@ void Grid::render(glm::mat4 *world){
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
     eff->end();
     
-    
+    drawHouses();
 }
 
 void Grid::renderCursor(int x,int y){
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
     
-    float xx = ((float)(x-centrex))-0.5;
-    float yy = ((float)get(x,y))*heightFactor;
-    float zz = (float)(y-centrey);
-    
     State *s = sm->push();
     s->light.col[0] = Colour(1,1,1,1);
     s->light.col[1] = Colour(1,1,1,1);
     s->light.ambient = Colour(0.7,0.7,0.7,1);
-    ms->push();
-    ms->translate(xx,yy-0.1,zz);
-    ms->scale(0.3);
+    pushxform(x,y,-0.5f);
+    ms->scale(0.3f);
     ms->rotY(Time::now()*2.0f);
-    mesh::cursor->render(sm->getx()->top());
+    meshes::cursor->render(sm->getx()->top());
     ms->pop();
     sm->pop();
 }
@@ -286,3 +298,40 @@ void Grid::down(int x,int y){
         }
     }
 }
+
+void Grid::pushxform(int x,int y,float offset){
+    MatrixStack *ms = StateManager::getInstance()->getx();
+    float xx = ((float)(x-centrex))-0.5;
+    float yy = ((float)get(x,y)+offset)*heightFactor;
+    float zz = (float)(y-centrey);
+    
+    ms->push();
+    ms->translate(xx,yy,zz);
+}
+
+void Grid::drawHouses(){
+    StateManager *sm = StateManager::getInstance();
+    MatrixStack *ms = sm->getx();
+    int locs[] = {
+        20,20,
+        24,23,
+        18,12,
+        20,22,
+        19,18,
+        -1,-1
+    };
+    
+    meshes::house1->startBatch();
+    
+    for(int *p = locs;*p>=0;p+=2){
+        if(visible[p[0]][p[1]]){
+            pushxform(p[0],p[1],0);
+            meshes::house1->render(ms->top());
+            ms->pop();
+        }
+    }
+    
+    
+    meshes::house1->endBatch();
+}
+    

@@ -9,11 +9,11 @@
 
 // just a big namespace of meshes and a loader. Keep it simple, eh?
 
-namespace mesh {
+namespace meshes {
 
 void load();
 
-extern class ObjMesh *ico,*cursor;
+extern class ObjMesh *ico,*cursor,*house1;
 
 }
 

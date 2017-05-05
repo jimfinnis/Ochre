@@ -41,6 +41,9 @@ class Grid {
     
     int centrex,centrey; // current centre point
     int modcount; // modifications since last resetModCount()
+    
+    // boolean flags indicating whether square is visible, set in genTriangles.
+    uint8_t visible[GRIDSIZE][GRIDSIZE];
 public:
     
     float heightFactor; // y is also multiplied by this
@@ -54,6 +57,9 @@ public:
         else
             return 0;
     }
+    
+    // push transform to this location with height offset
+    void pushxform(int x,int y,float offset);
     
     /// generate triangles centred around cx,cy.
     void genTriangles(int cx,int cy,int range);
@@ -69,6 +75,8 @@ public:
     void up(int x,int y);
     // lower at x,y (and neighbours if necessary)
     void down(int x,int y);
+    
+    void drawHouses();
 };
 
 

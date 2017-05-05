@@ -243,12 +243,9 @@ ObjMesh::~ObjMesh(){
 static Material defaultMat = {
     NULL,{0,0,0,1}};
 
-
-void ObjMesh::render(glm::mat4 *world){
+static Effect *eff;
+void ObjMesh::startBatch(){
     State *s = StateManager::getInstance()->get();
-    
-    // start the effect
-    Effect *eff;
     
     // use the state's effect if there is one.
     if(s->effect)
@@ -259,17 +256,19 @@ void ObjMesh::render(glm::mat4 *world){
     eff->begin();
     // upload the matrices
     eff->setUniforms();
-    eff->setWorldMatrix(world);
-    
     // bind the arrays
     glBindBuffer(GL_ARRAY_BUFFER,buffers[VERTEXBUFFER]);
     ERRCHK;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,buffers[INDEXBUFFER]);
     ERRCHK;
-    
     // tell them about offsets
     eff->setArrayOffsetsUnlit();
-       
+}
+
+void ObjMesh::renderInBatch(glm::mat4 *world){
+    eff->setWorldMatrix(world);
+    
+    
     // and iterate over the transitions
     
     for(std::vector<Transition>::iterator
@@ -282,7 +281,18 @@ void ObjMesh::render(glm::mat4 *world){
         ERRCHK;
         
     }
-    
+}
+
+void ObjMesh::endBatch(){
+    eff->end();
     glBindBuffer(GL_ARRAY_BUFFER,0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+}    
+    
+
+
+void ObjMesh::render(glm::mat4 *world){
+    startBatch();
+    renderInBatch(world);
+    endBatch();
 }

@@ -28,7 +28,12 @@ public:
     virtual ~ObjMesh();
     
     // standard render method
-    virtual void render(glm::mat4 *world);
+    void render(glm::mat4 *world);
+    
+    // batch rendering
+    void startBatch();
+    void renderInBatch(glm::mat4 *world);
+    void endBatch();
 };
 
 #endif /* __OBJ_H */

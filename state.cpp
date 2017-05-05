@@ -17,8 +17,8 @@ void State::resetLights(){
     light.col[1] = Colour(0,0,0,1);
     light.col[2] = Colour(0,0,0,1);
     
-    light.col[0] = Colour(0.6,0.5,  0.3,1);
-    light.col[1] = Colour(0.4,0.2,  0.2,1);
+    light.col[0] = Colour(0.7,0.7,  0.5,1);
+    light.col[1] = Colour(0.6,0.4,  0.3,1);
 }
 
 void State::resetView(){

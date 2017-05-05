@@ -6,13 +6,14 @@
 
 #include "obj.h"
 
-namespace mesh {
+namespace meshes {
 
-ObjMesh *ico,*cursor;
+ObjMesh *ico,*cursor,*house1;
 
 void load(){
     ico = new ObjMesh("media/meshes/ico","ico.obj");
     cursor = new ObjMesh("media/meshes/cursor","cursor.obj");
+    house1 = new ObjMesh("media/meshes/house1","house1.obj");
 }
 
 

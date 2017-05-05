@@ -7,12 +7,15 @@
 #include "globals.h"
 #include "font.h"
 
-Font *globals::font = NULL;
-Grid *globals::grid = NULL;
-bool globals::running = true;
-int globals::cursorx,globals::cursory;
+namespace globals {
+Font *font = NULL;
+Grid *grid = NULL;
+bool running = true;
+int cursorx,cursory;
 
 // initialise those globals which need it
-void globals::init(){
+void init(){
     font = new Font("media/fonts/Quicksand-Regular.otf",20);
+}
+
 }
