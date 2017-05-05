@@ -75,6 +75,12 @@ int main(int argc, char** argv)
             }
         }
         
+        if(debugtoggle)
+            glDisable(GL_MULTISAMPLE);
+        else
+            glEnable(GL_MULTISAMPLE);
+            
+        
         /* Clear the color and depth buffers. */
         glDisable(GL_SCISSOR_TEST);
         glClearColor(0,0,1,0);

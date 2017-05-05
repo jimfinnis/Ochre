@@ -19,8 +19,13 @@ Context::Context(int ww,int hh) : stat("stat"), tool("tool") {
     curscreen = NULL;
     
     SDL_Init(SDL_INIT_VIDEO);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 #if FULLSCREEN    
     wnd = SDL_CreateWindow("test", SDL_WINDOWPOS_UNDEFINED, 
                            SDL_WINDOWPOS_UNDEFINED,
@@ -35,18 +40,16 @@ Context::Context(int ww,int hh) : stat("stat"), tool("tool") {
     // this doesn't appear to work...
     SDL_SetWindowMinimumSize(wnd,640,480);
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     
     SDL_GL_SetSwapInterval(0);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     
     glc = SDL_GL_CreateContext(wnd);
     
     rdr = SDL_CreateRenderer(wnd, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-    glEnable(GL_MULTISAMPLE);
     
+    glEnable(GL_MULTISAMPLE);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
