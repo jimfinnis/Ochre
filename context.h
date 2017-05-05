@@ -21,7 +21,13 @@ class Context {
     SDL_Window *wnd;
     SDL_GLContext glc;
     
+    GLuint fb;
+    GLuint rbcolor,rbdepth; // don't separate these
+    GLuint fbwidth,fbheight;
+    
     static Context *instance;
+    
+    void rebuildFSAA();
     
 public:
     int w,h;

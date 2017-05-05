@@ -30,8 +30,6 @@ int main(int argc, char** argv)
     Context context(800,600);
     
     
-    // load the effects by starting the effect manager
-    EffectManager::getInstance();
     Time::init();
     Font::init();
     
