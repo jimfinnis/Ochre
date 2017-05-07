@@ -14,8 +14,6 @@ extern Font *font;
 extern Grid *grid;
 extern bool running;
 
-extern int cursorx,cursory;
-
 void init();
 }
 

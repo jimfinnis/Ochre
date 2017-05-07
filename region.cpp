@@ -22,11 +22,36 @@ void Region::notifyMouseMove(int x,int y){
     std::vector<Region *>::iterator i;
     for(i=regions.begin();i!=regions.end();++i){
         Region *r = *i;
-        if(x >= r->x && x<r->x+r->w && y>=r->y && y<r->y+r->h)
+        if(x >= r->x && x<r->x+r->w && y>=r->y && y<r->y+r->h){
             r->onMouseMove(x-r->x,y-r->y);
+            break;
+        }
     }
-    
 }
+
+void Region::notifyClick(int x,int y,int b){
+    Context *c = Context::getInstance();
+    // first switch to GL device coords (sigh)
+    y = c->h - y;
+    // then go through the regions
+    
+    std::vector<Region *>::iterator i;
+    for(i=regions.begin();i!=regions.end();++i){
+        Region *r = *i;
+        if(x >= r->x && x<r->x+r->w && y>=r->y && y<r->y+r->h){
+            switch(b){
+            case SDL_BUTTON_LEFT:
+                r->onLeftClick(x,y);break;
+            case SDL_BUTTON_MIDDLE:
+                r->onMiddleClick(x,y);break;
+            case SDL_BUTTON_RIGHT:
+                r->onRightClick(x,y);break;
+            }
+        }
+    }
+}
+
+
 
 Region::Region(const char *nm){
     // initially invalid
@@ -38,17 +63,12 @@ Region::~Region(){
     regions.erase(std::remove(regions.begin(),regions.end(),this),regions.end());
 }
 
-void Region::onMouseMove(int x, int y){
-    printf("%s: %d,%d\n",name,x,y);
-}
-
 void Region::setvp(){
     glViewport(x,y,w,h);
     glScissor(x,y,w,h);
     glEnable(GL_SCISSOR_TEST);
     current = this;
 }
-
 
 void Region::set(){
     setvp();
@@ -107,7 +127,6 @@ void Region::renderQuad(float x,float y,float w,float h,SDL_Texture *tex){
     em->flattex->end();
 }
 
-
 void IsoRegion::set(){
     setvp();
     
@@ -122,7 +141,7 @@ void IsoRegion::set(){
    glm::rotate(glm::mat4(),glm::radians(yaw),glm::vec3(0.0f,1.0f,0.0f));
  */
     
-    EffectManager::projection =
-          glm::perspective(glm::radians(20.0f), w/h, 0.1f, 100.0f);
+    
+    EffectManager::projection = glm::perspective(glm::radians(20.0f), w/h, 1.0f, 100.0f);
 }
 

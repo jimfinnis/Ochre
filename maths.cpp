@@ -316,15 +316,6 @@ void MatrixStack::pop()
     if(ct<0)
         FATAL("stack underflow");
 }
-void MatrixStack::mul(const glm::mat4& m)
-{
-    stack[ct] = m * stack[ct];
-}
-
-void MatrixStack::mulBack(const glm::mat4& m)
-{
-    stack[ct] = stack[ct] * m;
-}
 
 glm::mat4 *MatrixStack::top()
 {

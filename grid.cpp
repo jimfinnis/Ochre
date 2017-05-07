@@ -15,11 +15,14 @@
 #include "grid.h"
 #include "meshes.h"
 #include "time.h"
+#include "globals.h"
 #include <glm/gtx/normal.hpp>
 
 Grid::Grid(){
     heightFactor = 0.2f;
-    vbo=0;
+    vbo=0;ibo=0;
+    cursorx=cursory=128;
+    centrex=centrey=128;
     
     memset(grid,1,GRIDSIZE*GRIDSIZE);
     grid[20][20]=0;
@@ -27,13 +30,34 @@ Grid::Grid(){
     grid[21][20]=0;
     grid[21][21]=0;
 //    return;
-    for(int x=0;x<GRIDSIZE;x++)
-        for(int y=0;y<GRIDSIZE;y++)
+    for(int x=0;x<GRIDSIZE;x++){
+        for(int y=0;y<GRIDSIZE;y++){
             grid[x][y] = rand()%2;
+            gridmats[x][y] = 0;
+        }
+    }
+    
+    // same order as GMAT_ constants
+    materials.push_back(Material(NULL,1,1,1)); // grass
+    materials.push_back(Material(NULL,0.9,0.0,0.9)); // farm
+    
+    // once we know how many mats we need we can allocate the buckets for the triangles
+    // vertices for each material.
+    
+    for(int i=0;i<materials.size();i++){
+        buckets.push_back(std::vector<GLuint>());
+    }
+}
+
+void Grid::select(int idx){
+    if(idx>=0){
+        cursorx = vertidxs[idx][0];
+        cursory = vertidxs[idx][1];
+    }
 }
 
 Grid::~Grid(){
-    if(vbo)glDeleteBuffers(1,&vbo);
+    if(vbo)glDeleteBuffers(2,&vbo);
 }
 
 
@@ -49,7 +73,7 @@ static void calcnormal(UNLITVERTEX *v0,UNLITVERTEX *v1,UNLITVERTEX *v2){
     
 }
 
-void Grid::genTriangles(int cx,int cy,int range){
+void Grid::genTriangles(int range){
     extern bool debugtoggle;
     // First we need to make the vertex data. One useful thing is that we know
     // that each node in the grid cannot be more than 1 different from each of
@@ -63,7 +87,10 @@ void Grid::genTriangles(int cx,int cy,int range){
     // in order so there's no point even having an index buffer.
     
     initGridVerts();
-    centrex=cx;centrey=cy;
+    
+    for(int i=0;i<materials.size();i++){
+        buckets[i].clear();
+    }
     
     memset(visible,0,GRIDSIZE*GRIDSIZE);
     
@@ -72,9 +99,10 @@ void Grid::genTriangles(int cx,int cy,int range){
             
             if(abs(ox)+abs(oy)>=range)continue;
             
-            int x = cx+ox;
-            int y = cy+oy;
+            int x = centrex+ox;
+            int y = centrey+oy;
             
+            int mat = getmat(x,y);
             int h00 = get(x,y);
             int h10 = get(x+1,y);
             int h11 = get(x+1,y+1);
@@ -100,14 +128,16 @@ void Grid::genTriangles(int cx,int cy,int range){
                         visible[x][y]=1;
                         visible[x+1][y]=1;
                         // add base poly for front wedge
-                        v0 = addvert(x0,BASE,y0,1,0);
-                        v1 = addvert(x1,h10,y0,1,0);
-                        v2 = addvert(x0,h00,y0,0,0);
+                        v0 = addvert(x,y,x0,BASE,y0,1,0);
+                        v1 = addvert(x+1,y,x1,h10,y0,1,0);
+                        v2 = addvert(x,y,x0,h00,y0,0,0);
                         calcnormal(v0,v1,v2);
-                        v0 = addvert(x0,BASE,y0,1,0);
-                        v1 = addvert(x1,BASE,y0,1,0);
-                        v2 = addvert(x1,h10,y0,0,0);
+                        addtri(v0,v1,v2,mat);
+                        v0 = addvert(x,y,x0,BASE,y0,1,0);
+                        v1 = addvert(x+1,y,x1,BASE,y0,1,0);
+                        v2 = addvert(x+1,y,x1,h10,y0,0,0);
                         calcnormal(v0,v1,v2);
+                        addtri(v0,v1,v2,mat);
                     }
                 }
                 else if(ox<0){
@@ -116,25 +146,29 @@ void Grid::genTriangles(int cx,int cy,int range){
                         visible[x+1][y]=1;
                         visible[x][y+1]=1;
                         visible[x+1][y+1]=1;
-                        v0 = addvert(x0,h01,y1,0,1);
-                        v1 = addvert(x1,h11,y1,1,1);
-                        v2 = addvert(x1,h10,y0,1,0);
+                        v0 = addvert(x,y+1,x0,h01,y1,0,1);
+                        v1 = addvert(x+1,y+1,x1,h11,y1,1,1);
+                        v2 = addvert(x+1,y,x1,h10,y0,1,0);
                         calcnormal(v0,v1,v2);
+                        addtri(v0,v1,v2,mat);
                         // no base polys in these cases; they would be hidden
                     } else {
-                        v0 = addvert(x0,h00,y0,0,0);
-                        v1 = addvert(x1,h11,y1,1,1);
-                        v2 = addvert(x1,h10,y0,1,0);
+                        v0 = addvert(x,y,x0,h00,y0,0,0);
+                        v1 = addvert(x+1,y+1,x1,h11,y1,1,1);
+                        v2 = addvert(x+1,y,x1,h10,y0,1,0);
                         calcnormal(v0,v1,v2);
+                        addtri(v0,v1,v2,mat);
                         // base polys
-                        v0 = addvert(x1,BASE,y1,1,0);
-                        v1 = addvert(x1,h11,y1,1,1);
-                        v2 = addvert(x0,h00,y0,0,1);
+                        v0 = addvert(x+1,y+1,x1,BASE,y1,1,0);
+                        v1 = addvert(x+1,y+1,x1,h11,y1,1,1);
+                        v2 = addvert(x,y,x0,h00,y0,0,1);
                         calcnormal(v0,v1,v2);
-                        v0 = addvert(x1,BASE,y1,1,0);
-                        v1 = addvert(x0,h00,y0,0,1);
-                        v2 = addvert(x0,BASE,y0,0,0);
+                        addtri(v0,v1,v2,mat);
+                        v0 = addvert(x+1,y+1,x1,BASE,y1,1,0);
+                        v1 = addvert(x,y,x0,h00,y0,0,1);
+                        v2 = addvert(x,y,x0,BASE,y0,0,0);
                         calcnormal(v0,v1,v2);
+                        addtri(v0,v1,v2,mat);
                     }
                 } else {
                     if(oy==0){}
@@ -142,28 +176,32 @@ void Grid::genTriangles(int cx,int cy,int range){
                         visible[x][y]=1;
                         visible[x][y+1]=1;
                         visible[x+1][y+1]=1;
-                        v0 = addvert(x0,h00,y0,0,0);
-                        v1 = addvert(x0,h01,y1,0,1);
-                        v2 = addvert(x1,h11,y1,1,1);
+                        v0 = addvert(x,y,x0,h00,y0,0,0);
+                        v1 = addvert(x,y+1,x0,h01,y1,0,1);
+                        v2 = addvert(x+1,y+1,x1,h11,y1,1,1);
                         calcnormal(v0,v1,v2);
+                        addtri(v0,v1,v2,mat);
                         // no base polys in these cases; they would be hidden
                     } else {
                         visible[x][y]=1;
                         visible[x][y+1]=1;
                         visible[x+1][y]=1;
-                        v0 = addvert(x0,h00,y0,0,0);
-                        v1 = addvert(x0,h01,y1,0,1);
-                        v2 = addvert(x1,h10,y0,1,0);
+                        v0 = addvert(x,y,x0,h00,y0,0,0);
+                        v1 = addvert(x,y+1,x0,h01,y1,0,1);
+                        v2 = addvert(x+1,y,x1,h10,y0,1,0);
                         calcnormal(v0,v1,v2);
+                        addtri(v0,v1,v2,mat);
                         // base polys
-                        v0 = addvert(x1,BASE,y0,1,0);
-                        v1 = addvert(x1,h10,y0,1,1);
-                        v2 = addvert(x0,h01,y1,0,1);
+                        v0 = addvert(x+1,y,x1,BASE,y0,1,0);
+                        v1 = addvert(x+1,y,x1,h10,y0,1,1);
+                        v2 = addvert(x,y+1,x0,h01,y1,0,1);
                         calcnormal(v0,v1,v2);
-                        v0 = addvert(x0,BASE,y1,0,0);
-                        v1 = addvert(x1,BASE,y0,1,0);
-                        v2 = addvert(x0,h01,y1,0,1);
+                        addtri(v0,v1,v2,mat);
+                        v0 = addvert(x,y+1,x0,BASE,y1,0,0);
+                        v1 = addvert(x+1,y,x1,BASE,y0,1,0);
+                        v2 = addvert(x,y+1,x0,h01,y1,0,1);
                         calcnormal(v0,v1,v2);
+                        addtri(v0,v1,v2,mat);
                     }
                 }
             } else {
@@ -174,34 +212,58 @@ void Grid::genTriangles(int cx,int cy,int range){
                 // different triangulations for the two kinds of split
                 if(h00==h11){
                     // first triangle
-                    v0 = addvert(x0,h00,y0,0,0);
-                    v1 = addvert(x1,h11,y1,1,1);
-                    v2 = addvert(x1,h10,y0,1,0);
+                    v0 = addvert(x,y,x0,h00,y0,0,0);
+                    v1 = addvert(x+1,y+1,x1,h11,y1,1,1);
+                    v2 = addvert(x+1,y,x1,h10,y0,1,0);
                     calcnormal(v0,v1,v2);
+                    addtri(v0,v1,v2,mat);
                     //                v0->dump();v1->dump();v2->dump();
                     // second triangle
-                    v0 = addvert(x0,h00,y0,0,0);
-                    v1 = addvert(x0,h01,y1,0,1);
-                    v2 = addvert(x1,h11,y1,1,1);
+                    v0 = addvert(x,y,x0,h00,y0,0,0);
+                    v1 = addvert(x,y+1,x0,h01,y1,0,1);
+                    v2 = addvert(x+1,y+1,x1,h11,y1,1,1);
                     calcnormal(v0,v1,v2);
+                    addtri(v0,v1,v2,mat);
                     //                v0->dump();v1->dump();v2->dump();printf("\n");
                 } else {
                     // first triangle
-                    v0 = addvert(x0,h00,y0,0,0);
-                    v1 = addvert(x0,h01,y1,0,1);
-                    v2 = addvert(x1,h10,y0,1,0);
+                    v0 = addvert(x,y,x0,h00,y0,0,0);
+                    v1 = addvert(x,y+1,x0,h01,y1,0,1);
+                    v2 = addvert(x+1,y,x1,h10,y0,1,0);
                     calcnormal(v0,v1,v2);
+                    addtri(v0,v1,v2,mat);
                     // second triangle
-                    v0 = addvert(x0,h01,y1,0,1);
-                    v1 = addvert(x1,h11,y1,1,1);
-                    v2 = addvert(x1,h10,y0,1,0);
+                    v0 = addvert(x,y+1,x0,h01,y1,0,1);
+                    v1 = addvert(x+1,y+1,x1,h11,y1,1,1);
+                    v2 = addvert(x+1,y,x1,h10,y0,1,0);
                     calcnormal(v0,v1,v2);
+                    addtri(v0,v1,v2,mat);
                 }
             }
         }
     }
-    if(vbo)glDeleteBuffers(1,&vbo);
-    glGenBuffers(1,&vbo);
+    
+    // now build the entire index buffer with transitions
+    // First clear the data.
+    static std::vector<GLuint> idxdata;
+    idxdata.clear();
+    transitions.clear();
+    
+    // go over the materials
+    for(int i=0;i<materials.size();i++){
+        // add the transitions
+        if(buckets[i].size()){
+            transitions.push_back(Transition(idxdata.size(),buckets[i].size(),i));
+            // for each material, add its indices to the buffer.
+            for(std::vector<GLuint>::iterator it = buckets[i].begin();it!=buckets[i].end();++it){
+                idxdata.push_back(*it);
+            }
+        }                  
+    }
+        
+    
+    if(vbo)glDeleteBuffers(2,&vbo);
+    glGenBuffers(2,&vbo);
     ERRCHK;
     
     glBindBuffer(GL_ARRAY_BUFFER,vbo);
@@ -209,6 +271,12 @@ void Grid::genTriangles(int cx,int cy,int range){
     glBufferData(GL_ARRAY_BUFFER,sizeof(UNLITVERTEX)*vertct,verts,GL_STATIC_DRAW);
     ERRCHK;
     
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 sizeof(GLuint)*idxdata.size(),
+                 &idxdata[0],
+                 GL_STATIC_DRAW);
+    ERRCHK;
 }
 
 
@@ -237,17 +305,17 @@ void Grid::render(glm::mat4 *world){
     
     
     static const float whiteCol[] = {0.8,0.8,0.8,1};
-#if 0
-    static const float greyCol[] = {0.7,0.7,0.7,1};
-    eff->setMaterial(greyCol,NULL);
-    glDrawArrays(GL_TRIANGLES,0,vertct);
-    glClear(GL_DEPTH_BUFFER_BIT);
+    
+    for(std::vector<Transition>::iterator it=transitions.begin();it!=transitions.end();++it){
+        Material *m = &materials[it->matidx];
+        eff->setMaterial(m->diffuse,m->t);
+        glDrawElements(GL_TRIANGLES,it->count,GL_UNSIGNED_INT,
+                       (void *)(it->start*sizeof(GLuint)));
+        
+    }
+    
     eff->setMaterial(whiteCol,NULL);
-    glDrawArrays(GL_LINES,0,vertct);
-#else
-    eff->setMaterial(whiteCol,NULL);
     glDrawArrays(GL_TRIANGLES,0,vertct);
-#endif
     
     glBindBuffer(GL_ARRAY_BUFFER,0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
@@ -256,7 +324,31 @@ void Grid::render(glm::mat4 *world){
     drawHouses();
 }
 
-void Grid::renderCursor(int x,int y){
+int Grid::intersect(const glm::vec3& origin, const glm::vec3& ray){
+    
+    float mindist;
+    int found=-1;
+    for(int i=0;i<vertct;i++){
+        glm::tvec3<float> *v = reinterpret_cast<glm::tvec3<float>*>(&verts[i].x);
+        glm::vec3 diff = *v - origin;
+        float parm = glm::dot(ray,diff);
+        
+        if(parm>0){
+            // closest point on ray to vec
+            glm::vec3 loc = origin + parm*ray;
+            diff = *v - loc;
+            float dist = sqrt(diff.x*diff.x + diff.y*diff.y + diff.z*diff.z);
+            if(!i || dist<mindist){
+                found = i;
+                mindist = dist;
+            }
+        }
+    }
+    return found;
+}
+
+
+void Grid::renderCursor(){
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
     
@@ -264,7 +356,7 @@ void Grid::renderCursor(int x,int y){
     s->light.col[0] = Colour(1,1,1,1);
     s->light.col[1] = Colour(1,1,1,1);
     s->light.ambient = Colour(0.7,0.7,0.7,1);
-    pushxform(x,y,-0.5f);
+    pushxform(cursorx,cursory,-0.5f);
     ms->scale(0.3f);
     ms->rotY(Time::now()*2.0f);
     meshes::cursor->render(sm->getx()->top());

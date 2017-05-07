@@ -21,15 +21,10 @@ const float UNLITVERTEX::VERTEXEPSILON=0.001f;
 const float UNLITVERTEX::NORMALEPSILON=0.00f;
 const float UNLITVERTEX::UVEPSILON=0.01f;
 
-struct Material {
-    struct Texture *t; // will probably always be null
-    float diffuse[4];
-};
-
 static const int VERTEXBUFFER=0;
 static const int INDEXBUFFER=1;
 
-static int findOrCreateVert(std::vector<UNLITVERTEX>& verts,UNLITVERTEX &v){
+static int addvert(std::vector<UNLITVERTEX>& verts,UNLITVERTEX &v){
 //    for(size_t i=0;i<verts.size();i++){
 //        if(verts[i].compare(&v))
 //            return i;
@@ -100,7 +95,7 @@ ObjMesh::ObjMesh(const char *dir,const char *name){
     // and materials (which will have indices / 3, since triangles.
     std::vector<int> matidx;
     
-    // find centroid
+ /*   // find centroid (which we're not using at the mo)
     float cx=0,cy=0,cz=0;
     int ct=0;
     for(size_t s=0;s<shapes.size();s++){
@@ -129,7 +124,7 @@ ObjMesh::ObjMesh(const char *dir,const char *name){
     cx/=(float)ct;
     cy/=(float)ct;
     cz/=(float)ct;
-    
+*/    
     
     // next step - build out of this mess a unified set of vertices
     // and indices into them (as triples), and a material index list.
@@ -169,7 +164,7 @@ ObjMesh::ObjMesh(const char *dir,const char *name){
                 } else {
                     v.u = v.v = 0;
                 }
-                int vertidx = findOrCreateVert(verts,v);
+                int vertidx = addvert(verts,v);
                 // now add the index of the combined vertex
                 indx.push_back(vertidx);
 //                printf("%f,%f,%f %f,%f,%f %f,%f\n",
@@ -240,8 +235,7 @@ ObjMesh::~ObjMesh(){
     delete [] mats;
 }
 
-static Material defaultMat = {
-    NULL,{0,0,0,1}};
+static Material defaultMat;
 
 static Effect *eff;
 void ObjMesh::startBatch(){

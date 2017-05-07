@@ -5,6 +5,7 @@
  */
 
 #include <exception>
+#include <unistd.h>
 
 #include "gfx.h"
 #include "effect.h"
@@ -41,6 +42,7 @@ int main(int argc, char** argv)
     
     while(globals::running)
     {
+        
         SDL_Event e;
         while(SDL_PollEvent(&e))
         {
@@ -57,6 +59,10 @@ int main(int argc, char** argv)
                     curscreen->onKeyDown(e.key.keysym.sym);
                     break;
                 }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                // put the mouse button to all regions
+                Region::notifyClick(e.motion.x,e.motion.y,e.button.button);
                 break;
             case SDL_MOUSEMOTION:
                 // put the mouse move to all regions
@@ -98,7 +104,6 @@ int main(int argc, char** argv)
         curscreen->render();
         
         context.swap();
-        
     };
 
     return 0;

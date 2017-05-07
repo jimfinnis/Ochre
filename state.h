@@ -49,7 +49,7 @@ struct State {
     class Effect *effect;
     
     // extra stuff
-    class Texture *texture2;
+    SDL_Texture *texture2;
     Colour diffuse2;
     
     // other overrides are determined by some flags

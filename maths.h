@@ -253,8 +253,12 @@ public:
     void reset(); // sets stack to hold identity
     glm::mat4 *push(); // pushes stack, copies top and returns ptr
     void pop(); // pops stack and discards
-    void mul(const glm::mat4 &m); // top = m*top
-    void mulBack(const glm::mat4 &m); // top = top * m
+    void mul(const glm::mat4 &m){ // top = m*top
+        stack[ct] = m * stack[ct];
+    }
+    void mulBack(const glm::mat4 &m){ // top = top * m
+        stack[ct] = stack[ct] * m;
+    }
     
     void translate(float x,float y,float z){
         stack[ct] = glm::translate(stack[ct],glm::vec3(x,y,z));

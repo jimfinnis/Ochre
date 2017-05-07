@@ -7,6 +7,8 @@
 #include "state.h"
 #include "globals.h"
 #include "font.h"
+#include "time.h"
+#include "grid.h"
 
 void StatRegion::onMouseMove(int x,int y){
 }
@@ -18,6 +20,15 @@ void StatRegion::render(){
     StateManager *sm = StateManager::getInstance();
     sm->reset();
     
+    
     globals::font->render(10,20,20,"Ochre 0.0 (%s)",__DATE__);
-    globals::font->render(10,50,20,"%d %d",globals::cursorx,globals::cursory);
+    
+    static double lastTime=0;
+    double t = Time::now();
+    double ft = t-lastTime;
+    lastTime = t;
+    
+    globals::font->render(10,50,20,"%d %d %d",globals::grid->cursorx,globals::grid->cursory,
+                          (int)(1.0/ft));
+    
 }

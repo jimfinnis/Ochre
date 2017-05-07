@@ -23,6 +23,7 @@ public:
     float x,y,w,h;
     
     static void notifyMouseMove(int x,int y);
+    static void notifyClick(int x,int y,int b); // b is the SDL mouse button ID
     static void notifyResize();
     
     Region(const char *nm);
@@ -35,7 +36,10 @@ public:
         x=xx;y=yy;w=ww;h=hh;
     }
     
-    virtual void onMouseMove(int x, int y);
+    virtual void onMouseMove(int x, int y){};
+    virtual void onLeftClick(int w,int h){};
+    virtual void onRightClick(int w,int h){};
+    virtual void onMiddleClick(int w,int h){};
     
     /// convert a 0-1 into region coords - only used where appropriate
     int getx(float xx){

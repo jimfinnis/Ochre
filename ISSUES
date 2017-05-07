@@ -1,2 +1,8 @@
-- mipmap generation on textures
+- mesh building (add vert, add material transitions)
+    - use this for the grid
+    - and possibly for objmesh system?
+    - needs a way to add user data to vertex for raycasting
+      (or at least get the vertex index, so we can look up in a table)
+- raycasting for mouse click detection
 - speed up quad rendering with queueing
+- mipmap generation on textures??

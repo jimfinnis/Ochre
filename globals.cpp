@@ -11,7 +11,6 @@ namespace globals {
 Font *font = NULL;
 Grid *grid = NULL;
 bool running = true;
-int cursorx,cursory;
 
 // initialise those globals which need it
 void init(){

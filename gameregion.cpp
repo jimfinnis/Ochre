@@ -7,13 +7,45 @@
 #include "state.h"
 #include "grid.h"
 #include "globals.h"
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <iostream>
 
 GameRegion::GameRegion() : IsoRegion("game") {
-    globals::cursorx=20;
-    globals::cursory=20;
+    
 }
 
-void GameRegion::onMouseMove(int x,int y){
+void GameRegion::onMouseMove(int sx,int sy){
+    // get norm. dev. coords
+    sx=sx-x;
+    sy=sy-y;
+//    printf("POS %d %d - ",sx,sy);
+    float ndx=(2.0f * sx)/w-1.0f;
+    float ndy=(2.0f * sy)/h-1.0f; // this is already reversed (see region::notifymousemove)
+//    printf("%f %f\n",ndx,ndy);
+    
+    set(); // to make sure the effect manager has the correct projection
+    glm::vec4 ray_clip(ndx,ndy,-1.0f,1.0f);
+    glm::vec4 ray_eye = glm::inverse(EffectManager::projection)*ray_clip;
+    ray_eye.z = -1;ray_eye.w = 0;
+//    printf("EYE %f %f %f\n",ray_eye.x,ray_eye.y,ray_eye.z);
+    
+    glm::vec3 ray_world = (glm::inverse(view)*ray_eye);
+    ray_world = glm::normalize(ray_world);
+//    std::cout << glm::to_string(view) << std::endl;
+//    printf("WOR %f %f %f\n",ray_world.x,ray_world.y,ray_world.z);
+    
+    int pt = globals::grid->intersect(glm::vec3(0,10,35),ray_world);
+//    printf("%d\n",pt);
+    globals::grid->select(pt);
+}
+
+void GameRegion::onLeftClick(int x,int y){
+    globals::grid->up(globals::grid->cursorx,globals::grid->cursory);
+}
+
+void GameRegion::onRightClick(int x,int y){
+    globals::grid->down(globals::grid->cursorx,globals::grid->cursory);
 }
 
 void GameRegion::renderWater(){
@@ -55,13 +87,13 @@ void GameRegion::renderWater(){
     glDepthMask(GL_TRUE);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     
+    glDeleteBuffers(1,&vbo);
     em->untex->end();
     ms->pop();
  }
 
 void GameRegion::render(){
     setAndClear(Colour(0,0,0.2,1));
-    
     // reset the state manager
     StateManager *sm = StateManager::getInstance();
     sm->reset();
@@ -69,12 +101,14 @@ void GameRegion::render(){
     MatrixStack *ms = sm->getx();
     ms->push();
     
-    ms->mulBack(glm::lookAt(glm::vec3(0.0f,10.0f,35.0f),glm::vec3(),glm::vec3(0.0f,1.0f,0.0f)));
+    ms->mul(glm::lookAt(glm::vec3(0.0f,10.0f,35.0f),glm::vec3(),glm::vec3(0.0f,1.0f,0.0f)));
+    // copy the worldview matrix so we can access it for mouse clickage.
+    view = *(ms->top());
     
+    globals::grid->genTriangles(visibleGridSize);    
     
-    globals::grid->genTriangles(globals::cursorx,globals::cursory,visibleGridSize);
-    globals::grid->render(sm->getx()->top());
-    globals::grid->renderCursor(globals::cursorx,globals::cursory);
+    globals::grid->render(ms->top());
+    globals::grid->renderCursor();
     
     renderWater();
     

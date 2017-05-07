@@ -15,6 +15,7 @@ GameScreen::GameScreen() {
 }
 
 GameScreen::~GameScreen(){
+    delete globals::grid;
 }
 
 #define TOOLWIDTH 200
@@ -41,19 +42,22 @@ void GameScreen::onKeyDown(int k){
         globals::grid = new Grid();
         break;
     case SDLK_RIGHT:
-        globals::cursorx++;break;
+        globals::grid->cursorx++;break;
     case SDLK_LEFT:
-        globals::cursorx--;break;
+        globals::grid->cursorx--;break;
         // these are backwards because right-handed coord system: +ve z is into the screen
     case SDLK_UP:
-        globals::cursory--;break;
+        globals::grid->cursory--;break;
     case SDLK_DOWN:
-        globals::cursory++;break;
+        globals::grid->cursory++;break;
     case 'p':
-        globals::grid->up(globals::cursorx,globals::cursory);
+        globals::grid->up(globals::grid->cursorx,globals::grid->cursory);
         break;
     case 'l':
-        globals::grid->down(globals::cursorx,globals::cursory);
+        globals::grid->down(globals::grid->cursorx,globals::grid->cursory);
+        break;
+    case 'x':
+        globals::grid->recentre();
         break;
     default:
         printf("%d\n",k);

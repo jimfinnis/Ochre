@@ -11,14 +11,11 @@
 
 #include "gfx.h"
 #include "maths.h"
+#include "material.h"
 #include <vector>
 
-struct Transition{
-    int start,count,matidx;
-};
-
 class ObjMesh {
-    struct Material *mats;
+    Material *mats;
     
     GLuint buffers[2];
     std::vector<Transition> transitions;
