@@ -15,9 +15,9 @@
 
 #include "context.h"
 #include "screen.h"
-#include "grid.h"
 #include "meshes.h"
 #include "time.h"
+#include "game.h"
 #include "globals.h"
 
 #include "gamescreen.h"
@@ -100,10 +100,51 @@ void handleInput(){
 void update(){
 }
 
+#include "pool.h"
+
+// pool test functions.
+void tfl(){
+    Pool<int> pool(10);
+    int *foo[10];
+    for(int i=0;i<30;i++){
+        foo[i] = pool.alloc();
+        if(!foo[i])break;
+        *foo[i] = i*10;
+        printf("%d - %d\n",i,*foo[i]);
+    }
+    
+    
+    int chk=0;
+    for(int *p = pool.first(); p ; p=pool.next(p)){
+        if(chk++ == 100)break;
+        printf("%d\n",*p);
+   }
+    
+    for(int i=0;i<200;i++){
+        int qq = rand()%10;
+        int pp = rand()%10;
+        if(pp==qq)continue;
+        if(*foo[qq]!=qq*10){printf("FAIL0\n");};
+        pool.free(foo[qq]);
+        if(*foo[pp]!=pp*10){printf("FAIL0\n");};
+        pool.free(foo[pp]);
+        foo[qq] = pool.alloc();
+        *foo[qq]=qq*10;
+        foo[pp] = pool.alloc();
+        *foo[pp]=pp*10;
+        pool.dump();
+    }
+    
+    for(int *p = pool.first(); p ; p=pool.next(p)){
+        printf("%d\n",*p);
+   }
+    std::terminate();
+
+}
+    
 
 int main(int argc, char** argv)
 {
-    
     Time::init();
     Font::init();
     

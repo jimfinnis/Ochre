@@ -7,12 +7,12 @@
 #ifndef __GLOBALS_H
 #define __GLOBALS_H
 class Font;
-class Grid;
+class Game;
 
 namespace globals {
 extern Font *font;
-extern Grid *grid;
 extern bool running;
+extern Game *game;
 
 void init();
 }

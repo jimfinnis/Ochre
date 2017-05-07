@@ -5,8 +5,8 @@
  */
 #include "gameregion.h"
 #include "state.h"
-#include "grid.h"
 #include "globals.h"
+#include "game.h"
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
@@ -35,17 +35,19 @@ void GameRegion::onMouseMove(int sx,int sy){
 //    std::cout << glm::to_string(view) << std::endl;
 //    printf("WOR %f %f %f\n",ray_world.x,ray_world.y,ray_world.z);
     
-    int pt = globals::grid->intersect(glm::vec3(0,10,35),ray_world);
+    int pt = globals::game->grid.intersect(glm::vec3(0,10,35),ray_world);
 //    printf("%d\n",pt);
-    globals::grid->select(pt);
+    globals::game->grid.select(pt);
 }
 
 void GameRegion::onLeftClick(int x,int y){
-    globals::grid->up(globals::grid->cursorx,globals::grid->cursory);
+    Grid *g = &globals::game->grid;
+    g->up(g->cursorx,g->cursory);
 }
 
 void GameRegion::onRightClick(int x,int y){
-    globals::grid->down(globals::grid->cursorx,globals::grid->cursory);
+    Grid *g = &globals::game->grid;
+    g->down(g->cursorx,g->cursory);
 }
 
 void GameRegion::renderWater(){
@@ -70,8 +72,10 @@ void GameRegion::renderWater(){
     
     EffectManager *em = EffectManager::getInstance();
     
+    Grid *g = &globals::game->grid;
+
     ms->push();
-    ms->translate(0,0.5f*globals::grid->heightFactor,0);
+    ms->translate(0,0.5f*g->heightFactor,0);
     // the 0.6 is because we're not rendering the whole thing, just a diamondy shape
     ms->scale(visibleGridSize*0.62f);
     ms->rotY(glm::radians(45.0f));
@@ -105,10 +109,11 @@ void GameRegion::render(){
     // copy the worldview matrix so we can access it for mouse clickage.
     view = *(ms->top());
     
-    globals::grid->genTriangles(visibleGridSize);    
+    Grid *g = &globals::game->grid;
+    g->genTriangles(visibleGridSize);    
     
-    globals::grid->render(ms->top());
-    globals::grid->renderCursor();
+    g->render(ms->top());
+    g->renderCursor();
     
     renderWater();
     

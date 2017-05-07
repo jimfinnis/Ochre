@@ -8,7 +8,7 @@
 #include "globals.h"
 #include "font.h"
 #include "time.h"
-#include "grid.h"
+#include "game.h"
 
 void StatRegion::onMouseMove(int x,int y){
 }
@@ -28,7 +28,9 @@ void StatRegion::render(){
     double ft = t-lastTime;
     lastTime = t;
     
-    globals::font->render(10,50,20,"%d %d %d",globals::grid->cursorx,globals::grid->cursory,
+    Grid *g = &globals::game->grid;
+    
+    globals::font->render(10,50,20,"%d %d %d",g->cursorx,g->cursory,
                           (int)(1.0/ft));
     
 }

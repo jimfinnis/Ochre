@@ -9,7 +9,7 @@
 
 namespace globals {
 Font *font = NULL;
-Grid *grid = NULL;
+Game *game = NULL;
 bool running = true;
 
 // initialise those globals which need it

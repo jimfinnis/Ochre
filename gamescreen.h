@@ -19,8 +19,6 @@ class GameScreen : public Screen {
     ToolRegion tool;
     StatRegion stat;
     
-    int hx,hy;
-    
 public:
     GameScreen();
     virtual ~GameScreen();

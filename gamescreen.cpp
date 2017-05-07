@@ -6,16 +6,14 @@
 
 #include "gamescreen.h"
 #include "globals.h"
-#include "grid.h"
+#include "game.h"
 
 GameScreen::GameScreen() {
-    globals::grid = new Grid();
-    hx=20;
-    hy=20;
+    globals::game = new Game();
 }
 
 GameScreen::~GameScreen(){
-    delete globals::grid;
+    delete globals::game;
 }
 
 #define TOOLWIDTH 200
@@ -36,28 +34,27 @@ void GameScreen::render(){
 }
 
 void GameScreen::onKeyDown(int k){
+    
+    Grid *g = &globals::game->grid;
+    
     switch(k){
-    case 't':
-        delete globals::grid;
-        globals::grid = new Grid();
-        break;
     case SDLK_RIGHT:
-        globals::grid->cursorx++;break;
+        g->cursorx++;break;
     case SDLK_LEFT:
-        globals::grid->cursorx--;break;
+        g->cursorx--;break;
         // these are backwards because right-handed coord system: +ve z is into the screen
     case SDLK_UP:
-        globals::grid->cursory--;break;
+        g->cursory--;break;
     case SDLK_DOWN:
-        globals::grid->cursory++;break;
+        g->cursory++;break;
     case 'p':
-        globals::grid->up(globals::grid->cursorx,globals::grid->cursory);
+        g->up(g->cursorx,g->cursory);
         break;
     case 'l':
-        globals::grid->down(globals::grid->cursorx,globals::grid->cursory);
+        g->down(g->cursorx,g->cursory);
         break;
     case 'x':
-        globals::grid->recentre();
+        g->recentre();
         break;
     default:
         printf("%d\n",k);
