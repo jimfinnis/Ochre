@@ -22,14 +22,14 @@
 
 static float noise(float x,float y){
     static const int OCTAVES = 4;
-    float persist = 0.75;
+    float persist = 0.8;
     
-    float v = glm::simplex(glm::tvec2<float>(x,y));
-    float p = 0.5f;
+    float p = powf(2,-3);
     float amp = persist;
+    float v = 0;
     for(int i=0;i<OCTAVES;i++){
         v += glm::simplex(glm::tvec2<float>(x*p,y*p))*amp;
-        p*=0.5f;
+        p*=2;
         amp*=persist;
     }
     return v*0.5;
