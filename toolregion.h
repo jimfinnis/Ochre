@@ -15,6 +15,7 @@ public:
     virtual ~ToolRegion(){};
     
     virtual void onMouseMove(int x,int y);
+    virtual void onLeftClick(int x,int y);
     virtual void render();
 };
 

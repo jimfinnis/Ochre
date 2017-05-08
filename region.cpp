@@ -39,6 +39,8 @@ void Region::notifyClick(int x,int y,int b){
     for(i=regions.begin();i!=regions.end();++i){
         Region *r = *i;
         if(x >= r->x && x<r->x+r->w && y>=r->y && y<r->y+r->h){
+            x-=r->x;
+            y-=r->y;
             switch(b){
             case SDL_BUTTON_LEFT:
                 r->onLeftClick(x,y);break;

@@ -9,7 +9,7 @@
 #include "game.h"
 
 GameScreen::GameScreen() {
-    globals::game = new Game();
+    globals::game = new Game(0,-2);
 }
 
 GameScreen::~GameScreen(){

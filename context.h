@@ -15,9 +15,6 @@
  */
 
 class Context {
-    friend class Font;
-    
-    SDL_Renderer *rdr;
     SDL_Window *wnd;
     SDL_GLContext glc;
     
@@ -32,6 +29,7 @@ class Context {
 public:
     int w,h;
     class Screen *curscreen;
+    SDL_Renderer *rdr;
     
     static Context *getInstance(){
         return instance;

@@ -13,6 +13,9 @@
 /// a running game level, with data about both players and the world.
 
 struct Game {
+    Game(int seed,float waterlevel) : grid(seed,waterlevel){
+    }
+    
     Grid grid;
     
     Player p;

@@ -11,28 +11,50 @@
 #include "obj.h"
 #include "font.h"
 
+#include "context.h"
 #include "screen.h"
 #include "grid.h"
 #include "meshes.h"
 #include "time.h"
 #include "globals.h"
 #include <glm/gtx/normal.hpp>
+#include <glm/gtc/noise.hpp>
 
-Grid::Grid(){
+static float noise(float x,float y){
+    static const int OCTAVES = 4;
+    float persist = 0.75;
+    
+    float v = glm::simplex(glm::tvec2<float>(x,y));
+    float p = 0.5f;
+    float amp = persist;
+    for(int i=0;i<OCTAVES;i++){
+        v += glm::simplex(glm::tvec2<float>(x*p,y*p))*amp;
+        p*=0.5f;
+        amp*=persist;
+    }
+    return v*0.5;
+}
+
+Grid::Grid(int seed,float waterlevel){
     heightFactor = 0.2f;
     vbo=0;ibo=0;
-    cursorx=cursory=128;
-    centrex=centrey=128;
+    cursorx=cursory=GRIDSIZE/2;
+    centrex=centrey=cursorx;
+    float seedf = 1000.0f*seed;
     
     memset(grid,1,GRIDSIZE*GRIDSIZE);
     grid[20][20]=0;
     grid[20][21]=0;
     grid[21][20]=0;
     grid[21][21]=0;
-//    return;
+    //    return;
+    
     for(int x=0;x<GRIDSIZE;x++){
         for(int y=0;y<GRIDSIZE;y++){
-            grid[x][y] = rand()%2;
+            float v = noise(1093.0f+seedf+x*0.1f,y*0.1f)*5-waterlevel;
+            if(v<0)v=0;
+            if(v>5)v=5;
+            grid[x][y] = v;
             gridmats[x][y] = 0;
         }
     }
@@ -47,6 +69,16 @@ Grid::Grid(){
     for(int i=0;i<materials.size();i++){
         buckets.push_back(std::vector<GLuint>());
     }
+    
+    maptex = SDL_CreateTexture(Context::getInstance()->rdr,
+                               SDL_PIXELFORMAT_ARGB8888,
+                               SDL_TEXTUREACCESS_STREAMING,
+                               GRIDSIZE,GRIDSIZE);
+    if(!maptex){
+        throw Exception().set("could not create grid map texture: %s",
+                              SDL_GetError());
+    }
+    writeTexture();
 }
 
 void Grid::select(int idx){
@@ -58,6 +90,7 @@ void Grid::select(int idx){
 
 Grid::~Grid(){
     if(vbo)glDeleteBuffers(2,&vbo);
+    if(maptex)SDL_DestroyTexture(maptex);
 }
 
 
@@ -116,8 +149,6 @@ void Grid::genTriangles(int range){
             
             glm::vec3 norm;
             UNLITVERTEX *v0,*v1,*v2;
-            
-//            printf("%d %d %d %d\n",h00,h01,h10,h11);
             
             // deal with edges
             
@@ -322,6 +353,7 @@ void Grid::render(glm::mat4 *world){
     eff->end();
     
     drawHouses();
+    writeTexture();
 }
 
 int Grid::intersect(const glm::vec3& origin, const glm::vec3& ray){
@@ -428,3 +460,39 @@ void Grid::drawHouses(){
     meshes::house1->endBatch();
 }
     
+void Grid::writeTexture(){
+    SDL_Rect r;
+    uint8_t *pixels;
+    int pitch;
+    
+    if(SDL_LockTexture(maptex,NULL,(void **)&pixels,&pitch)<0)
+        throw Exception().set("cannot lock grid map texture: %s",
+                              SDL_GetError());
+    uint8_t *row = pixels;
+    for(int y=0;y<GRIDSIZE;y++){
+        uint32_t *r = (uint32_t *)row;
+        for(int x=0;x<GRIDSIZE;x++){
+            uint32_t col;
+            switch(grid[x][y]){
+            case 0:
+                col = 0x0080ff;break;
+            case 1:
+                col = 0x808080;break;
+            case 2:
+                col = 0xa0a0a0;break;
+            case 3:
+                col = 0xb0b0b0;break;
+            case 4:
+                col = 0xc0c0c0;break;
+            case 5:
+                col = 0xffffff;break;
+            default:
+                col = 0xff0000;break;
+            }
+            col |= ((visible[x][y])?0xff:0xa0)<<24;
+            *r++=col;
+        }
+        row += pitch;
+    }
+    SDL_UnlockTexture(maptex);
+}

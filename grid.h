@@ -15,8 +15,8 @@
 
 /// the grid component of the world from which the heightmap is generated.
 
-#define GRIDSIZE 256
-#define MAXVERTS 16384
+#define GRIDSIZE 128
+#define MAXVERTS 32767
 
 // these are the predefined grid materials
 
@@ -47,7 +47,7 @@ class Grid {
     }
     
     UNLITVERTEX *addvert(int gx,int gy,float x,float y,float z,float u,float v){
-        if(vertct==MAXVERTS)
+        if(vertct>=MAXVERTS)
             FATAL("Too many verts in grid!");
         
         vertidxs[vertct][0] = gx;
@@ -79,6 +79,9 @@ class Grid {
     // each material has a vector of ints, which store the triangle indices during
     // mesh generation.
     std::vector<std::vector<GLuint>> buckets;
+    
+    // we can write the texture to a map, too.
+    SDL_Texture *maptex;
 
 public:
     int cursorx,cursory; // selected point
@@ -86,7 +89,7 @@ public:
     
     float heightFactor; // y is also multiplied by this
     
-    Grid();
+    Grid(int seed,float waterlevel);
     ~Grid();
     
     inline int get(int x,int y){
@@ -101,6 +104,11 @@ public:
             return gridmats[x][y];
         else
             return 0;
+    }
+    
+    /// get the map texture
+    SDL_Texture *getMapTex(){
+        return maptex;
     }
         
     
@@ -135,6 +143,8 @@ public:
     // lower at x,y (and neighbours if necessary)
     void down(int x,int y);
     
+    // draw the map (will require people to be added)
+    void writeTexture();
     void drawHouses();
 };
 
