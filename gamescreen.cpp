@@ -9,7 +9,7 @@
 #include "game.h"
 
 GameScreen::GameScreen() {
-    globals::game = new Game(0,-2);
+    globals::game = new Game(10,-2);
 }
 
 GameScreen::~GameScreen(){
@@ -36,8 +36,12 @@ void GameScreen::render(){
 void GameScreen::onKeyDown(int k){
     
     Grid *g = &globals::game->grid;
-    
+    static int qqq=0;
     switch(k){
+//    case 'm': // DEBUGGING KEY TO REGEN WORLD
+//        delete globals::game;
+//        globals::game = new Game(qqq++,-2);
+//        break;
     case SDLK_RIGHT:
         g->cursorx++;break;
     case SDLK_LEFT:
