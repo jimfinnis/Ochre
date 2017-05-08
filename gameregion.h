@@ -12,7 +12,7 @@
 
 class GameRegion : public IsoRegion {
     void renderWater();
-    static const int visibleGridSize=16;
+    static const int visibleGridSize=8;
     glm::mat4 view;
 public:
     GameRegion();

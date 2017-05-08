@@ -7,6 +7,9 @@
 #ifndef __PLAYER_H
 #define __PLAYER_H
 
+#include "pool.h"
+#include "person.h"
+
 /// max number of people for each player
 #define MAXPOP 256
 
@@ -17,7 +20,9 @@
 
 
 struct Player {
+    Pool<Person> people;
     
+    Player();
 };
 
 #endif /* __PLAYER_H */

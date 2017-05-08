@@ -7,7 +7,11 @@
 #ifndef __POOL_H
 #define __POOL_H
 
-/// allocation pool with iterator. Ctors/dtors are run
+#include <new>
+#include <stdlib.h>
+#include <stdio.h>
+
+/// allocation pool with iterator. Runs ctors and dtors.
 
 template<class T> class Pool {
     int cap;
@@ -62,7 +66,7 @@ public:
         //        dump("alloc",o-data);
         
         // run constructor
-        new(o) T();
+        new(o) T;
         return o;
     }
     

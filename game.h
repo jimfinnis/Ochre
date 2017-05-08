@@ -19,7 +19,6 @@ struct Game {
     Grid grid;
     
     Player p;
-    
 };
 
 #endif /* __GAME_H */

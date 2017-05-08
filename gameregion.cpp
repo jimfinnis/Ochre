@@ -109,13 +109,16 @@ void GameRegion::render(){
     // copy the worldview matrix so we can access it for mouse clickage.
     view = *(ms->top());
     
-    Grid *g = &globals::game->grid;
+    Game *game = globals::game;
+    
+    Grid *g = &game->grid;
     g->genTriangles(visibleGridSize);    
     
     g->render(ms->top());
     g->renderCursor();
     
     renderWater();
+    
     
     
     ms->pop();
