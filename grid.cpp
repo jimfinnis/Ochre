@@ -433,6 +433,29 @@ void Grid::pushxform(int x,int y,float offset){
     ms->translate(xx,yy,zz);
 }
 
+inline float lerp(float s, float e, float t){return s+(e-s)*t;}
+inline float blerp(float c00, float c10, float c01, float c11, float tx, float ty){
+    return lerp(lerp(c00, c10, tx), lerp(c01, c11, tx), ty);
+}
+
+void Grid::pushxforminterp(float fx,float fy,float offset){
+    MatrixStack *ms = StateManager::getInstance()->getx();
+    fx -= centrex;
+    fy -= centrey;
+    
+    int x = (int)fx;
+    int y = (int)fy;
+    
+    float h00 = get(x,y);
+    float h01 = get(x,y+1);
+    float h10 = get(x+1,y);
+    float h11 = get(x+1,y+1);
+    
+    float r = blerp(h00,h10,h01,h11,fx-x,fy-y)+offset;
+    ms->push();
+    ms->translate(fx,r,fy);
+}
+
 void Grid::drawHouses(){
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();

@@ -5,6 +5,11 @@
  */
 
 #include "player.h"
+#include "gfx.h"
+#include "effect.h"
+#include "state.h"
+#include "obj.h"
+#include "grid.h"
 
 Player::Player() : people(256){
     // we'll just test with one person
@@ -12,3 +17,11 @@ Player::Player() : people(256){
     p->init(24,24);
 }
 
+void Player::render(){
+    // draw all the little folk.
+    
+    for(Person *p=people.first();p;p=people.next(p)){
+        
+    }
+    
+}

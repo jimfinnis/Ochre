@@ -23,6 +23,9 @@ struct Player {
     Pool<Person> people;
     
     Player();
+    
+    // assumes grid transform is stacked.
+    void render();
 };
 
 #endif /* __PLAYER_H */

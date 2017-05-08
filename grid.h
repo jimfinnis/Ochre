@@ -89,6 +89,11 @@ public:
     
     float heightFactor; // y is also multiplied by this
     
+    /// is a given grid square visible (set by genTriangles)
+    bool isVisible(int x,int y){
+        return visible[x][y]!=0;
+    }
+    
     Grid(int seed,float waterlevel);
     ~Grid();
     
@@ -127,6 +132,8 @@ public:
     
     // push transform to this location with height offset
     void pushxform(int x,int y,float offset);
+    // as pushxform, but does bilinear interp on heights
+    void pushxforminterp(float x,float y,float offset);
     
     /// generate triangles centred around centrex,centrey.
     void genTriangles(int range);
