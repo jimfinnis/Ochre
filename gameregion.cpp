@@ -30,7 +30,7 @@ void GameRegion::onMouseMove(int sx,int sy){
     ray_eye.z = -1;ray_eye.w = 0;
 //    printf("EYE %f %f %f\n",ray_eye.x,ray_eye.y,ray_eye.z);
     
-    glm::vec3 ray_world = (glm::inverse(view)*ray_eye);
+    glm::vec3 ray_world = glm::vec3(glm::inverse(view)*ray_eye);
     ray_world = glm::normalize(ray_world);
 //    std::cout << glm::to_string(view) << std::endl;
 //    printf("WOR %f %f %f\n",ray_world.x,ray_world.y,ray_world.z);
