@@ -17,6 +17,9 @@
 #include "meshes.h"
 #include "time.h"
 #include "globals.h"
+#include "game.h"
+#include "player.h"
+
 #include <glm/gtx/normal.hpp>
 #include <glm/gtc/noise.hpp>
 
@@ -141,9 +144,9 @@ void Grid::genTriangles(int range){
             int h11 = get(x+1,y+1);
             int h01 = get(x,y+1);
             
-            // get the vertex coords (adding correction)
-            float x0 = (float)ox-0.5;
-            float x1 = (float)(ox+0.5);
+            // get the vertex coords 
+            float x0 = (float)ox;
+            float x1 = (float)(ox+1);
             float y0 = (float)oy;
             float y1 = (float)(oy+1);
             
@@ -423,11 +426,11 @@ void Grid::down(int x,int y){
     }
 }
 
-void Grid::pushxform(int x,int y,float offset){
+void Grid::pushxform(float x,float y,float offset){
     MatrixStack *ms = StateManager::getInstance()->getx();
-    float xx = ((float)(x-centrex))-0.5;
+    float xx = x-centrex;
     float yy = ((float)get(x,y)+offset)*heightFactor;
-    float zz = (float)(y-centrey);
+    float zz = y-centrey;
     
     ms->push();
     ms->translate(xx,yy,zz);
@@ -440,8 +443,6 @@ inline float blerp(float c00, float c10, float c01, float c11, float tx, float t
 
 void Grid::pushxforminterp(float fx,float fy,float offset){
     MatrixStack *ms = StateManager::getInstance()->getx();
-    fx -= centrex;
-    fy -= centrey;
     
     int x = (int)fx;
     int y = (int)fy;
@@ -452,8 +453,11 @@ void Grid::pushxforminterp(float fx,float fy,float offset){
     float h11 = get(x+1,y+1);
     
     float r = blerp(h00,h10,h01,h11,fx-x,fy-y)+offset;
+    
     ms->push();
-    ms->translate(fx,r,fy);
+    fx -= centrex;
+    fy -= centrey;
+    ms->translate(fx,r*heightFactor,fy);
 }
 
 void Grid::drawHouses(){
@@ -517,5 +521,15 @@ void Grid::writeTexture(){
         }
         row += pitch;
     }
+    
+    if(globals::game){
+        Player *player = &globals::game->p;
+        for(Person *p=player->people.first();p;p=player->people.next(p)){
+            uint32_t *r = (uint32_t *)(pixels + pitch * (int)p->y);
+            r[(int)p->x] = 0xffffffff;
+        }
+    }
+    
+    
     SDL_UnlockTexture(maptex);
 }

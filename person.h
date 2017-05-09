@@ -18,9 +18,9 @@ struct Person {
     Person(){
     }
     
-    void init(float xx,float yy){
+    void init(float xx,float yy,int ddx,int ddy){
         x=xx;y=yy;
-        dx=dy=1;
+        dx=ddx;dy=ddy;
     }
     
     float getrot(){

@@ -29,8 +29,8 @@ public:
     
     // batch rendering
     void startBatch();
-    void renderInBatch(glm::mat4 *world);
     void endBatch();
+    void renderInBatch(glm::mat4 *world);
 };
 
 #endif /* __OBJ_H */

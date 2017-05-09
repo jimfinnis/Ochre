@@ -131,7 +131,7 @@ public:
     }
     
     // push transform to this location with height offset
-    void pushxform(int x,int y,float offset);
+    void pushxform(float x,float y,float offset);
     // as pushxform, but does bilinear interp on heights
     void pushxforminterp(float x,float y,float offset);
     

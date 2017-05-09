@@ -13,9 +13,12 @@
 #include "meshes.h"
 
 Player::Player() : people(256){
-    // we'll just test with one person
-    Person *p = people.alloc();
-    p->init(24,24);
+    for(;;){
+        Person *p = people.alloc();
+        if(!p)break;
+        p->init(drand48()*20+20,drand48()*20+20,
+                (rand()%3)-1,(rand()%3)-1);
+    }
 }
 
 void Player::render(){
@@ -25,11 +28,11 @@ void Player::render(){
     Grid *g = &game->grid;
     MatrixStack *ms = StateManager::getInstance()->getx();
     
-    meshes::ico->startBatch();
+    meshes::marker->startBatch();
     
     for(Person *p=people.first();p;p=people.next(p)){
         // this might go wrong at edges due to rounding, see how it looks
-        if(g->isVisible(p->x,p->y)){
+        if(g->isVisible(p->x,p->y) && g->isVisible(p->x,p->y+1)){
             g->pushxforminterp(p->x,p->y,-0.2f);
             ms->rotY(p->getrot());
             ms->scale(0.2);
@@ -38,7 +41,6 @@ void Player::render(){
             ms->pop();
         }
     }
-    
 }
 
 void Player::update(float t){
