@@ -31,10 +31,7 @@ Context context(800,600);
     
 
 void render(){
-    if(debugtoggle)
-        glDisable(GL_MULTISAMPLE);
-    else
-        glEnable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE);
     
     
     /* Clear the color and depth buffers. */

@@ -34,6 +34,7 @@ public:
     /// set up the array offsets for unlit vertices
     void setArrayOffsetsUnlit();
     
+    
 protected:
     /// 1st stage of initialisation
     Effect(const char *name,unsigned int f){

@@ -14,6 +14,9 @@
 
 struct Game {
     Game(int seed,float waterlevel) : grid(seed,waterlevel){
+        grid.cursorx=20;
+        grid.cursory=20;
+        grid.recentre();
     }
     
     Grid grid;

@@ -18,9 +18,6 @@ void main()
 }
 
 %%fragment
-#version 330 core
-
-layout(location = 0) out vec3 color;
 uniform sampler2D sTex;
 varying vec4 vCol;
 varying vec2 vTexCoords;

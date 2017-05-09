@@ -63,6 +63,7 @@ void Context::rebuildFSAA(){
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         FATAL("bad fb");
     ERRCHK;
+    
 }    
 
 
@@ -88,7 +89,7 @@ Context::Context(int ww,int hh) : stat("stat"), tool("tool") {
 #if GLDEBUG    
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 #endif
-
+    
 #if FULLSCREEN    
     wnd = SDL_CreateWindow("test", SDL_WINDOWPOS_UNDEFINED, 
                            SDL_WINDOWPOS_UNDEFINED,
@@ -103,7 +104,7 @@ Context::Context(int ww,int hh) : stat("stat"), tool("tool") {
     SDL_GL_SetSwapInterval(0);
     // this doesn't appear to work...
     SDL_SetWindowMinimumSize(wnd,640,480);
-
+    
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     
@@ -112,7 +113,7 @@ Context::Context(int ww,int hh) : stat("stat"), tool("tool") {
     glc = SDL_GL_CreateContext(wnd);
     
     rdr = SDL_CreateRenderer(wnd, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-
+    
 #if GLDEBUG
     // call to enable debug
     glDebugMessageCallback(debugcallback,NULL);
@@ -132,6 +133,7 @@ Context::Context(int ww,int hh) : stat("stat"), tool("tool") {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
+    
 }
 
 void Context::resize(int ww,int hh){
@@ -147,20 +149,28 @@ void Context::resize(int ww,int hh){
     curscreen->resize(ww,hh);
 }
 
+extern bool debugtoggle;
 void Context::swap(){
     
-    glBindFramebuffer(GL_FRAMEBUFFER,0);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER,fb);
-    glReadBuffer(GL_COLOR_ATTACHMENT0);
     
-    glDisable(GL_SCISSOR_TEST);
-    glBlitFramebuffer(0,0,fbwidth,fbheight,
-                      0,0,fbwidth,fbheight,
-                      GL_COLOR_BUFFER_BIT,
-                      GL_LINEAR);
-    
-    glBindFramebuffer(GL_FRAMEBUFFER,fb);
-    
+    if(debugtoggle){
+        // bind the FSAA buffer's color 0 to the read buffer and the
+        // screen to the draw buffer
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER,fb);
+        glReadBuffer(GL_COLOR_ATTACHMENT0);
+        
+        // and blit the FSAA buffer to the screen
+        glDisable(GL_SCISSOR_TEST);
+        glBlitFramebuffer(0,0,fbwidth,fbheight,
+                          0,0,fbwidth,fbheight,
+                          GL_COLOR_BUFFER_BIT,
+                          GL_LINEAR);
+        // rebind to the FSAA buffer
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fb);
+    }
+    else
+        glBindFramebuffer(GL_FRAMEBUFFER,0);
     SDL_GL_SwapWindow(wnd);
 }
 
