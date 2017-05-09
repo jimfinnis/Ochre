@@ -153,7 +153,10 @@ extern bool debugtoggle;
 void Context::swap(){
     
     
+    // if debug toggle is on, we render direct (for testing FSAA)
     if(debugtoggle){
+        glBindFramebuffer(GL_FRAMEBUFFER,0);
+    } else {
         // bind the FSAA buffer's color 0 to the read buffer and the
         // screen to the draw buffer
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
@@ -169,8 +172,6 @@ void Context::swap(){
         // rebind to the FSAA buffer
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER,fb);
     }
-    else
-        glBindFramebuffer(GL_FRAMEBUFFER,0);
     SDL_GL_SwapWindow(wnd);
 }
 
