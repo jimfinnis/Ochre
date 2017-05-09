@@ -26,6 +26,8 @@ struct Player {
     
     // assumes grid transform is stacked.
     void render();
+    
+    void update(float t);
 };
 
 #endif /* __PLAYER_H */

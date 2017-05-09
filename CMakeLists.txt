@@ -17,7 +17,7 @@ add_executable(${PROJECT_NAME} state.cpp context.cpp
     region.cpp font.cpp time.cpp player.cpp
     effect.cpp obj.cpp maths.cpp grid.cpp meshes.cpp
     gameregion.cpp gamescreen.cpp main.cpp screen.cpp globals.cpp
-    statregion.cpp toolregion.cpp
+    statregion.cpp toolregion.cpp person.cpp
 )
 
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2TTF_INCLUDE_DIRS}

@@ -19,6 +19,10 @@ struct Game {
         grid.recentre();
     }
     
+    void update(float t){
+        p.update(t);
+    }
+    
     Grid grid;
     
     Player p;

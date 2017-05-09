@@ -11,17 +11,28 @@
 /// ctor and dtor will run.
 
 struct Person {
+    
     float x,y; // note these are in gridspace
-    float rot;       // facing direction so we can render and move
+    int dx,dy; // direction
     
     Person(){
-        rot=0;
     }
     
     void init(float xx,float yy){
         x=xx;y=yy;
+        dx=dy=1;
     }
     
+    float getrot(){
+        return dirToRot[dx+1][dy+1];
+    }
+    
+    void update(float t);
+    
+    static void initConsts();
+    
+private:
+    static float dirToRot[3][3];
 };
 
 #endif /* __PERSON_H */

@@ -13,7 +13,7 @@ namespace meshes {
 
 void load();
 
-extern class ObjMesh *ico,*cursor,*house1;
+extern class ObjMesh *ico,*cursor,*house1,*marker;
 
 }
 

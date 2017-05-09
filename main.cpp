@@ -94,7 +94,8 @@ void handleInput(){
     
 }
 
-void update(){
+void update(float t){
+    globals::game->update(t);
 }
 
 #include "pool.h"
@@ -146,14 +147,18 @@ int main(int argc, char** argv)
     Font::init();
     
     globals::init();
+    Person::initConsts();
     
     curscreen = new GameScreen();
     
     meshes::load();
     
+    double lastt = Time::now();
     while(globals::running)
     {
-        update();
+        double t = Time::now();
+        update(t-lastt);
+        lastt=t;
         handleInput();
         render();
     };
