@@ -28,7 +28,7 @@ static float noise(float x,float y){
     float amp = persist;
     float v = 0;
     for(int i=0;i<OCTAVES;i++){
-        v += glm::simplex(glm::tvec2<float>(x*p,y*p))*amp;
+        v += glm::simplex(glm::vec2(x*p,y*p))*amp;
         p*=2;
         amp*=persist;
     }
@@ -95,9 +95,9 @@ Grid::~Grid(){
 
 
 static void calcnormal(UNLITVERTEX *v0,UNLITVERTEX *v1,UNLITVERTEX *v2){
-    glm::tvec3<float> *vv0 = reinterpret_cast<glm::tvec3<float>*>(&v0->x);
-    glm::tvec3<float> *vv1 = reinterpret_cast<glm::tvec3<float>*>(&v1->x);
-    glm::tvec3<float> *vv2 = reinterpret_cast<glm::tvec3<float>*>(&v2->x);
+    glm::vec3 *vv0 = reinterpret_cast<glm::vec3*>(&v0->x);
+    glm::vec3 *vv1 = reinterpret_cast<glm::vec3*>(&v1->x);
+    glm::vec3 *vv2 = reinterpret_cast<glm::vec3*>(&v2->x);
     
     glm::vec3 norm = glm::triangleNormal(*vv0,*vv1,*vv2);
     v0->nx = v1->nx = v2->nx = norm.x;
@@ -361,7 +361,7 @@ int Grid::intersect(const glm::vec3& origin, const glm::vec3& ray){
     float mindist;
     int found=-1;
     for(int i=0;i<vertct;i++){
-        glm::tvec3<float> *v = reinterpret_cast<glm::tvec3<float>*>(&verts[i].x);
+        glm::vec3 *v = reinterpret_cast<glm::vec3*>(&verts[i].x);
         glm::vec3 diff = *v - origin;
         float parm = glm::dot(ray,diff);
         
