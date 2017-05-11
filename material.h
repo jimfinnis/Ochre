@@ -8,13 +8,13 @@
 #define __MATERIAL_H
 
 struct Material {
-    SDL_Texture *t; // will probably always be null
+    GLuint texture; // 0 if none
     float diffuse[4];
     
-    Material() : Material(NULL,1,1,1){}
+    Material() : Material(0,1,1,1){}
         
-    Material(SDL_Texture *tt,float r,float g,float b,float a=1){
-        t = tt;
+    Material(GLuint tt,float r,float g,float b,float a=1){
+        texture = tt;
         diffuse[0] = r;
         diffuse[1] = g;
         diffuse[2] = b;

@@ -63,8 +63,8 @@ Grid::Grid(int seed,float waterlevel){
     }
     
     // same order as GMAT_ constants
-    materials.push_back(Material(NULL,1,1,1)); // grass
-    materials.push_back(Material(NULL,0.9,0.0,0.9)); // farm
+    materials.push_back(Material(0,1,1,1)); // grass
+    materials.push_back(Material(0,0.9,0.0,0.9)); // farm
     
     // once we know how many mats we need we can allocate the buckets for the triangles
     // vertices for each material.
@@ -73,10 +73,23 @@ Grid::Grid(int seed,float waterlevel){
         buckets.push_back(std::vector<GLuint>());
     }
     
-    maptex = SDL_CreateTexture(Context::getInstance()->rdr,
-                               SDL_PIXELFORMAT_ARGB8888,
-                               SDL_TEXTUREACCESS_STREAMING,
-                               GRIDSIZE,GRIDSIZE);
+    glGenTextures(1,&maptex);
+    ERRCHK;
+    glBindTexture(GL_TEXTURE_2D,maptex);
+    ERRCHK;
+    glTexStorage2D(GL_TEXTURE_2D,1,GL_RGBA8,GRIDSIZE,GRIDSIZE);
+    ERRCHK;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    ERRCHK;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
+    ERRCHK;
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+    ERRCHK;
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+    ERRCHK;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);    
+    
     if(!maptex){
         throw Exception().set("could not create grid map texture: %s",
                               SDL_GetError());
@@ -93,7 +106,7 @@ void Grid::select(int idx){
 
 Grid::~Grid(){
     if(vbo)glDeleteBuffers(2,&vbo);
-    if(maptex)SDL_DestroyTexture(maptex);
+    if(maptex)glDeleteTextures(1,&maptex);
 }
 
 
@@ -342,13 +355,13 @@ void Grid::render(glm::mat4 *world){
     
     for(std::vector<Transition>::iterator it=transitions.begin();it!=transitions.end();++it){
         Material *m = &materials[it->matidx];
-        eff->setMaterial(m->diffuse,m->t);
+        eff->setMaterial(m->diffuse,m->texture);
         glDrawElements(GL_TRIANGLES,it->count,GL_UNSIGNED_INT,
                        (void *)(it->start*sizeof(GLuint)));
         
     }
     
-    eff->setMaterial(whiteCol,NULL);
+    eff->setMaterial(whiteCol,0);
     glDrawArrays(GL_TRIANGLES,0,vertct);
     
     glBindBuffer(GL_ARRAY_BUFFER,0);
@@ -488,21 +501,16 @@ void Grid::drawHouses(){
 }
     
 void Grid::writeTexture(){
-    SDL_Rect r;
-    uint8_t *pixels;
-    int pitch;
+    uint32_t image[GRIDSIZE][GRIDSIZE];
     
-    if(SDL_LockTexture(maptex,NULL,(void **)&pixels,&pitch)<0)
-        throw Exception().set("cannot lock grid map texture: %s",
-                              SDL_GetError());
-    uint8_t *row = pixels;
+    uint32_t *p = &image[0][0];
     for(int y=0;y<GRIDSIZE;y++){
-        uint32_t *r = (uint32_t *)row;
         for(int x=0;x<GRIDSIZE;x++){
             uint32_t col;
             switch(grid[x][y]){
             case 0:
-                col = 0x0080ff;break;
+                // ABGR colours; endianness!
+                col = 0xff8000;break;
             case 1:
                 col = 0x808080;break;
             case 2:
@@ -517,19 +525,24 @@ void Grid::writeTexture(){
                 col = 0xff0000;break;
             }
             col |= ((visible[x][y])?0xff:0xa0)<<24;
-            *r++=col;
+            *p++ = col;
         }
-        row += pitch;
     }
     
     if(globals::game){
         Player *player = &globals::game->p;
         for(Person *p=player->people.first();p;p=player->people.next(p)){
-            uint32_t *r = (uint32_t *)(pixels + pitch * (int)p->y);
-            r[(int)p->x] = 0xffffffff;
+            image[(int)p->y][(int)p->x] = 0xffffffff;
         }
     }
     
-    
-    SDL_UnlockTexture(maptex);
+    glBindTexture(GL_TEXTURE_2D,maptex);
+    ERRCHK;
+    glPixelStorei(GL_UNPACK_ALIGNMENT,4);
+    ERRCHK;
+    glTexSubImage2D(GL_TEXTURE_2D,0,0,0,GRIDSIZE,GRIDSIZE,
+                    GL_RGBA,GL_UNSIGNED_BYTE,&image[0][0]);
+    ERRCHK;
+    glBindTexture(GL_TEXTURE_2D,0);
+    ERRCHK;
 }

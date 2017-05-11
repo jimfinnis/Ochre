@@ -71,14 +71,14 @@ ObjMesh::ObjMesh(const char *dir,const char *name){
         printf("Mat %ld : tex %s\n",i,texname.c_str());
         // load the texture if any
         if(!texname.empty()){
-/*            m->t = TextureManager::getInstance()->createOrFind(texname.c_str());
+/*            m->texture = TextureManager::getInstance()->createOrFind(texname.c_str());
             if(!m->t){
                 printf("cannot load %s\n",texname.c_str());
    }
  */
-            m->t = NULL;
+            m->texture = 0;
         }else
-              m->t = NULL;
+              m->texture = 0;
         
         // now set the diffuse (the only attrib we support)
         m->diffuse[0] = tm.diffuse[0];
@@ -269,7 +269,7 @@ void ObjMesh::renderInBatch(glm::mat4 *world){
         it=transitions.begin();it!=transitions.end();it++){
         Material *m = it->matidx < 0 ? &defaultMat : mats+it->matidx;
         
-        eff->setMaterial(m->diffuse,NULL); // replace with texture if required
+        eff->setMaterial(m->diffuse,0); // replace with texture if required
         glDrawElements(GL_TRIANGLES,it->count,GL_UNSIGNED_INT,
                        (void *)(it->start*sizeof(GLuint)));
         ERRCHK;

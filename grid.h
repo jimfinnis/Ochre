@@ -81,7 +81,7 @@ class Grid {
     std::vector<std::vector<GLuint>> buckets;
     
     // we can write the texture to a map, too.
-    SDL_Texture *maptex;
+    GLuint maptex;
 
 public:
     int cursorx,cursory; // selected point
@@ -112,7 +112,7 @@ public:
     }
     
     /// get the map texture
-    SDL_Texture *getMapTex(){
+    GLuint getMapTex(){
         return maptex;
     }
         

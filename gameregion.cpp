@@ -82,7 +82,7 @@ void GameRegion::renderWater(){
     em->untex->begin();
     em->untex->setWorldMatrix(sm->getx()->top());
     static const float seaCol[] = {0.5,2,2,1}; // note the overunity colours for mult. rendering
-    em->untex->setMaterial(seaCol,NULL);
+    em->untex->setMaterial(seaCol,0);
     em->untex->setArrayOffsetsUnlit();
     // trick for multiplicative rendering
     glDepthMask(GL_FALSE);

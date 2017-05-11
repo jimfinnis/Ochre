@@ -30,7 +30,7 @@ void Font::render(float x,float y,float h,const char *s,...){
         
     vsnprintf(buf,1024,s,args);
     va_end(args);
-    
+/*    
     SDL_Surface *tmp = TTF_RenderUTF8_Blended(font,buf,textcol);
     
     SDL_Texture *tex = SDL_CreateTextureFromSurface(Context::getInstance()->rdr,tmp);
@@ -50,5 +50,5 @@ void Font::render(float x,float y,float h,const char *s,...){
     Region::current->renderQuad(x,y,h*r,h,tex);
     
     SDL_DestroyTexture(tex);
-    
+*/    
 }

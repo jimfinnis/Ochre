@@ -95,7 +95,7 @@ static PRELITVERTEX quad[] = {
     {0,0,0, 0,0},
 };
         
-void Region::renderQuad(float x,float y,float w,float h,SDL_Texture *tex){
+void Region::renderQuad(float x,float y,float w,float h,GLuint tex){
     EffectManager *em = EffectManager::getInstance();
     em->flattex->begin();
     glm::mat4 id;

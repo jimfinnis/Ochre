@@ -64,7 +64,7 @@ public:
     void setAndClear(const Colour& c);
     
     /// render a quad into the region using its coordinates (not for iso!)
-    void renderQuad(float x,float y,float w,float h,SDL_Texture *tex);
+    void renderQuad(float x,float y,float w,float h,GLuint tex);
 };
 
 /// as above, but sets an isometric projection

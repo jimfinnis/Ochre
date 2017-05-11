@@ -33,7 +33,7 @@ void State::setDefault(){
     fog.neardist = 10000;
     fog.fardist = 20000;
     diffuse2 = Colour(1,1,1,1);
-    texID0 = texID1 = NULL;
+    texID0 = texID1 = 0;
     overrides = 0;
     modes = 0;
     effect = NULL;

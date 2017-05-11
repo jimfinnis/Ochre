@@ -24,7 +24,7 @@ public:
     /// set the transformation uniforms
     void setWorldMatrix(glm::mat4 *world);
     /// set material uniforms
-    void setMaterial(const float *diffuse,SDL_Texture* texture=NULL);
+    void setMaterial(const float *diffuse,GLuint texture=0);
     /// set envmap colour and alpha
     void setMapCol(float *col);
     

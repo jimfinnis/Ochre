@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170509.1100>
+//  Last Modified : <170511.0040>
 //
 //  Description	
 //
@@ -472,13 +472,13 @@ void Effect::setUniforms(){
     }
     if(has(EDU_SAMPLER2)){
         glActiveTexture(GL_TEXTURE1);
-        SDL_GL_BindTexture(s->texID1,NULL,NULL);
+        glBindTexture(GL_TEXTURE_2D,s->texID1);
         glUniform1i(mSampler2Idx,1);
         ERRCHK;
     }
 }    
 
-void Effect::setMaterial(const float *diffuse,SDL_Texture *texture)
+void Effect::setMaterial(const float *diffuse,GLuint texture)
 {
     State *s = StateManager::getInstance()->get();
     if(has(EDU_DIFFUSECOL)){
@@ -501,7 +501,7 @@ void Effect::setMaterial(const float *diffuse,SDL_Texture *texture)
         if(s->texID0)texture=s->texID0; // texture override
         glActiveTexture(GL_TEXTURE0);
         ERRCHK;
-        SDL_GL_BindTexture(texture,NULL,NULL);
+        glBindTexture(GL_TEXTURE_2D,texture);
         ERRCHK;
         glUniform1i(mSamplerIdx,0);
         ERRCHK;

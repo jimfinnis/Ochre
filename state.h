@@ -45,11 +45,10 @@ struct State {
     glm::mat4 view;
     
     // texture if any (texID0 overrides material)
-    SDL_Texture *texID0,*texID1;
+    GLuint texID0,texID1;
     class Effect *effect;
     
     // extra stuff
-    SDL_Texture *texture2;
     Colour diffuse2;
     
     // other overrides are determined by some flags
