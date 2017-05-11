@@ -30,12 +30,24 @@ void Font::render(float x,float y,float h,const char *s,...){
         
     vsnprintf(buf,1024,s,args);
     va_end(args);
-/*    
-    SDL_Surface *tmp = TTF_RenderUTF8_Blended(font,buf,textcol);
     
-    SDL_Texture *tex = SDL_CreateTextureFromSurface(Context::getInstance()->rdr,tmp);
-    if(SDL_SetTextureBlendMode(tex,SDL_BLENDMODE_BLEND))
-        FATAL("texture blend mode not supported");
+    // yes, this is vile. Render, creating a new surface, create a
+    // new gl texture from that surface, render that, delete both.
+    // SDL_GL_CreateTexture probably does this underneath, but it
+    // creates rectangle textures which my laptop (see elsewhere)
+    // doesn't like.
+    
+    // blended creates 32-bit RGBA
+    
+    SDL_Surface *tmp = TTF_RenderUTF8_Blended(font,buf,textcol);
+    GLuint tex;
+    glGenTextures(1,&tex);
+    glBindTexture(GL_TEXTURE_2D,tex);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,tmp->w,tmp->h,0,GL_RGBA,GL_UNSIGNED_BYTE,
+                 tmp->pixels);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
+    
     SDL_FreeSurface(tmp);
     
     int ww,hh;
@@ -49,6 +61,5 @@ void Font::render(float x,float y,float h,const char *s,...){
     
     Region::current->renderQuad(x,y,h*r,h,tex);
     
-    SDL_DestroyTexture(tex);
-*/    
+    glDeleteTextures(1,&tex);
 }

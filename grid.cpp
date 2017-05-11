@@ -77,7 +77,14 @@ Grid::Grid(int seed,float waterlevel){
     ERRCHK;
     glBindTexture(GL_TEXTURE_2D,maptex);
     ERRCHK;
-    glTexStorage2D(GL_TEXTURE_2D,1,GL_RGBA8,GRIDSIZE,GRIDSIZE);
+    
+    // yes, I'd rather use glTexStorage2D, but my laptop is running
+    // Ubuntu 14.04 (and I can't distupgrade yet, I don't want to break
+    // ROS [I'm a roboticist] and also it's *really old*)
+    // (My normal devbox is up-to-date but I *like* terence [the laptop])
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, GRIDSIZE,GRIDSIZE, 
+                 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+//    glTexStorage2D(GL_TEXTURE_2D,1,GL_RGBA8,);
     ERRCHK;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     ERRCHK;
