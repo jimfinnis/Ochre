@@ -18,6 +18,9 @@
 #define GRIDSIZE 128
 #define MAXVERTS 32767
 
+// the visibility and opaque arrays are bigger than the grid itself
+#define VISBORDER 16
+
 // these are the predefined grid materials
 
 #define GMAT_GRASS 0
@@ -68,8 +71,12 @@ class Grid {
     
     int modcount; // modifications since last resetModCount()
     
-    // boolean flags indicating whether square is visible, set in genTriangles.
-    uint8_t visible[GRIDSIZE][GRIDSIZE];
+    // booleans indicating whether node is visible, set in genTriangles.
+    uint8_t visible[GRIDSIZE+VISBORDER*2][GRIDSIZE+VISBORDER*2];
+    
+    // booleans indicating how "opaque" a node is for drawing people.
+    // This is an ugly way to do it.
+    uint8_t opacity[GRIDSIZE+VISBORDER*2][GRIDSIZE+VISBORDER*2];
     
     // materials
     std::vector<Material> materials;
@@ -91,8 +98,12 @@ public:
     
     /// is a given grid square visible (set by genTriangles)
     bool isVisible(int x,int y){
-        return visible[x][y]!=0;
+        return visible[x+VISBORDER][y+VISBORDER]!=0;
     }
+    
+    /// use bilinear interp to get opacity for people from 
+    /// opacity array
+    float getOpacity(float x, float y);
     
     Grid(int seed,float waterlevel);
     ~Grid();

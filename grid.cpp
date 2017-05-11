@@ -142,7 +142,7 @@ void Grid::genTriangles(int range){
         buckets[i].clear();
     }
     
-    memset(visible,0,GRIDSIZE*GRIDSIZE);
+    memset(visible,0,(GRIDSIZE+VISBORDER*2)*(GRIDSIZE+VISBORDER*2));
     
     for(int ox=-range;ox<range;ox++){
         for(int oy=-range;oy<range;oy++){
@@ -151,6 +151,11 @@ void Grid::genTriangles(int range){
             
             int x = centrex+ox;
             int y = centrey+oy;
+            
+            // coords in the vis and opaque buffers, which are
+            // bigger so we can view off the map edge
+            int xv = x+VISBORDER;
+            int yv = y+VISBORDER;
             
             int mat = getmat(x,y);
             int h00 = get(x,y);
@@ -173,8 +178,8 @@ void Grid::genTriangles(int range){
             if(abs(ox)+abs(oy)==range-1){
                 if(ox==0){
                     if(oy>0){
-                        visible[x][y]=1;
-                        visible[x+1][y]=1;
+                        visible[xv][yv]=1;
+                        visible[xv+1][yv]=1;
                         // add base poly for front wedge
                         v0 = addvert(x,y,x0,BASE,y0,1,0);
                         v1 = addvert(x+1,y,x1,h10,y0,1,0);
@@ -191,9 +196,9 @@ void Grid::genTriangles(int range){
                 else if(ox<0){
                     if(oy==0){}
                     else if(oy<0){
-                        visible[x+1][y]=1;
-                        visible[x][y+1]=1;
-                        visible[x+1][y+1]=1;
+                        visible[xv+1][yv]=1;
+                        visible[xv][yv+1]=1;
+                        visible[xv+1][yv+1]=1;
                         v0 = addvert(x,y+1,x0,h01,y1,0,1);
                         v1 = addvert(x+1,y+1,x1,h11,y1,1,1);
                         v2 = addvert(x+1,y,x1,h10,y0,1,0);
@@ -221,9 +226,9 @@ void Grid::genTriangles(int range){
                 } else {
                     if(oy==0){}
                     else if(oy<0){
-                        visible[x][y]=1;
-                        visible[x][y+1]=1;
-                        visible[x+1][y+1]=1;
+                        visible[xv][yv]=1;
+                        visible[xv][yv+1]=1;
+                        visible[xv+1][yv+1]=1;
                         v0 = addvert(x,y,x0,h00,y0,0,0);
                         v1 = addvert(x,y+1,x0,h01,y1,0,1);
                         v2 = addvert(x+1,y+1,x1,h11,y1,1,1);
@@ -231,9 +236,9 @@ void Grid::genTriangles(int range){
                         addtri(v0,v1,v2,mat);
                         // no base polys in these cases; they would be hidden
                     } else {
-                        visible[x][y]=1;
-                        visible[x][y+1]=1;
-                        visible[x+1][y]=1;
+                        visible[xv][yv]=1;
+                        visible[xv][yv+1]=1;
+                        visible[xv+1][yv]=1;
                         v0 = addvert(x,y,x0,h00,y0,0,0);
                         v1 = addvert(x,y+1,x0,h01,y1,0,1);
                         v2 = addvert(x+1,y,x1,h10,y0,1,0);
@@ -253,10 +258,10 @@ void Grid::genTriangles(int range){
                     }
                 }
             } else {
-                visible[x][y]=1;
-                visible[x][y+1]=1;
-                visible[x+1][y]=1;
-                visible[x+1][y+1]=1;
+                visible[xv][yv]=1;
+                visible[xv][yv+1]=1;
+                visible[xv+1][yv]=1;
+                visible[xv+1][yv+1]=1;
                 // different triangulations for the two kinds of split
                 if(h00==h11){
                     // first triangle
@@ -325,6 +330,18 @@ void Grid::genTriangles(int range){
                  &idxdata[0],
                  GL_STATIC_DRAW);
     ERRCHK;
+    
+    // ugly code for eroding the visible array to form the opaque
+    // array
+    memset(opacity,0,(GRIDSIZE+VISBORDER*2)*(GRIDSIZE+VISBORDER*2));
+    for(int y=VISBORDER;y<GRIDSIZE+VISBORDER;y++){
+        for(int x=VISBORDER;x<GRIDSIZE+VISBORDER;x++){
+            if(visible[x-1][y-1]&&visible[x][y-1]&&visible[x+1][y-1]&&
+               visible[x-1][y]&&visible[x][y]&&visible[x+1][y]&&
+               visible[x-1][y+1]&&visible[x][y+1]&&visible[x+1][y+1])
+                opacity[x][y]=1;
+        }
+    }
 }
 
 
@@ -474,6 +491,19 @@ void Grid::pushxforminterp(float fx,float fy,float offset){
     ms->translate(fx,r*heightFactor,fy);
 }
 
+float Grid::getOpacity(float fx, float fy){
+    int x = (int)fx;
+    int y = (int)fy;
+    
+    float v00 = opacity[x+VISBORDER][y+VISBORDER];
+    float v01 = opacity[x+VISBORDER][y+VISBORDER+1];
+    float v10 = opacity[x+VISBORDER+1][y+VISBORDER];
+    float v11 = opacity[x+VISBORDER+1][y+VISBORDER+1];
+    
+    return blerp(v00,v10,v01,v11,fx-x,fy-y);
+}
+
+
 void Grid::drawHouses(){
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
@@ -489,16 +519,15 @@ void Grid::drawHouses(){
     meshes::house1->startBatch();
     
     for(int *p = locs;*p>=0;p+=2){
-        if(visible[p[0]][p[1]]){
+        if(visible[p[0]+VISBORDER][p[1]+VISBORDER]){
             pushxform(p[0],p[1],0);
             ms->rotY(glm::radians(45.0f));
             meshes::house1->render(ms->top());
             ms->pop();
         }
     }
-    
-    
     meshes::house1->endBatch();
+    
 }
     
 void Grid::writeTexture(){
@@ -507,6 +536,7 @@ void Grid::writeTexture(){
     uint32_t *p = &image[0][0];
     for(int y=0;y<GRIDSIZE;y++){
         for(int x=0;x<GRIDSIZE;x++){
+
             uint32_t col;
             switch(grid[x][y]){
             case 0:
@@ -525,7 +555,7 @@ void Grid::writeTexture(){
             default:
                 col = 0xff0000;break;
             }
-            col |= ((visible[x][y])?0xff:0xa0)<<24;
+            col |= ((visible[x+VISBORDER][y+VISBORDER])?0xff:0xa0)<<24;
             *p++ = col;
         }
     }

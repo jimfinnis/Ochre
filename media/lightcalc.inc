@@ -8,10 +8,10 @@
     vCol = colDiffuse * col + uAmbient;
     
     
-    vCol.w = col.w;
-    
     vCol = min(vCol,1.0);
+    vCol.w = colDiffuse.w;
     
     float eyedist = gl_Position.z;
     vFog = smoothstep(uFogDist[0],uFogDist[1],eyedist);
 
+    

@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170511.0040>
+//  Last Modified : <170511.1126>
 //
 //  Description	
 //
@@ -492,7 +492,7 @@ void Effect::setMaterial(const float *diffuse,GLuint texture)
             col[3]=s->alpha;
             diffuse = col;
         }
-                  
+        
         glUniform4fv(mDiffuseIdx,1,diffuse);
         ERRCHK;
     }

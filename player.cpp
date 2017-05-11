@@ -26,16 +26,19 @@ void Player::render(){
     
     Game *game = globals::game;
     Grid *g = &game->grid;
-    MatrixStack *ms = StateManager::getInstance()->getx();
+    StateManager *sm = StateManager::getInstance();
+    MatrixStack *ms = sm->getx();
     
     meshes::marker->startBatch();
-    
+    State *s = sm->get();
+    s->overrides |= STO_DIFFUSE;
     for(Person *p=people.first();p;p=people.next(p)){
-        // this might go wrong at edges due to rounding, see how it looks
-        if(g->isVisible(p->x,p->y) && g->isVisible(p->x,p->y+1)){
+        float opacity = g->getOpacity(p->x,p->y);
+        if(opacity>0.001){
             g->pushxforminterp(p->x,p->y,-0.2f);
             ms->rotY(p->getrot());
             ms->scale(0.2);
+            s->diffuse = Colour(opacity,opacity,opacity,opacity);
             meshes::marker->render(ms->top());
             // RENDER HERE
             ms->pop();
