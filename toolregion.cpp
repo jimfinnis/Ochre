@@ -8,6 +8,11 @@
 #include "game.h"
 #include "globals.h"
 
+// map width as ratio of tool region
+#define MAPWIDTH 0.9
+// map top in tool region
+#define MAPTOP 20
+
 void ToolRegion::onMouseMove(int x,int y){
 }
 
@@ -20,9 +25,9 @@ void ToolRegion::render(){
     
     Grid *g = &globals::game->grid;
     
-    float mapw = w*0.75f;
+    float mapw = w*MAPWIDTH;
     float mapx = (w-mapw)/2.0f;
-    float mapy = 20;
+    float mapy = MAPTOP;
     
     renderQuad(mapx,mapy,mapw,mapw,g->getMapTex());
 }
@@ -30,9 +35,9 @@ void ToolRegion::render(){
 
 void ToolRegion::onLeftClick(int x,int y){
     y=h - y; // flip coords back again, since we are really working from the top.
-    float mapw = w*0.75f;
+    float mapw = w*MAPWIDTH;
     float mapx = (w-mapw)/2.0f;
-    float mapy = 20;
+    float mapy = MAPTOP;
     float xx=x,yy=y;
     
     if(x>=mapx && y>=mapy && x<mapx+mapw && y<mapy+mapw){

@@ -19,7 +19,10 @@
 const float PI	=	3.1415927f;
 const float Log2 = 0.6931471805f;
 
-
+// signum - gives -1,0,1
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
 
 /// handy interpolation function. Returns a value interpolated between a and b with parameter t.
 /// Output is a if t=0, b if t=1

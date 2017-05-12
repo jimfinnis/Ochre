@@ -62,6 +62,8 @@ Grid::Grid(int seed,float waterlevel){
             gridmats[x][y] = 0;
         }
     }
+    recalcSafe(); // calculate initial "safe squares"
+    
     
     // same order as GMAT_ constants
     materials.push_back(Material(0,1,1,1)); // grass
@@ -122,6 +124,17 @@ static void calcnormal(UNLITVERTEX *v0,UNLITVERTEX *v1,UNLITVERTEX *v2){
     v0->nz = v1->nz = v2->nz = norm.z;
     
 }
+
+void Grid::recalcSafe(){
+    // work out grid square safety - a square is only safe if it is entirely land.
+    memset(gridsafe,0,GRIDSIZE*GRIDSIZE);
+    for(int x=0;x<GRIDSIZE-1;x++){
+        for(int y=0;y<GRIDSIZE-1;y++){
+            if(grid[x][y] && grid[x+1][y] && grid[x][y+1] && grid[x+1][y+1])
+                gridsafe[x][y]=1;
+        }
+    }
+}    
 
 void Grid::genTriangles(int range){
     extern bool debugtoggle;
@@ -433,7 +446,7 @@ void Grid::renderCursor(){
     snark = vis.getVisibility(cursorx,cursory);
 }
 
-void Grid::up(int x,int y){
+void Grid::_up(int x,int y){
     if(x<0 || x>=GRIDSIZE || y<0 || y>=GRIDSIZE)return;
     
     grid[x][y]++;
@@ -446,7 +459,7 @@ void Grid::up(int x,int y){
     }
 }
 
-void Grid::down(int x,int y){
+void Grid::_down(int x,int y){
     if(x<0 || x>=GRIDSIZE || y<0 || y>=GRIDSIZE)return;
     if(grid[x][y]==0)return;
     

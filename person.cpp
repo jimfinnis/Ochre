@@ -6,9 +6,10 @@
 
 #include "person.h"
 #include "maths.h"
-#include "grid.h"
+#include "globals.h"
+#include "game.h"
 
-#define PERSONSPEED 1.1f
+#define PERSONSPEED 11.1f
 
 // table mapping direction onto rotation (in degrees, but gets
 // switched to radians)
@@ -29,6 +30,45 @@ void Person::initConsts(){
 
 
 void Person::update(float t){
+    Grid *g = &globals::game->grid;
+    
+    // randomly change dest
+    if(!(rand()%100)){
+        if((*g)(x,y))        path.clear();
+    }
+
+    
+    // pathing test
+    if(!path.size()){
+        pathidx=0;
+        destx = rand()%GRIDSIZE;
+        desty = rand()%GRIDSIZE;
+        dx=dy=0;
+        if(g->get(destx,desty)>0){
+            bool found=JPS::findPath(path,*g,
+                                     x,y,
+                                     destx,desty,
+                                     0);
+        }
+    }        
+    
+    // pathing
+    if(path.size()){
+        int px = path[pathidx].x, py = path[pathidx].y;
+        // compare current position with path position
+        if((int)x == px && (int)y == py){
+            pathidx++; // arrived at next pos, increment path
+            if(pathidx==path.size()){
+                path.clear();dx=dy=0; // arrived at final point
+            }
+        } else {
+            dx = sgn(px-x);
+            dy = sgn(py-y);
+        }
+//        printf("%d/%d: %f %f -> %d %d (%d %d)\n",pathidx,path.size(),x,y,px,py,dx,dy);
+    }
+    
+    
     // adjustment for diagonal speed slowdown
     float diag = (dx && dy) ? 0.707107f : 1;
     

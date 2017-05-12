@@ -12,12 +12,12 @@
 #include "globals.h"
 #include "meshes.h"
 
-Player::Player() : people(256){
+Player::Player() : people(16384){
+//    for(int i=0;i<3;i++){
     for(;;){
         Person *p = people.alloc();
         if(!p)break;
-        p->init(drand48()*20+20,drand48()*20+20,
-                (rand()%3)-1,(rand()%3)-1);
+        p->init(drand48()*20+20,drand48()*20+20,1,1);
     }
 }
 

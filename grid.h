@@ -56,7 +56,7 @@ struct VisLines {
 class Grid {
     uint8_t grid[GRIDSIZE][GRIDSIZE];     // height map
     uint8_t gridmats[GRIDSIZE][GRIDSIZE]; // material index for square (x,y,x+1,y+1)
-    
+    uint8_t gridsafe[GRIDSIZE][GRIDSIZE];  // is SQUARE x,y,x+1,y+1 entirely safe (for pathing)
     uint8_t mapvis[GRIDSIZE][GRIDSIZE]; // visibility of node
     
     
@@ -115,6 +115,11 @@ class Grid {
     // visibility edges structure
     VisLines vis;
     
+    // raise up at x,y (and neighbours if necessary) (internal, does the work)
+    void _up(int x,int y);
+    // lower at x,y (and neighbours if necessary) (internal, does the work)
+    void _down(int x,int y);
+
 public:
     int cursorx,cursory; // selected point
     int centrex,centrey;
@@ -133,9 +138,22 @@ public:
     Grid(int seed,float waterlevel);
     ~Grid();
     
-    inline int get(int x,int y){
+    inline int get(int x,int y) const{
         if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
             return grid[x][y];
+        else
+            return 0;
+    }
+    
+    // call this every time the terrain changes to recalculate
+    // the safe grid squares for pathing.
+    void recalcSafe();
+    
+    // this is required for JPS pathing library - uses the gridsafe array
+    // to see if a square is safe to walk on
+    inline bool operator()(unsigned x, unsigned y) const {
+        if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
+            return gridsafe[x][y];
         else
             return 0;
     }
@@ -182,9 +200,15 @@ public:
     int getModCount(){return modcount;}
     
     // raise up at x,y (and neighbours if necessary)
-    void up(int x,int y);
+    void up(int x,int y){
+        _up(x,y);
+        recalcSafe();
+    }
     // lower at x,y (and neighbours if necessary)
-    void down(int x,int y);
+    void down(int x,int y){
+        _down(x,y);
+        recalcSafe();
+    }
     
     // draw the map (will require people to be added)
     void writeTexture();
