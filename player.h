@@ -18,15 +18,21 @@
 /// be here too.
 
 
+/// these are the modes available to the player
+enum PlayerMode {
+    // In settle mode, we look nearby for a flat piece of land. If we can't find
+    // one we wander about - away from the enemy.
+    PLAYER_SETTLE,
+};
+
 
 struct Player {
     Pool<Person> people;
-    
+    PlayerMode mode;
     Player();
     
     // assumes grid transform is stacked.
     void render();
-    
     void update(float t);
 };
 

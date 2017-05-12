@@ -39,7 +39,7 @@ static float noise(float x,float y){
 }
 
 Grid::Grid(int seed,float waterlevel){
-    heightFactor = 0.2f;
+    heightFactor = 0.5f;
     vbo=0;ibo=0;
     cursorx=cursory=GRIDSIZE/2;
     centrex=centrey=cursorx;
@@ -98,7 +98,7 @@ Grid::Grid(int seed,float waterlevel){
         throw Exception().set("could not create grid map texture: %s",
                               SDL_GetError());
     }
-    writeTexture();
+    writeMapTexture();
 }
 
 void Grid::select(int idx){
@@ -400,7 +400,7 @@ void Grid::render(glm::mat4 *world){
     eff->end();
     
     drawHouses();
-    writeTexture();
+    writeMapTexture();
 }
 
 int Grid::intersect(const glm::vec3& origin, const glm::vec3& ray){
@@ -567,34 +567,28 @@ void Grid::drawHouses(){
 }
 
 struct coltable {
-    uint32_t cols[6]; // normal map colour
-    uint32_t colsvis[6]; // visible map colour
+    uint32_t cols[16]; // normal map colour
+    uint32_t colsvis[16]; // visible map colour
     coltable(){
-        float hsvs[6][3] = {
-            {0.5,0.8,1},
-            {0,0,0.5},
-            {0,0,0.6},
-            {0,0,0.7},
-            {0,0,0.8},
-            {0,0,0.9},
-        };
+        Colour c;
+        c.setFromHSV(0.5,0.8,0.5f);
+        cols[0] = c.getABGR32();
+        c.setFromHSV(0.5,0.8,1);
+        colsvis[0] = c.getABGR32();
         
-        for(int i=0;i<6;i++){
+        for(int i=1;i<16;i++){
             Colour c;
-            c.setFromHSV(hsvs[i][0],
-                         hsvs[i][1],
-                         hsvs[i][2]*0.5f);
+            float base = powf(((float)i)/16.0f,0.4f)*0.5f;
+            c.setFromHSV(0,0,base);
             cols[i] = c.getABGR32();
-            c.setFromHSV(hsvs[i][0],
-                         hsvs[i][1]+0.1,
-                         hsvs[i][2]);
+            c.setFromHSV(0,0,base*2.0f);
             colsvis[i] = c.getABGR32();
         }
     }
         
 } cols;
 
-void Grid::writeTexture(){
+void Grid::writeMapTexture(){
     uint32_t image[GRIDSIZE][GRIDSIZE];
     
     uint32_t *p = &image[0][0];
@@ -609,7 +603,19 @@ void Grid::writeTexture(){
     if(globals::game){
         Player *player = &globals::game->p;
         for(Person *p=player->people.first();p;p=player->people.next(p)){
-            image[(int)p->y][(int)p->x] = 0xffffffff;
+            uint32_t col;
+            switch(p->pmode){
+            case NOPATH:
+                col = 0xffffffff;break;
+            case COARSEPATH:
+                col = 0xff00ffff;break;
+            case FINEPATH:
+                col = 0xffff0000;break;
+            default:
+                col = 0xff0000ff;break;
+            }
+            image[(int)p->y][(int)p->x] = col;
+            
         }
     }
     

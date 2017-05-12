@@ -13,35 +13,55 @@
 /// one of the little people in the game - allocated from a pool,
 /// ctor and dtor will run.
 
+enum PathFindingMode {
+    // nopath - haven't found a path
+    NOPATH,
+          // following a path using JPS
+          COARSEPATH,
+          // getting to the absolute location within a square
+          FINEPATH,
+          ZOMBIE, // not really a PFM - but kill me.
+          DEBUGSTOP
+};
+          
+
 struct Person {
     
     float x,y; // note these are in gridspace
-    int dx,dy; // direction
+    float dx,dy; // direction
     
-    bool hasPath;
-    int destx,desty; // full destination for path
+    float destx,desty; // full destination for path
     int pathidx; // current index of path
     
+    PathFindingMode pmode;
+    
     Person(){
-        hasPath = false;
+        pmode = NOPATH;
     }
     
-    void init(float xx,float yy,int ddx,int ddy){
+    void init(class Player *player, float xx,float yy){
         x=xx;y=yy;
-        dx=ddx;dy=ddy;
+        dx=dy=0;
+        p=player;
+        
     }
     
     float getrot(){
-        return dirToRot[dx+1][dy+1];
+        return dirToRot[sgn(dx)+1][sgn(dy)+1];
     }
+    
+    bool pathTo(float xx,float yy);
     
     void update(float t);
     
     static void initConsts();
     
 private:
-    static float dirToRot[3][3];
+    // we've reached our goal in the current mode
+    void goalFound();
     
+    static float dirToRot[3][3];
+    class Player *p;
     JPS::PathVector path;
 };
 

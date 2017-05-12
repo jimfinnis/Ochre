@@ -201,8 +201,10 @@ public:
     
     // raise up at x,y (and neighbours if necessary)
     void up(int x,int y){
-        _up(x,y);
-        recalcSafe();
+        if(grid[x][y]<15){ // have to draw the line somewhere..
+            _up(x,y);
+            recalcSafe();
+        }
     }
     // lower at x,y (and neighbours if necessary)
     void down(int x,int y){
@@ -211,7 +213,7 @@ public:
     }
     
     // draw the map (will require people to be added)
-    void writeTexture();
+    void writeMapTexture();
     void drawHouses();
     
     // move cursor and move centre if required

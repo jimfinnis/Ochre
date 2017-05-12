@@ -17,8 +17,9 @@ Player::Player() : people(16384){
     for(;;){
         Person *p = people.alloc();
         if(!p)break;
-        p->init(drand48()*20+20,drand48()*20+20,1,1);
+        p->init(this,drand48()*20+20,drand48()*20+20);
     }
+    mode = PLAYER_SETTLE;
 }
 
 void Player::render(){
@@ -38,16 +39,17 @@ void Player::render(){
             g->pushxforminterp(p->x,p->y,-0.2f);
             ms->rotY(p->getrot());
             ms->scale(0.2);
-            s->diffuse = Colour(opacity,opacity,opacity,opacity);
+            s->diffuse = Colour(1,1,1,opacity);
             meshes::marker->render(ms->top());
-            // RENDER HERE
             ms->pop();
         }
     }
 }
 
 void Player::update(float t){
-    for(Person *p=people.first();p;p=people.next(p)){
+    for(Person *q,*p=people.first();p;p=q){
+        q=people.next(p);
         p->update(t);
+        if(p->pmode == ZOMBIE)people.free(p);
     }
 }

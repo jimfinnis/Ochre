@@ -8,6 +8,7 @@
 #include "maths.h"
 #include "globals.h"
 #include "game.h"
+#include "player.h"
 
 #define PERSONSPEED 11.1f
 
@@ -28,44 +29,70 @@ void Person::initConsts(){
     dirToRot[1][1]=0;
 }
 
+void Person::goalFound(){
+}
+
+bool Person::pathTo(float xx,float yy){
+    if(JPS::findPath(path,globals::game->grid,
+                     x,y,(int)xx,(int)yy)){
+        pathidx=0;
+        destx = xx;
+        desty = yy;
+        pmode = COARSEPATH;
+        return true;
+    } else {
+        pmode = NOPATH;
+        return false;
+    }
+}
+    
+        
+        
+
 
 void Person::update(float t){
     Grid *g = &globals::game->grid;
     
-    // randomly change dest
-    if(!(rand()%100)){
-        if((*g)(x,y))        path.clear();
-    }
-
-    
-    // pathing test
-    if(!path.size()){
-        pathidx=0;
-        destx = rand()%GRIDSIZE;
-        desty = rand()%GRIDSIZE;
-        dx=dy=0;
-        if(g->get(destx,desty)>0){
-            bool found=JPS::findPath(path,*g,
-                                     x,y,
-                                     destx,desty,
-                                     0);
-        }
-    }        
-    
     // pathing
-    if(path.size()){
-        int px = path[pathidx].x, py = path[pathidx].y;
-        // compare current position with path position
-        if((int)x == px && (int)y == py){
-            pathidx++; // arrived at next pos, increment path
-            if(pathidx==path.size()){
-                path.clear();dx=dy=0; // arrived at final point
+    switch(pmode){
+    case NOPATH:
+        pathTo(rand()%GRIDSIZE,rand()%GRIDSIZE);
+        break;
+    case COARSEPATH:
+        if(path.size()){
+            float px = (float)path[pathidx].x, py = (float)path[pathidx].y;
+            // compare current position with path position
+            if((x-px)*(x-px)+(y-py)*(y-py) < 0.25){
+                pathidx++; // arrived at next pos, increment path
+                if(pathidx==path.size()){
+                    pmode = FINEPATH;
+                }
+            } else {
+                dx = sgn(px-x);
+                dy = sgn(py-y);
             }
-        } else {
-            dx = sgn(px-x);
-            dy = sgn(py-y);
+            if(abs(g->cursorx - (int)x)<1 && abs(g->cursory-(int)y)<1)
+                printf("%d/%d: %f %f -> %f %f (%f %f)\n",pathidx,path.size(),x,y,px,py,dx,dy);
+        } else
+            pmode=FINEPATH;
+        break;
+    case FINEPATH:
+        {
+            float deltax = (destx-x);
+            float deltay = (desty-y);
+            if(deltax*deltax+deltay*deltay < 0.001f){
+                dx=dy=0;
+//                printf("%f %f\n",x,y);
+                pmode = DEBUGSTOP;
+            } else {
+                // Zeno's person.
+                dx = deltax*0.5f;
+                dy = deltay*0.5f;
+//                printf("F %f %f -> %f %f (%f %f)\n",x,y,destx,desty,dx,dy);
+            }
         }
-//        printf("%d/%d: %f %f -> %d %d (%d %d)\n",pathidx,path.size(),x,y,px,py,dx,dy);
+        break;
+    default:break;
     }
     
     
