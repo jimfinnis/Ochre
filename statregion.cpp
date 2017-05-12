@@ -20,7 +20,6 @@ void StatRegion::render(){
     StateManager *sm = StateManager::getInstance();
     sm->reset();
     
-    
     globals::font->render(10,20,20,"Ochre 0.0 (%s)",__DATE__);
     
     static double lastTime=0;

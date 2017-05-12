@@ -12,6 +12,7 @@ void init();
 double now();
 uint32_t ticks();
 void tick();
+void sleep(double t);
 };
 
 #endif /* __UTIME_H */

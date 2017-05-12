@@ -44,6 +44,11 @@ uint32_t ticks(){
     return ticksctr;
 }
 
+void sleep(double t){
+    t *= 1000000.0;
+    ::usleep((unsigned long)t);
+}
+
 void tick(){
     ticksctr++;
 }

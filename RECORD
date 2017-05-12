@@ -1,0 +1,8 @@
+Turn off antialiasing (debug code is in context.cpp), glc doesn't
+like it. Turn off font output, ditto.
+
+glc-capture -s ./ochre
+
+glc-play <output.glc> -o - -y 1 | ffmpeg -i - -an -vcodec libx264 -crf 22 -r 25 -threads 0 "omgitworked.mp4"
+
+The -r 25 limits the output framerate.

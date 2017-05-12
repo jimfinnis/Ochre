@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170511.1126>
+//  Last Modified : <170512.1522>
 //
 //  Description	
 //
@@ -133,7 +133,7 @@ void Effect::compile(){
     printf("Get attr done\n");
     GLint linked;
     glGetProgramiv(program,GL_LINK_STATUS,&linked);
-//    ERRCHK;
+    ERRCHK;
     if(!linked){
         GLint infolen;
         glGetProgramiv(program,GL_INFO_LOG_LENGTH,&infolen);

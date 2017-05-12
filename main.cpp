@@ -161,6 +161,7 @@ int main(int argc, char** argv)
         lastt=t;
         handleInput();
         render();
+ //       Time::sleep(0.02); // yeah, frame rate cap.
     };
     
     return 0;

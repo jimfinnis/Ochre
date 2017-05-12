@@ -11,7 +11,7 @@
 #include "effect.h"
 
 Context *Context::instance = NULL;
-#define GLDEBUG 0
+#define GLDEBUG 1
 
 #define FULLSCREEN 0
 
@@ -151,7 +151,6 @@ void Context::resize(int ww,int hh){
 
 extern bool debugtoggle;
 void Context::swap(){
-    
     
     // if debug toggle is on, we render direct (for testing FSAA)
     if(debugtoggle){

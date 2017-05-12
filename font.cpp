@@ -55,7 +55,7 @@ void Font::render(float x,float y,float h,const char *s,...){
         FATAL("cannot get string size");
     float texw=ww,texh=hh;
         
-    ERRCHK;
+//    ERRCHK;
     
     float r = texw/texh;
     
