@@ -43,14 +43,18 @@ void GameScreen::onKeyDown(int k){
 //        globals::game = new Game(qqq++,-2);
 //        break;
     case SDLK_RIGHT:
-        g->cursorx++;break;
+        g->moveCursor(1,0);
+        break;
     case SDLK_LEFT:
-        g->cursorx--;break;
+        g->moveCursor(-1,0);
+        break;
         // these are backwards because right-handed coord system: +ve z is into the screen
     case SDLK_UP:
-        g->cursory--;break;
+        g->moveCursor(0,-1);
+        break;
     case SDLK_DOWN:
-        g->cursory++;break;
+        g->moveCursor(0,1);
+        break;
     case 'p':
         g->up(g->cursorx,g->cursory);
         break;

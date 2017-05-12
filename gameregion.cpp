@@ -106,8 +106,8 @@ void GameRegion::render(){
     ms->push();
     
     ms->mul(glm::lookAt(glm::vec3(0.0f,10.0f,35.0f),glm::vec3(),glm::vec3(0.0f,1.0f,0.0f)));
-    
     ms->rotY(rotAngle);
+    ms->translate(-0.5,0,0);
     
     // copy the worldview matrix so we can access it for mouse clickage.
     view = *(ms->top());

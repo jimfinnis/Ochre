@@ -189,6 +189,16 @@ public:
     // draw the map (will require people to be added)
     void writeTexture();
     void drawHouses();
+    
+    // move cursor and move centre if required
+    void moveCursor(int dx,int dy){
+        cursorx+=dx;
+        cursory+=dy;
+        if(getVisibility(cursorx,cursory)<0.5){
+            centrex+=dx;centrey+=dy;
+        }
+    }
+            
 };
 
 
