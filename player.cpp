@@ -33,7 +33,7 @@ void Player::render(){
     State *s = sm->get();
     s->overrides |= STO_DIFFUSE;
     for(Person *p=people.first();p;p=people.next(p)){
-        float opacity = g->getOpacity(p->x,p->y);
+        float opacity = g->getVisibility(p->x,p->y);
         if(opacity>0.001){
             g->pushxforminterp(p->x,p->y,-0.2f);
             ms->rotY(p->getrot());

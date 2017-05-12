@@ -30,7 +30,9 @@ void StatRegion::render(){
     
     Grid *g = &globals::game->grid;
     
-    globals::font->render(10,50,20,"%d %d %d",g->cursorx,g->cursory,
-                          (int)(1.0/ft));
+    extern float snark;
+    globals::font->render(10,50,20,"%d %d %d %.3f",g->cursorx,g->cursory,
+                          (int)(1.0/ft),snark);
     
+          
 }

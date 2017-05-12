@@ -54,6 +54,9 @@ struct Colour
     Colour(float rr,float gg,float bb,float aa){
         r=rr;g=gg;b=bb;a=aa;
     }
+    Colour(float rr,float gg,float bb){
+        r=rr;g=gg;b=bb;a=1;
+    }
     Colour(){
         r=g=b=0;
         a=1;

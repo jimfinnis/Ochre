@@ -12,7 +12,7 @@
 #include <iostream>
 
 GameRegion::GameRegion() : IsoRegion("game") {
-    
+    rotAngle=0;
 }
 
 void GameRegion::onMouseMove(int sx,int sy){
@@ -106,13 +106,16 @@ void GameRegion::render(){
     ms->push();
     
     ms->mul(glm::lookAt(glm::vec3(0.0f,10.0f,35.0f),glm::vec3(),glm::vec3(0.0f,1.0f,0.0f)));
+    
+    ms->rotY(rotAngle);
+    
     // copy the worldview matrix so we can access it for mouse clickage.
     view = *(ms->top());
     
     Game *game = globals::game;
     
     Grid *g = &game->grid;
-    g->genTriangles(visibleGridSize);    
+    g->genTriangles(visibleGridSize);
     g->render(ms->top());
     g->renderCursor();
     

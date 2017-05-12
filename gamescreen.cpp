@@ -60,6 +60,10 @@ void GameScreen::onKeyDown(int k){
     case 'x':
         g->recentre();
         break;
+    case SDLK_PERIOD:
+        game.rotAngle+=0.1f;break;
+    case SDLK_COMMA:
+        game.rotAngle-=0.1f;break;
     default:
         printf("%d\n",k);
     }

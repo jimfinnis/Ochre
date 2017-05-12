@@ -26,9 +26,38 @@
 #define GMAT_GRASS 0
 #define GMAT_FARM 1
 
+
+/// this class manages visibility lines - we tell how visible an entity 
+/// by looking at the minimum of its distance from edges of the viewable
+/// region in world space.
+struct VisLines {
+    struct line {
+        // lines are in vector form
+        glm::vec2 a; // start of line
+        glm::vec2 n; // line normal
+        // return the distance squared from the line
+        // (0 if on the wrong side)
+        float getDistSquared(float x, float y);
+    };
+    line lines[8];
+    int ct;
+    void reset(){ct=0;}
+    void add(float x1,float y1,float x2,float y2){
+        lines[ct].a=glm::vec2(x1,y1);
+        lines[ct++].n=glm::normalize(glm::vec2(x2-x1,y2-y1));
+    }
+    
+    float getVisibility(float x,float y);
+    
+};
+
+/// this is the grid - the heightmap of the world and how to render it.
+
 class Grid {
     uint8_t grid[GRIDSIZE][GRIDSIZE];     // height map
-    uint8_t gridmats[GRIDSIZE][GRIDSIZE]; // material index for square
+    uint8_t gridmats[GRIDSIZE][GRIDSIZE]; // material index for square (x,y,x+1,y+1)
+    
+    uint8_t mapvis[GRIDSIZE][GRIDSIZE]; // visibility of node
     
     
     // vertex data goes in here
@@ -71,13 +100,6 @@ class Grid {
     
     int modcount; // modifications since last resetModCount()
     
-    // booleans indicating whether node is visible, set in genTriangles.
-    uint8_t visible[GRIDSIZE+VISBORDER*2][GRIDSIZE+VISBORDER*2];
-    
-    // booleans indicating how "opaque" a node is for drawing people.
-    // This is an ugly way to do it.
-    uint8_t opacity[GRIDSIZE+VISBORDER*2][GRIDSIZE+VISBORDER*2];
-    
     // materials
     std::vector<Material> materials;
     // material transition table for rendering
@@ -89,21 +111,24 @@ class Grid {
     
     // we can write the texture to a map, too.
     GLuint maptex;
-
+    
+    // visibility edges structure
+    VisLines vis;
+    
 public:
     int cursorx,cursory; // selected point
     int centrex,centrey;
     
     float heightFactor; // y is also multiplied by this
     
-    /// is a given grid square visible (set by genTriangles)
+    /// is a given grid square visible
     bool isVisible(int x,int y){
-        return visible[x+VISBORDER][y+VISBORDER]!=0;
+        return true;
     }
     
-    /// use bilinear interp to get opacity for people from 
-    /// opacity array
-    float getOpacity(float x, float y);
+    float getVisibility(float x, float y){
+        return vis.getVisibility(x,y);
+    }
     
     Grid(int seed,float waterlevel);
     ~Grid();
