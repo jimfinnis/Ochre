@@ -18,13 +18,14 @@ struct Game {
         grid.cursory=20;
         grid.recentre();
     }
-    
+
     void update(float t){
         p.update(t);
+        grid.update(t);
     }
-    
+
     Grid grid;
-    
+
     Player p;
 };
 

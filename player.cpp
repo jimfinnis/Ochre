@@ -12,7 +12,7 @@
 #include "globals.h"
 #include "meshes.h"
 
-Player::Player() : people(16384){
+Player::Player() : people(256){
 //    for(int i=0;i<3;i++){
     for(;;){
         Person *p = people.alloc();
@@ -24,12 +24,12 @@ Player::Player() : people(16384){
 
 void Player::render(){
     // draw all the little folk.
-    
+
     Game *game = globals::game;
     Grid *g = &game->grid;
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
-    
+
     meshes::marker->startBatch();
     State *s = sm->get();
     s->overrides |= STO_DIFFUSE;
