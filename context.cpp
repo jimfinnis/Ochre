@@ -11,7 +11,7 @@
 #include "effect.h"
 
 Context *Context::instance = NULL;
-#define GLDEBUG 1
+#define GLDEBUG 0
 
 #define FULLSCREEN 0
 
