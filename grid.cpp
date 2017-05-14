@@ -455,7 +455,7 @@ void Grid::_up(int x,int y){
     modcount++;
     for(int xx=x-1;xx<=x+1;xx++){
         for(int yy=y-1;yy<=y+1;yy++){
-            if(h-get(xx,yy)>1)up(xx,yy); // recursion oh god.
+            if(h-get(xx,yy)>1)_up(xx,yy); // recursion oh god.
         }
     }
 }
@@ -469,7 +469,7 @@ void Grid::_down(int x,int y){
     int h = grid[x][y];
     for(int xx=x-1;xx<=x+1;xx++){
         for(int yy=y-1;yy<=y+1;yy++){
-            if(get(xx,yy)-h>1)down(xx,yy); // recursion oh god.
+            if(get(xx,yy)-h>1)_down(xx,yy); // recursion oh god.
         }
     }
 }
@@ -600,7 +600,7 @@ void Grid::writeMapTexture(){
 
             // for debugging, replace that with stigmergy
             Colour c;
-            c.setFromHSV(0,0,mapsteps[x][y]*0.1f);
+            c.setFromHSV(grid[x][y]?0.5:0,0.5,mapsteps[x][y]*0.1f+0.3f);
             col = c.getABGR32();
 
             *p++ = col;
@@ -641,7 +641,10 @@ void Grid::writeMapTexture(){
 void Grid::update(float t){
   for(int y=0;y<GRIDSIZE;y++){
     for(int x=0;x<GRIDSIZE;x++){
-      mapsteps[x][y]*=0.99f;
+      mapsteps[x][y]*=0.996f;
+      // add a little noise to mess things up a bit, and stop the
+      // little sods making lawnmower stripes
+      mapsteps[x][y]+=drand48()*0.001f;
     }
   }
 }

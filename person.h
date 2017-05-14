@@ -30,6 +30,8 @@ struct Person {
 
     float x,y; // note these are in gridspace
     float dx,dy; // direction
+    float oldx,oldy; // a record of a previous location; used for reducing stigmergy when we get stuck
+    float stuckHormone; // yes, hormone. Sue me.
 
     float destx,desty; // full destination for path
     int pathidx; // current index of path
@@ -37,7 +39,9 @@ struct Person {
     PathFindingMode pmode;
 
     Person(){
-        pmode = WANDER;
+      pmode = WANDER;
+      stuckHormone = 0;
+      oldx=oldy=-100;
     }
 
     void init(class Player *player, float xx,float yy){
@@ -50,20 +54,18 @@ struct Person {
     void setDirectionToAntiStigmergy();
 
     float getrot(){
-        return dirToRot[sgn(dx)+1][sgn(dy)+1];
+        extern float dirToRot[3][3];
+        return dirToRot[sgn(-dx)+1][sgn(-dy)+1];
     }
 
     bool pathTo(float xx,float yy);
 
     void update(float t);
 
-    static void initConsts();
-
 private:
     // we've reached our goal in the current mode
     void goalFound();
 
-    static float dirToRot[3][3];
     class Player *p;
     JPS::PathVector path;
 };

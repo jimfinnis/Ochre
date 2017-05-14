@@ -15,7 +15,7 @@
 
 /// the grid component of the world from which the heightmap is generated.
 
-#define GRIDSIZE 128
+#define GRIDSIZE 256
 #define MAXVERTS 32767
 
 // the visibility and opaque arrays are bigger than the grid itself

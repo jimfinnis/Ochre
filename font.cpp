@@ -28,8 +28,12 @@ void Font::render(float x,float y,float h,const char *s,...){
     va_list args;
     va_start(args,s);
         
+#if CAPTURING
+    return;
+#endif
     vsnprintf(buf,1024,s,args);
     va_end(args);
+    
     
     // yes, this is vile. Render, creating a new surface, create a
     // new gl texture from that surface, render that, delete both.

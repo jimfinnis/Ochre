@@ -1,5 +1,6 @@
-Turn off antialiasing (debug code is in context.cpp), glc doesn't
-like it. Turn off font output, ditto.
+#define CAPTURING 1
+turns off fsaa and font rendering (glc-cap hates them)
+
 
 glc-capture -s ./ochre
 

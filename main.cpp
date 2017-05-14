@@ -28,30 +28,30 @@ Screen *curscreen;
 
 // this creates all the graphics and does initialisation, etc.
 Context context(800,600);
-    
+
 
 void render(){
     glEnable(GL_MULTISAMPLE);
-    
-    
+
+
     /* Clear the color and depth buffers. */
     glDisable(GL_SCISSOR_TEST);
     glClearColor(0,0,1,0);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    
+
     // reset the state manager
     StateManager *sm = StateManager::getInstance();
     sm->reset();
-    
+
     // draw regions
     //        scr.stat.setAndClear(Colour(0,0.5,0,1));
     //        scr.tool.setAndClear(Colour(0,0,0.5,1));
-    
-    
+
+
     //        scr.stat.set();
-    
+
     curscreen->render();
-    
+
     context.swap();
 }
 
@@ -91,7 +91,7 @@ void handleInput(){
             break;
         }
     }
-    
+
 }
 
 void update(float t){
@@ -110,14 +110,14 @@ void tfl(){
         *foo[i] = i*10;
         printf("%d - %d\n",i,*foo[i]);
     }
-    
-    
+
+
     int chk=0;
     for(int *p = pool.first(); p ; p=pool.next(p)){
         if(chk++ == 100)break;
         printf("%d\n",*p);
    }
-    
+
     for(int i=0;i<200;i++){
         int qq = rand()%10;
         int pp = rand()%10;
@@ -132,30 +132,30 @@ void tfl(){
         *foo[pp]=pp*10;
         pool.dump();
     }
-    
+
     for(int *p = pool.first(); p ; p=pool.next(p)){
         printf("%d\n",*p);
    }
     std::terminate();
 
 }
-    
+
 
 int main(int argc, char** argv)
 {
     Time::init();
     Font::init();
-    
+
     globals::init();
-    Person::initConsts();
-    
+
     curscreen = new GameScreen();
-    
+
     meshes::load();
-    
+
     double lastt = Time::now();
     while(globals::running)
     {
+        Time::tick();
         double t = Time::now();
         update(t-lastt);
         lastt=t;
@@ -163,6 +163,6 @@ int main(int argc, char** argv)
         render();
  //       Time::sleep(0.02); // yeah, frame rate cap.
     };
-    
+
     return 0;
 }

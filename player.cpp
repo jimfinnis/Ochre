@@ -37,9 +37,9 @@ void Player::render(){
         float opacity = g->getVisibility(p->x,p->y);
         if(opacity>0.001){
             g->pushxforminterp(p->x,p->y,-0.2f);
-            ms->rotY(p->getrot());
+            ms->rotY(p->getrot()+glm::radians(90.0f));
             ms->scale(0.2);
-            s->diffuse = Colour(1,1,1,opacity);
+            s->diffuse = Colour(1,1-p->stuckHormone,1-p->stuckHormone,opacity);
             meshes::marker->render(ms->top());
             ms->pop();
         }
