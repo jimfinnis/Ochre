@@ -22,6 +22,13 @@ float dirToRot[3][3] = {
     {glm::radians(315.0f),glm::radians(270.0f),glm::radians(225.0f)},
 };
 
+void Person::init(class Player *player, int idx, float xx,float yy){
+    x=xx;y=yy;
+    dx=dy=0;
+    p=player;
+    nextDirUpdate = globals::timeNow+UPDATEDIRINTERVAL*(double)(idx%10);
+}
+
 
 void Person::goalFound(){
 }
@@ -39,7 +46,7 @@ bool Person::pathTo(float xx,float yy){
     }
 }
 
-float targetX = 0,targetY=128,stigBias=0.8f;
+float targetX = 128,targetY=255,stigBias=0.6f;
 
 void Person::setDirectionToAntiStigmergy(){
     Grid *g = &globals::game->grid;
@@ -49,62 +56,44 @@ void Person::setDirectionToAntiStigmergy(){
     int targetdx = sgn(targetX-x);
     int targetdy = sgn(targetY-y);
     
-    static Person *stuckChap=NULL;
-    bool show;
-    
-    if(0 && stuckHormone>0.1f && (*g)(cx,cy) && (!stuckChap || stuckChap==this)){
-        stuckChap=this;
-        show=true;
-    } else show=false;
-    if(show)printf("%p %f: %2.2f,%2.2f [%d,%d] (%2.2f,%2.2f) : ",this,
-                   stuckHormone,
-                   x,y,cx,cy,dx,dy);
-    
     int idx=sgn(dx); // blee.
     int idy=sgn(dy);
     
     float minst = FLT_MAX;
-    float effectiveStigBias = interp(stigBias,1.0f,stuckHormone);
-    //  printf("SB: %f H: %f\n",effectiveStigBias,stuckHormone);
+    
     int oxf,oyf;
     for(int ox=-1;ox<=1;ox++){
-        if(show)putchar('(');
         for(int oy=-1;oy<=1;oy++){
             float st=1000;
             // do not scan my own area, do not permit us to turn around
             // or go into the sea. The middle rule there is to avoid
-            // stuckage, when combined with the stuck hormone (which decreases
-            // bias in stigmergy).
-            if( (ox||oy) && (ox!=-idx || oy!=-idy) && (*g)(cx+ox,cy+oy)){
+            // stuckage.
+            if( (ox||oy) && (ox!=-idx && oy!=-idy) && (*g)(cx+ox,cy+oy)){
                 st =g->mapsteps[cx+ox][cy+oy];
-                if(targetdx==ox && targetdy==oy)st*=effectiveStigBias; // and towards target
+                if(targetdx==ox && targetdy==oy)st*=stigBias; // and towards target
                 if(st<minst){
                     minst=st;oxf=ox;oyf=oy;
                 }
             }
-            if(show)printf("%2.2f,",st);
         }
-        if(show)putchar(')');
     }
-            
+    
     
     
     if(minst<FLT_MAX){
         dx = oxf;
         dy = oyf;
-        if(show)printf(" --> %2.2f,%2.2f",dx,dy);
     } else {
         dx=dy=0; // might happen if we're in the water
     }
-    if(show)putchar('\n');
 }
 
 
-
-void Person::update(float t){
+void Person::updateDirection(){
+    // repath - this runs infrequently.
+    
     Grid *g = &globals::game->grid;
     
-    // pathing
     switch(pmode){
     case WANDER:
         setDirectionToAntiStigmergy();
@@ -148,10 +137,15 @@ void Person::update(float t){
         break;
     default:break;
     }
+}    
+
+
+void Person::update(float t){
+    Grid *g = &globals::game->grid;
     
-    
-    if(!(Time::ticks() % 20)){
-        oldx=x;oldy=y;
+    if(globals::timeNow > nextDirUpdate){
+        nextDirUpdate = globals::timeNow + UPDATEDIRINTERVAL;
+        updateDirection();
     }
     
     // adjustment for diagonal speed slowdown
@@ -159,19 +153,6 @@ void Person::update(float t){
     
     x += PERSONSPEED*t*(float)dx*diag;
     y += PERSONSPEED*t*(float)dy*diag;
-    
-    // release the stuck hormone
-    float ddx = x-oldx;
-    float ddy = y-oldy;
-    if(ddx*ddx + ddy*ddy < 0.01f){
-        // just set it high if we haven't moved.
-        stuckHormone=1;
-    }
-    //float release = (0.99f-stuckHormone)/(1.0f+ddx*ddx+ddy*ddy);
-    //stuckHormone += release*0.001f;
-    //printf("%f %f\n",release,stuckHormone);
-    // and decay it
-    stuckHormone *= 0.9f;
     
     g->mapsteps[(int)x][(int)y]++;
     

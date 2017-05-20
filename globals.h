@@ -13,7 +13,7 @@ namespace globals {
 extern Font *font;
 extern bool running;
 extern Game *game;
-
+extern double timeNow; // to save time calling now()
 void init();
 }
 

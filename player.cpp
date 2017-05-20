@@ -13,11 +13,10 @@
 #include "meshes.h"
 
 Player::Player() : people(1024){
-//    for(int i=0;i<3;i++){
-    for(;;){
+    for(int i=0;;i++){
         Person *p = people.alloc();
         if(!p)break;
-        p->init(this,drand48()*20+20,drand48()*20+20);
+        p->init(this,i,drand48()*20+20,drand48()*20+20);
     }
     mode = PLAYER_SETTLE;
 }
@@ -32,14 +31,12 @@ void Player::render(){
 
     meshes::marker->startBatch();
     State *s = sm->get();
-    s->overrides |= STO_DIFFUSE;
     for(Person *p=people.first();p;p=people.next(p)){
         float opacity = g->getVisibility(p->x,p->y);
         if(opacity>0.001){
             g->pushxforminterp(p->x,p->y,-0.2f);
             ms->rotY(p->getrot()+glm::radians(90.0f));
             ms->scale(0.2);
-            s->diffuse = Colour(1,1-p->stuckHormone,1-p->stuckHormone,opacity);
             meshes::marker->render(ms->top());
             ms->pop();
         }

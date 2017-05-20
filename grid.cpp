@@ -60,7 +60,7 @@ Grid::Grid(int seed,float waterlevel){
             if(v>5)v=5;
             grid[x][y] = v;
             gridmats[x][y] = 0;
-            mapsteps[x][y] = 0.0f;
+            mapsteps[x][y]=drand48();
         }
     }
     recalcSafe(); // calculate initial "safe squares"
@@ -114,15 +114,26 @@ Grid::~Grid(){
     if(maptex)glDeleteTextures(1,&maptex);
 }
 
+#define DEBUGNORMAL 0
+#if DEBUGNORMAL
+static float debugNormalMult = 1.0f;
+#endif
+
 static void calcnormal(UNLITVERTEX *v0,UNLITVERTEX *v1,UNLITVERTEX *v2){
     glm::vec3 *vv0 = reinterpret_cast<glm::vec3*>(&v0->x);
     glm::vec3 *vv1 = reinterpret_cast<glm::vec3*>(&v1->x);
     glm::vec3 *vv2 = reinterpret_cast<glm::vec3*>(&v2->x);
 
     glm::vec3 norm = glm::triangleNormal(*vv0,*vv1,*vv2);
+#if DEBUGNORMAL
+    v0->nx = v1->nx = v2->nx = norm.x*debugNormalMult;
+    v0->ny = v1->ny = v2->ny = norm.y*debugNormalMult;
+    v0->nz = v1->nz = v2->nz = norm.z*debugNormalMult;
+#else
     v0->nx = v1->nx = v2->nx = norm.x;
     v0->ny = v1->ny = v2->ny = norm.y;
     v0->nz = v1->nz = v2->nz = norm.z;
+#endif
 
 }
 
@@ -199,6 +210,12 @@ void Grid::genTriangles(int range){
             int yv = y+VISBORDER;
 
             int mat = getmat(x,y);
+#if DEBUGNORMAL
+            if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
+                debugNormalMult = mapsteps[x][y]*0.01f + 0.5f;
+            else
+                debugNormalMult=1.0f;
+#endif
             int h00 = get(x,y);
             int h10 = get(x+1,y);
             int h11 = get(x+1,y+1);
@@ -439,7 +456,7 @@ void Grid::renderCursor(){
     s->light.ambient = Colour(0.7,0.7,0.7,1);
     pushxform(cursorx,cursory,-0.5f);
     ms->scale(0.3f);
-    ms->rotY(Time::now()*2.0f);
+    ms->rotY(globals::timeNow*2.0f);
     meshes::cursor->render(sm->getx()->top());
     ms->pop();
     sm->pop();
@@ -641,10 +658,10 @@ void Grid::writeMapTexture(){
 void Grid::update(float t){
   for(int y=0;y<GRIDSIZE;y++){
     for(int x=0;x<GRIDSIZE;x++){
-      mapsteps[x][y]*=0.996f;
+      mapsteps[x][y]*=0.998f;
       // add a little noise to mess things up a bit, and stop the
       // little sods making lawnmower stripes
-      mapsteps[x][y]+=drand48()*0.001f;
+//      mapsteps[x][y]+=drand48()*0.001f;
     }
   }
 }

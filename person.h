@@ -25,30 +25,24 @@ enum PathFindingMode {
           DEBUGSTOP
 };
 
+#define UPDATEDIRINTERVAL 0.2
 
 struct Person {
 
     float x,y; // note these are in gridspace
     float dx,dy; // direction
-    float oldx,oldy; // a record of a previous location; used for reducing stigmergy when we get stuck
-    float stuckHormone; // yes, hormone. Sue me.
 
     float destx,desty; // full destination for path
     int pathidx; // current index of path
 
     PathFindingMode pmode;
+    double nextDirUpdate;
 
     Person(){
-      pmode = WANDER;
-      stuckHormone = 0;
-      oldx=oldy=-100;
+        pmode = WANDER;
     }
 
-    void init(class Player *player, float xx,float yy){
-        x=xx;y=yy;
-        dx=dy=0;
-        p=player;
-    }
+    void init(class Player *player, int idx, float xx,float yy);
 
     // used in wandering - sets the direction to where no-one has been
     void setDirectionToAntiStigmergy();
@@ -65,6 +59,7 @@ struct Person {
 private:
     // we've reached our goal in the current mode
     void goalFound();
+    void updateDirection();
 
     class Player *p;
     JPS::PathVector path;

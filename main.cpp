@@ -95,6 +95,7 @@ void handleInput(){
 }
 
 void update(float t){
+    globals::timeNow = Time::now();
     globals::game->update(t);
 }
 
