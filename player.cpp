@@ -12,7 +12,7 @@
 #include "globals.h"
 #include "meshes.h"
 
-Player::Player() : people(256){
+Player::Player() : people(1024){
 //    for(int i=0;i<3;i++){
     for(;;){
         Person *p = people.alloc();
