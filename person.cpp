@@ -26,7 +26,7 @@ void Person::init(class Player *player, int idx, float xx,float yy){
     x=xx;y=yy;
     dx=dy=0;
     p=player;
-    nextDirUpdate = globals::timeNow+UPDATEDIRINTERVAL*(double)(idx%10);
+    nextDirUpdate = globals::timeNow+UPDATEDIRINTERVAL*0.2*(double)(idx%10);
 }
 
 
