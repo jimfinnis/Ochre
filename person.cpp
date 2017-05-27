@@ -26,6 +26,7 @@ void Person::init(class Player *player, int idx, float xx,float yy){
     x=xx;y=yy;
     dx=dy=0;
     p=player;
+    drowntime=0;
     nextInfrequentUpdate = globals::timeNow+INFREQUENTUPDATEINTERVAL*0.2*(double)(idx%10);
 }
 

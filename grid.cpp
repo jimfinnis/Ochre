@@ -526,7 +526,7 @@ float Grid::getinterp(float fx,float fy){
     float h10 = get(x+1,y);
     float h11 = get(x+1,y+1);
 
-    float r = blerp(h00,h10,h01,h11,fx-x,fy-y);
+    return blerp(h00,h10,h01,h11,fx-x,fy-y);
 }
 
 void Grid::pushxforminterp(float fx,float fy,float offset){
