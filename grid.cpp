@@ -63,7 +63,7 @@ Grid::Grid(int seed,float waterlevel){
 
 
     // same order as GMAT_ constants
-    materials.push_back(Material(0,1,1,1)); // grass
+    materials.push_back(Material(0,0.7,0.7,0.7)); // grass
     materials.push_back(Material(0,0.9,0.0,0.9)); // farm
 
     // once we know how many mats we need we can allocate the buckets for the triangles

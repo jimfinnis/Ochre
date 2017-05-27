@@ -6,3 +6,6 @@
 - raycasting for mouse click detection
 - speed up quad rendering with queueing
 - mipmap generation on textures??
+
+
+- pathing when interrupted (i.e. landscape changed)
