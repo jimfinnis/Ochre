@@ -38,10 +38,10 @@ bool Person::pathTo(float xx,float yy){
         pathidx=0;
         destx = xx;
         desty = yy;
-        pmode = COARSEPATH;
+        state = COARSEPATH;
         return true;
     } else {
-        pmode = NOPATH;
+        state = WANDER;
         return false;
     }
 }
@@ -94,12 +94,9 @@ void Person::updateDirection(){
     
     Grid *g = &globals::game->grid;
     
-    switch(pmode){
+    switch(state){
     case WANDER:
         setDirectionToAntiStigmergy();
-        break;
-    case NOPATH:
-        pathTo(rand()%GRIDSIZE,rand()%GRIDSIZE);
         break;
     case COARSEPATH:
         if(path.size()){
@@ -108,7 +105,7 @@ void Person::updateDirection(){
             if((x-px)*(x-px)+(y-py)*(y-py) < 0.25){
                 pathidx++; // arrived at next pos, increment path
                 if(pathidx==path.size()){
-                    pmode = FINEPATH;
+                    state = FINEPATH;
                 }
             } else {
                 dx = sgn(px-x);
@@ -117,7 +114,7 @@ void Person::updateDirection(){
             //  if(abs(g->cursorx - (int)x)<1 && abs(g->cursory-(int)y)<1)
             //  printf("%d/%d: %f %f -> %f %f (%f %f)\n",pathidx,path.size(),x,y,px,py,dx,dy);
         } else
-            pmode=FINEPATH;
+            state=FINEPATH;
         break;
     case FINEPATH:
         {
@@ -126,7 +123,7 @@ void Person::updateDirection(){
             if(deltax*deltax+deltay*deltay < 0.001f){
                 dx=dy=0;
                 //                printf("%f %f\n",x,y);
-                pmode = DEBUGSTOP;
+                state = DEBUGSTOP;
             } else {
                 // Zeno's person.
                 dx = deltax*0.5f;

@@ -47,6 +47,6 @@ void Player::update(float t){
     for(Person *q,*p=people.first();p;p=q){
         q=people.next(p);
         p->update(t);
-        if(p->pmode == ZOMBIE)people.free(p);
+        if(p->state == ZOMBIE)people.free(p);
     }
 }

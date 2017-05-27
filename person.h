@@ -10,22 +10,27 @@
 #include "grid.h"
 #include "JPS.h"
 
-/// one of the little people in the game - allocated from a pool,
-/// ctor and dtor will run.
+/// State, mainly to do with how I'm moving.
 
-enum PathFindingMode {
-    // nopath - haven't found a path or a purpose in life either.
-    NOPATH,
-          WANDER, // bimble using a negative stigmergic algorithm
+enum PersonState {
+    WANDER, // bimble using a negative stigmergic algorithm
+          
           // following a path using JPS
           COARSEPATH,
+          
+          // having completed COARSEPATH,
           // getting to the absolute location within a square
           FINEPATH,
-          ZOMBIE, // not really a PFM - but kill me.
+          
+          // not a path finding mode as such, more a state
+          ZOMBIE,
           DEBUGSTOP
 };
 
 #define UPDATEDIRINTERVAL 0.2
+
+/// one of the little people in the game - allocated from a pool,
+/// ctor and dtor will run.
 
 struct Person {
 
@@ -35,11 +40,11 @@ struct Person {
     float destx,desty; // full destination for path
     int pathidx; // current index of path
 
-    PathFindingMode pmode;
+    PersonState state;
     double nextDirUpdate;
 
     Person(){
-        pmode = WANDER;
+        state = WANDER;
     }
 
     void init(class Player *player, int idx, float xx,float yy);

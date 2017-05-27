@@ -629,9 +629,7 @@ void Grid::writeMapTexture(){
         Player *player = &globals::game->p;
         for(Person *p=player->people.first();p;p=player->people.next(p)){
             uint32_t col;
-            switch(p->pmode){
-            case NOPATH:
-                col = 0xffffffff;break;
+            switch(p->state){
             case COARSEPATH:
                 col = 0xff00ffff;break;
             case FINEPATH:
