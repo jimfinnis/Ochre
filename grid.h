@@ -10,12 +10,13 @@
 #include "state.h"
 #include "effect.h"
 #include "material.h"
+#include "house.h"
 
 #include <vector>
 
 /// the grid component of the world from which the heightmap is generated.
 
-#define GRIDSIZE 256
+#define GRIDSIZE 64
 #define MAXVERTS 32767
 
 // the visibility and opaque arrays are bigger than the grid itself
@@ -58,7 +59,8 @@ class Grid {
     uint8_t gridmats[GRIDSIZE][GRIDSIZE]; // material index for square (x,y,x+1,y+1)
     uint8_t gridsafe[GRIDSIZE][GRIDSIZE];  // is SQUARE x,y,x+1,y+1 entirely safe (for pathing)
     uint8_t mapvis[GRIDSIZE][GRIDSIZE]; // visibility of node
-
+    uint8_t isflat[GRIDSIZE][GRIDSIZE]; // flatness of SQUARE x,y,x+1,y+1 
+    
     // vertex data goes in here
     UNLITVERTEX verts[MAXVERTS];
     int vertidxs[MAXVERTS][2]; // positions of verts in grid space
@@ -118,7 +120,9 @@ class Grid {
     void _up(int x,int y);
     // lower at x,y (and neighbours if necessary) (internal, does the work)
     void _down(int x,int y);
-
+    
+    
+    
 public:
     int cursorx,cursory; // selected point
     int centrex,centrey;
@@ -128,8 +132,19 @@ public:
     // stigmergic trace - incremented when a peep enters square (x,y,x+1,y+1) and decays
     // over time. Idea pinched from Populous, so I've kept the name of the variable.
     float mapsteps[GRIDSIZE][GRIDSIZE];
-
-
+    
+    
+    /// an array of pointers to houses
+    House *houses[GRIDSIZE][GRIDSIZE];
+    
+    /// return any house in this square
+    House *getHouse(int x,int y){
+        if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
+            return houses[x][y];
+        else
+            return NULL;
+    }
+        
     /// is a given grid square visible
     bool isVisible(int x,int y){
         return true;
@@ -153,8 +168,9 @@ public:
     void update(float t);
 
     // call this every time the terrain changes to recalculate
-    // the safe grid squares for pathing.
-    void recalcSafe();
+    // the safe grid squares for pathing, and also to calculate which
+    // squares are flat.
+    void recalc();
 
     // this is required for JPS pathing library - uses the gridsafe array
     // to see if a square is safe to walk on
@@ -190,6 +206,22 @@ public:
             centrey = cursory;
         }
     }
+    
+    // given a lookup table of offsets of the form (x1,y1,x2,y2,...,-999)
+    // return whether all those squares are flat.
+    int isFlatAtAllOffsets(int x,int y,const int *lookup){
+        for(int i=0;lookup[i]>-900;i+=2){
+            if(!isFlat(x+lookup[i],y+lookup[i+1]))
+                return false;
+        }
+        return true;
+    }
+    
+    // does this point lie within a flat square?
+    bool isFlat(int x,int y);
+    
+    // get the height at x,y doing bilinear interpolation between the corners
+    float getinterp(float x,float y);
 
     // push transform to this location with height offset
     void pushxform(float x,float y,float offset);
@@ -210,18 +242,19 @@ public:
     void up(int x,int y){
         if(grid[x][y]<15){ // have to draw the line somewhere..
             _up(x,y);
-            recalcSafe();
+            recalc();
         }
     }
     // lower at x,y (and neighbours if necessary)
     void down(int x,int y){
         _down(x,y);
-        recalcSafe();
+        recalc();
     }
 
     // draw the map (will require people to be added)
     void writeMapTexture();
-    void drawHouses();
+    // draw the houses (call after genTriangles())
+    void renderHouses(int range);
 
     // move cursor and move centre if required
     void moveCursor(int dx,int dy){

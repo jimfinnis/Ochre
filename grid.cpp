@@ -39,18 +39,14 @@ static float noise(float x,float y){
 }
 
 Grid::Grid(int seed,float waterlevel){
-    heightFactor = 0.5f;
+    heightFactor = 0.2f;
     vbo=0;ibo=0;
     cursorx=cursory=GRIDSIZE/2;
     centrex=centrey=cursorx;
     float seedf = 1000.0f*seed;
 
     memset(grid,1,GRIDSIZE*GRIDSIZE);
-    grid[20][20]=0;
-    grid[20][21]=0;
-    grid[21][20]=0;
-    grid[21][21]=0;
-    //    return;
+    memset(houses,0,GRIDSIZE*GRIDSIZE*sizeof(House *));
 
     for(int x=0;x<GRIDSIZE;x++){
         for(int y=0;y<GRIDSIZE;y++){
@@ -63,7 +59,7 @@ Grid::Grid(int seed,float waterlevel){
             mapsteps[x][y]=drand48();
         }
     }
-    recalcSafe(); // calculate initial "safe squares"
+    recalc(); // calculate initial "safe squares"
 
 
     // same order as GMAT_ constants
@@ -114,36 +110,53 @@ Grid::~Grid(){
     if(maptex)glDeleteTextures(1,&maptex);
 }
 
-#define DEBUGNORMAL 0
-#if DEBUGNORMAL
-static float debugNormalMult = 1.0f;
-#endif
+// two versions of the calcnormal routine, one for when no corners are at the cursor,
+// and one for when one of the corners is (so we can brighten it or something)
 
-static void calcnormal(UNLITVERTEX *v0,UNLITVERTEX *v1,UNLITVERTEX *v2){
+inline void calcnormal(UNLITVERTEX *v0,UNLITVERTEX *v1,UNLITVERTEX *v2){
     glm::vec3 *vv0 = reinterpret_cast<glm::vec3*>(&v0->x);
     glm::vec3 *vv1 = reinterpret_cast<glm::vec3*>(&v1->x);
     glm::vec3 *vv2 = reinterpret_cast<glm::vec3*>(&v2->x);
 
     glm::vec3 norm = glm::triangleNormal(*vv0,*vv1,*vv2);
-#if DEBUGNORMAL
-    v0->nx = v1->nx = v2->nx = norm.x*debugNormalMult;
-    v0->ny = v1->ny = v2->ny = norm.y*debugNormalMult;
-    v0->nz = v1->nz = v2->nz = norm.z*debugNormalMult;
-#else
     v0->nx = v1->nx = v2->nx = norm.x;
     v0->ny = v1->ny = v2->ny = norm.y;
     v0->nz = v1->nz = v2->nz = norm.z;
-#endif
-
 }
 
-void Grid::recalcSafe(){
+inline void calcnormal(UNLITVERTEX *v0,UNLITVERTEX *v1,UNLITVERTEX *v2,
+                       bool iscur0,bool iscur1,bool iscur2){
+    glm::vec3 *vv0 = reinterpret_cast<glm::vec3*>(&v0->x);
+    glm::vec3 *vv1 = reinterpret_cast<glm::vec3*>(&v1->x);
+    glm::vec3 *vv2 = reinterpret_cast<glm::vec3*>(&v2->x);
+
+    glm::vec3 norm = glm::triangleNormal(*vv0,*vv1,*vv2);
+    glm::vec3 normb = norm;
+    normb *= 1.5;
+    vv0 = reinterpret_cast<glm::vec3*>(&v0->nx);
+    vv1 = reinterpret_cast<glm::vec3*>(&v1->nx);
+    vv2 = reinterpret_cast<glm::vec3*>(&v2->nx);
+    
+    *vv0 = iscur0 ? normb : norm;
+    *vv1 = iscur1 ? normb : norm;
+    *vv2 = iscur2 ? normb : norm;
+}
+
+void Grid::recalc(){
     // work out grid square safety - a square is only safe if it is entirely land.
     memset(gridsafe,0,GRIDSIZE*GRIDSIZE);
     for(int x=0;x<GRIDSIZE-1;x++){
         for(int y=0;y<GRIDSIZE-1;y++){
             if(grid[x][y] && grid[x+1][y] && grid[x][y+1] && grid[x+1][y+1])
                 gridsafe[x][y]=1;
+            
+            // and work out whether the square is flat
+            int h00 = get(x,y);
+            int h01 = get(x,y+1);
+            int h10 = get(x+1,y);
+            int h11 = get(x+1,y+1);
+    
+            isflat[x][y] = (h00 == h01 && h00 == h10 && h00 == h10 && h00 == h11);
         }
     }
 }
@@ -210,16 +223,15 @@ void Grid::genTriangles(int range){
             int yv = y+VISBORDER;
 
             int mat = getmat(x,y);
-#if DEBUGNORMAL
-            if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
-                debugNormalMult = mapsteps[x][y]*0.01f + 0.5f;
-            else
-                debugNormalMult=1.0f;
-#endif
+            
             int h00 = get(x,y);
+            bool iscur00 = x==cursorx && y==cursory;
             int h10 = get(x+1,y);
+            bool iscur10 = x+1==cursorx && y==cursory;
             int h11 = get(x+1,y+1);
+            bool iscur11 = x+1==cursorx && y+1==cursory;
             int h01 = get(x,y+1);
+            bool iscur01 = x==cursorx && y+1==cursory;
 
             // get the vertex coords
             float x0 = (float)ox;
@@ -255,14 +267,14 @@ void Grid::genTriangles(int range){
                         v0 = addvert(x,y+1,x0,h01,y1,0,1);
                         v1 = addvert(x+1,y+1,x1,h11,y1,1,1);
                         v2 = addvert(x+1,y,x1,h10,y0,1,0);
-                        calcnormal(v0,v1,v2);
+                        calcnormal(v0,v1,v2,iscur01,iscur11,iscur10);
                         addtri(v0,v1,v2,mat);
                         // no base polys in these cases; they would be hidden
                     } else {
                         v0 = addvert(x,y,x0,h00,y0,0,0);
                         v1 = addvert(x+1,y+1,x1,h11,y1,1,1);
                         v2 = addvert(x+1,y,x1,h10,y0,1,0);
-                        calcnormal(v0,v1,v2);
+                        calcnormal(v0,v1,v2,iscur00,iscur11,iscur10);
                         addtri(v0,v1,v2,mat);
                         // base polys
                         v0 = addvert(x+1,y+1,x1,BASE,y1,1,0);
@@ -282,14 +294,14 @@ void Grid::genTriangles(int range){
                         v0 = addvert(x,y,x0,h00,y0,0,0);
                         v1 = addvert(x,y+1,x0,h01,y1,0,1);
                         v2 = addvert(x+1,y+1,x1,h11,y1,1,1);
-                        calcnormal(v0,v1,v2);
+                        calcnormal(v0,v1,v2,iscur00,iscur01,iscur11);
                         addtri(v0,v1,v2,mat);
                         // no base polys in these cases; they would be hidden
                     } else {
                         v0 = addvert(x,y,x0,h00,y0,0,0);
                         v1 = addvert(x,y+1,x0,h01,y1,0,1);
                         v2 = addvert(x+1,y,x1,h10,y0,1,0);
-                        calcnormal(v0,v1,v2);
+                        calcnormal(v0,v1,v2,iscur00,iscur01,iscur10);
                         addtri(v0,v1,v2,mat);
                         // base polys
                         v0 = addvert(x+1,y,x1,BASE,y0,1,0);
@@ -311,14 +323,14 @@ void Grid::genTriangles(int range){
                     v0 = addvert(x,y,x0,h00,y0,0,0);
                     v1 = addvert(x+1,y+1,x1,h11,y1,1,1);
                     v2 = addvert(x+1,y,x1,h10,y0,1,0);
-                    calcnormal(v0,v1,v2);
+                    calcnormal(v0,v1,v2,iscur00,iscur11,iscur10);
                     addtri(v0,v1,v2,mat);
                     //                v0->dump();v1->dump();v2->dump();
                     // second triangle
                     v0 = addvert(x,y,x0,h00,y0,0,0);
                     v1 = addvert(x,y+1,x0,h01,y1,0,1);
                     v2 = addvert(x+1,y+1,x1,h11,y1,1,1);
-                    calcnormal(v0,v1,v2);
+                    calcnormal(v0,v1,v2,iscur00,iscur01,iscur11);
                     addtri(v0,v1,v2,mat);
                     //                v0->dump();v1->dump();v2->dump();printf("\n");
                 } else {
@@ -326,13 +338,13 @@ void Grid::genTriangles(int range){
                     v0 = addvert(x,y,x0,h00,y0,0,0);
                     v1 = addvert(x,y+1,x0,h01,y1,0,1);
                     v2 = addvert(x+1,y,x1,h10,y0,1,0);
-                    calcnormal(v0,v1,v2);
+                    calcnormal(v0,v1,v2,iscur00,iscur01,iscur10);
                     addtri(v0,v1,v2,mat);
                     // second triangle
                     v0 = addvert(x,y+1,x0,h01,y1,0,1);
                     v1 = addvert(x+1,y+1,x1,h11,y1,1,1);
                     v2 = addvert(x+1,y,x1,h10,y0,1,0);
-                    calcnormal(v0,v1,v2);
+                    calcnormal(v0,v1,v2,iscur01,iscur11,iscur10);
                     addtri(v0,v1,v2,mat);
                 }
             }
@@ -417,7 +429,6 @@ void Grid::render(glm::mat4 *world){
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
     eff->end();
 
-    drawHouses();
     writeMapTexture();
 }
 
@@ -506,9 +517,7 @@ inline float blerp(float c00, float c10, float c01, float c11, float tx, float t
     return lerp(lerp(c00, c10, tx), lerp(c01, c11, tx), ty);
 }
 
-void Grid::pushxforminterp(float fx,float fy,float offset){
-    MatrixStack *ms = StateManager::getInstance()->getx();
-
+float Grid::getinterp(float fx,float fy){
     int x = (int)fx;
     int y = (int)fy;
 
@@ -517,12 +526,24 @@ void Grid::pushxforminterp(float fx,float fy,float offset){
     float h10 = get(x+1,y);
     float h11 = get(x+1,y+1);
 
-    float r = blerp(h00,h10,h01,h11,fx-x,fy-y)+offset;
+    float r = blerp(h00,h10,h01,h11,fx-x,fy-y);
+}
+
+void Grid::pushxforminterp(float fx,float fy,float offset){
+    MatrixStack *ms = StateManager::getInstance()->getx();
 
     ms->push();
+    float r = getinterp(fx,fy)+offset;
     fx -= centrex;
     fy -= centrey;
     ms->translate(fx,r*heightFactor,fy);
+}
+
+bool Grid::isFlat(int x,int y){
+    if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
+        return isflat[x][y];
+    else
+        return false;
 }
 
 float VisLines::line::getDistSquared(float x,float y){
@@ -558,26 +579,28 @@ float VisLines::getVisibility(float x,float y){
 
 
 
-void Grid::drawHouses(){
+void Grid::renderHouses(int range){
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
-    int locs[] = {
-        20,20,
-        24,23,
-        18,12,
-        20,22,
-        19,18,
-        -1,-1
-    };
-
+    
     meshes::house1->startBatch();
+    
+    for(int ox=-range;ox<range;ox++){
+        for(int oy=-range;oy<range;oy++){
 
-    for(int *p = locs;*p>=0;p+=2){
-        if(getVisibility(p[0],p[1])>0.5f){
-            pushxform(p[0],p[1],0);
-            ms->rotY(glm::radians(45.0f));
-            meshes::house1->render(ms->top());
-            ms->pop();
+            if(abs(ox)+abs(oy)>=range)continue;
+
+            int x = centrex+ox;
+            int y = centrey+oy;
+            
+            if(houses[x][y]){
+                if(getVisibility(x,y)>0.5f){
+                    pushxform(x+0.5f,y+0.5f,0);
+                    ms->rotY(glm::radians(45.0f));
+                    meshes::house1->render(ms->top());
+                    ms->pop();
+                }
+            }
         }
     }
     meshes::house1->endBatch();
@@ -614,18 +637,21 @@ void Grid::writeMapTexture(){
         for(int x=0;x<GRIDSIZE;x++){
             uint8_t h = grid[x][y];
             uint32_t col = mapvis[x][y] ? cols.colsvis[h] : cols.cols[h];
-
+            
+            if(houses[x][y])
+                col = 0xff0000ff;
+            
             // for debugging, replace that with stigmergy
-            Colour c;
-            c.setFromHSV(grid[x][y]?0.5:0,0.5,mapsteps[x][y]*0.1f+0.3f);
-            col = c.getABGR32();
+//            Colour c;
+//            c.setFromHSV(grid[x][y]?0.5:0,0.5,mapsteps[x][y]*0.1f+0.3f);
+//            col = c.getABGR32();
 
             *p++ = col;
         }
     }
 
 
-    if(0 && globals::game){
+    if(1 && globals::game){
         Player *player = &globals::game->p;
         for(Person *p=player->people.first();p;p=player->people.next(p)){
             uint32_t col;
@@ -635,11 +661,12 @@ void Grid::writeMapTexture(){
             case FINEPATH:
                 col = 0xffff0000;break;
             default:
-                col = 0xff0000ff;break;
+                col = 0xff00ff00;break;
             }
             image[(int)p->y][(int)p->x] = col;
 
         }
+        
     }
 
     glBindTexture(GL_TEXTURE_2D,maptex);

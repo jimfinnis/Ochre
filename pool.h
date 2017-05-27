@@ -70,6 +70,11 @@ public:
         return o;
     }
     
+    /// handy for doing some kind of hashing
+    int getidx(T *o){
+        return o-data;
+    }
+    
     void dump(const char *deb="???",int n=-1){
         printf("%s %d: Freehead %d, allochead %d\n",deb,n,freehead,allochead);
         for(int i=0;i<capacity;i++){

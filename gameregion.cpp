@@ -117,6 +117,7 @@ void GameRegion::render(){
     Grid *g = &game->grid;
     g->genTriangles(visibleGridSize);
     g->render(ms->top());
+    g->renderHouses(visibleGridSize);
     g->renderCursor();
     
     renderWater();

@@ -26,12 +26,9 @@ void Person::init(class Player *player, int idx, float xx,float yy){
     x=xx;y=yy;
     dx=dy=0;
     p=player;
-    nextDirUpdate = globals::timeNow+UPDATEDIRINTERVAL*0.2*(double)(idx%10);
+    nextInfrequentUpdate = globals::timeNow+INFREQUENTUPDATEINTERVAL*0.2*(double)(idx%10);
 }
 
-
-void Person::goalFound(){
-}
 
 bool Person::pathTo(float xx,float yy){
     if(JPS::findPath(path,globals::game->grid,x,y,(int)xx,(int)yy)){
@@ -46,15 +43,17 @@ bool Person::pathTo(float xx,float yy){
     }
 }
 
-float targetX = 128,targetY=255,stigBias=0.6f;
+// this is how much the player's wander target direction decreases
+// the stigmergic bias.
+static float stigBias=0.6f;
 
 void Person::setDirectionToAntiStigmergy(){
     Grid *g = &globals::game->grid;
     int cx = (int)x;
     int cy = (int)y;
     
-    int targetdx = sgn(targetX-x);
-    int targetdy = sgn(targetY-y);
+    int targetdx = sgn(p->wanderX-x);
+    int targetdy = sgn(p->wanderY-y);
     
     int idx=sgn(dx); // blee.
     int idy=sgn(dy);
@@ -68,7 +67,10 @@ void Person::setDirectionToAntiStigmergy(){
             // do not scan my own area, do not permit us to turn around
             // or go into the sea. The middle rule there is to avoid
             // stuckage.
-            if( (ox||oy) && (ox!=-idx && oy!=-idy) && (*g)(cx+ox,cy+oy)){
+            if( (ox||oy)  // my own square
+                && (ox!=-idx && oy!=-idy) &&  // turning around
+                (*g)(cx+ox,cy+oy)) // safe square (uses the operator() JPS uses for pathing)
+            {
                 st =g->mapsteps[cx+ox][cy+oy];
                 if(targetdx==ox && targetdy==oy)st*=stigBias; // and towards target
                 if(st<minst){
@@ -89,25 +91,49 @@ void Person::setDirectionToAntiStigmergy(){
 }
 
 
-void Person::updateDirection(){
+void Person::updateInfrequent(){
     // repath - this runs infrequently.
     
     Grid *g = &globals::game->grid;
+    int ix = (int)x;
+    int iy = (int)y;
+    
+    // are we on a flat square? Which is OK?
+    
+    if(!g->houses[ix][iy] &&  // no houses
+       (*g)(ix,iy) && // safe
+       g->get(ix,iy) &&
+       g->isFlat(ix,iy)){ // flat
+        // make a new house if we can
+        House *h = p->houses.alloc();
+        if(h){
+            h->init(ix,iy,p);
+            printf("House added at %d,%d  %lx\n",ix,iy,p);
+            state = ZOMBIE; // "kill" the villager (he is now the houseowner)
+        }
+    }
     
     switch(state){
     case WANDER:
+        // if we're wandering stigmergically - the default behaviour - that's in
+        // a separate method.
         setDirectionToAntiStigmergy();
         break;
     case COARSEPATH:
+        // if we're following a path, and there's some path left, go that way.
         if(path.size()){
             float px = (float)path[pathidx].x, py = (float)path[pathidx].y;
-            // compare current position with path position
+            // "Are we there yet? Are we there yet?"
+            // compare current position with path position 
             if((x-px)*(x-px)+(y-py)*(y-py) < 0.25){
-                pathidx++; // arrived at next pos, increment path
+                // arrived at next pos, increment path index.
+                pathidx++; 
                 if(pathidx==path.size()){
+                    // if we've completed the path, move onto fine pathing.
                     state = FINEPATH;
                 }
             } else {
+                // "No, we're not there yet. Shut up, and don't hit your sister."
                 dx = sgn(px-x);
                 dy = sgn(py-y);
             }
@@ -140,18 +166,40 @@ void Person::updateDirection(){
 void Person::update(float t){
     Grid *g = &globals::game->grid;
     
-    if(globals::timeNow > nextDirUpdate){
-        nextDirUpdate = globals::timeNow + UPDATEDIRINTERVAL;
-        updateDirection();
+    if(globals::timeNow > nextInfrequentUpdate){
+        nextInfrequentUpdate = globals::timeNow + INFREQUENTUPDATEINTERVAL;
+        updateInfrequent();
     }
     
     // adjustment for diagonal speed slowdown
     float diag = (dx && dy) ? 0.707107f : 1;
     
-    x += PERSONSPEED*t*(float)dx*diag;
-    y += PERSONSPEED*t*(float)dy*diag;
+    float newx = x+PERSONSPEED*t*(float)dx*diag;
+    float newy = y+PERSONSPEED*t*(float)dy*diag;
     
-    g->mapsteps[(int)x][(int)y]++;
+    // get grid coords
+    int ix = (int)x;
+    int iy = (int)y;
+    
+    if((*g)(ix,iy)){ // uses the operator() used by pathing elsewhere
+        // it's OK to move here - do so.
+        x = newx;
+        y = newy;
+    } else {
+        // something's gone wrong - don't move us, deal with the bad square
+        if(g->getinterp(newx,newy)<0.5f){ // use the actual height where we are, interpolating between the corners
+            // we're in the sea!
+            drowntime+=t;
+            if(drowntime>DROWNSURVIVALTIME){
+                state = ZOMBIE; // "Like tears in the rain. Time to die."
+            } else {
+                path.clear(); // our path is useless, it goes into the sea
+                state = WANDER;
+            }
+        }
+    }
+     
+    g->mapsteps[ix][iy]++;
     
     if(x<0)x=0;
     if(x>=GRIDSIZE-1)x=GRIDSIZE-2;

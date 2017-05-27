@@ -12,13 +12,22 @@
 #include "globals.h"
 #include "meshes.h"
 
-Player::Player() : people(1024){
+/// max number of people for each player
+#define MAXPOP 256
+
+/// max houses for each player
+#define MAXHOUSES 256
+
+
+Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     for(int i=0;;i++){
         Person *p = people.alloc();
         if(!p)break;
         p->init(this,i,drand48()*20+20,drand48()*20+20);
     }
     mode = PLAYER_SETTLE;
+    wanderX = GRIDSIZE/2;
+    wanderY = GRIDSIZE/2;
 }
 
 void Player::render(){
@@ -44,9 +53,32 @@ void Player::render(){
 }
 
 void Player::update(float t){
+    Game *game = globals::game;
+    Grid *g = &game->grid;
+    
     for(Person *q,*p=people.first();p;p=q){
         q=people.next(p);
         p->update(t);
         if(p->state == ZOMBIE)people.free(p);
+    }
+    for(House *q,*p=houses.first();p;p=q){
+        q=houses.next(p);
+        p->update(t);
+        if(!p->pop){ // houses die when their population hits zero
+            houses.free(p);
+        }
+    }
+}
+
+void Player::spawn(int x,int y,int n){
+    float fx = ((float)x)+0.5f;
+    float fy = ((float)y)+0.5f;
+    
+    for(int i=0;i<n;i++){
+        Person *p = people.alloc();
+        if(!p)break; // ran out of slots!
+        float px = fx + (drand48()-0.5);
+        float py = fy + (drand48()-0.5);
+        p->init(this,people.getidx(p),px,py);
     }
 }
