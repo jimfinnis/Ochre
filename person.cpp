@@ -46,7 +46,7 @@ bool Person::pathTo(float xx,float yy){
 
 // this is how much the player's wander target direction decreases
 // the stigmergic bias.
-static float stigBias=0.6f;
+static float stigBias=1;
 
 void Person::setDirectionToAntiStigmergy(){
     Grid *g = &globals::game->grid;
@@ -72,7 +72,7 @@ void Person::setDirectionToAntiStigmergy(){
                 && (ox!=-idx && oy!=-idy) &&  // turning around
                 (*g)(cx+ox,cy+oy)) // safe square (uses the operator() JPS uses for pathing)
             {
-                st =g->mapsteps[cx+ox][cy+oy];
+                st =g->mapsteps[cx+ox][cy+oy] * globals::rnd->range(1,1.1f);
                 if(targetdx==ox && targetdy==oy)st*=stigBias; // and towards target
                 if(st<minst){
                     minst=st;oxf=ox;oyf=oy;
@@ -103,13 +103,15 @@ void Person::updateInfrequent(){
     if(!g->objects[ix][iy] &&  // no objects in the way
        (*g)(ix,iy) && // safe
        g->get(ix,iy) &&
-       g->isFlat(ix,iy)){ // flat
+       g->isFlatForBuild(ix,iy)){ // flat
         // make a new house if we can
         House *h = p->houses.alloc();
         if(h){
             h->init(ix,iy,p);
-            printf("House added at %d,%d  %p\n",ix,iy,p);
-            state = ZOMBIE; // "kill" the villager (he is now the houseowner)
+//            printf("House added at %d,%d  %p\n",ix,iy,p);
+            // "kill" the villager (he is now the houseowner and moves
+            // into the house)
+            state = ZOMBIE; 
         }
     }
     

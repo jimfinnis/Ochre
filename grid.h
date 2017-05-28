@@ -16,7 +16,7 @@
 
 /// the grid component of the world from which the heightmap is generated.
 
-#define GRIDSIZE 64
+#define GRIDSIZE 256
 #define MAXVERTS 32767
 
 // the visibility and opaque arrays are bigger than the grid itself
@@ -146,7 +146,7 @@ public:
     
     void addHouse(int x,int y,House *h);
     
-    void removeHouse(int x,int y);
+    void removeHouse(int x,int y,House *h);
         
     /// is a given grid square visible
     bool isVisible(int x,int y){
@@ -211,7 +211,18 @@ public:
     }
     
     // given a lookup table of offsets of the form (x1,y1,x2,y2,...,-999)
-    // return whether all those squares are flat.
+    // return whether all those squares are flat. Also checks for objects
+    // and farmland, which are obstacles too.
+    bool isFlatAtAllOffsetsForBuild(int x,int y,const int *lookup){
+        for(int i=0;lookup[i]>-900;i+=2){
+            if(!isFlatForBuild(x+lookup[i],y+lookup[i+1]))
+                return false;
+        }
+        return true;
+    }
+    
+    // as above but doesn't check for farmland, so a house which is
+    // already built doesn't get blocked by its own farm!
     bool isFlatAtAllOffsets(int x,int y,const int *lookup){
         for(int i=0;lookup[i]>-900;i+=2){
             if(!isFlat(x+lookup[i],y+lookup[i+1]))
@@ -220,8 +231,12 @@ public:
         return true;
     }
     
+    
     // does this point lie within a flat square?
     bool isFlat(int x,int y);
+    
+    // does this point lie within a flat square and is not farm?
+    bool isFlatForBuild(int x,int y);
     
     // get the height at x,y doing bilinear interpolation between the corners
     float getinterp(float x,float y);

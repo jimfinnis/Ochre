@@ -35,6 +35,12 @@ inline float interp(float a,float b,float t)
 class RandomNumberGenerator
 {
 public:
+    
+    RandomNumberGenerator(){
+        init();
+    }
+              
+    
     /// initialise the generator and seed with a given value, or a default.
     void init(uint32_t seed = 4357)
     {
@@ -215,10 +221,6 @@ private:
     uint32_t mLast;					//!< last generated value
     uint32_t *mNext;					//!< next ptr
 };
-
-/// instance of generator, initialised in MainApplicationClass::InitPostShell()
-extern RandomNumberGenerator gRand;
-
 
 
 ///\@}
