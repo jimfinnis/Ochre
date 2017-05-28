@@ -17,8 +17,16 @@
 class ObjMesh {
     Material *mats;
     
+    struct QueueEntry {
+        QueueEntry(glm::mat4 *w){
+            world = *w;
+        }
+        glm::mat4 world;
+    };
+    
     GLuint buffers[2];
-    std::vector<Transition> transitions;
+    std::vector<Transition> transitions; // material transitions
+    std::vector<QueueEntry> queue; // queued renders
     
 public:
     ObjMesh(const char *dir,const char *name);
@@ -27,7 +35,23 @@ public:
     // standard render method
     void render(glm::mat4 *world);
     
-    // batch rendering
+    // queue a render, and then render the queue using batching
+    void queueRender(glm::mat4 *world){
+        queue.push_back(QueueEntry(world));
+    }
+    
+    void renderQueue(){
+        startBatch();
+        for(auto it = queue.begin();it!=queue.end();++it){
+            renderInBatch(&(*it).world);
+        }
+        endBatch();
+        queue.clear();
+    }
+    // render all object mesh queues
+    static void renderAll();
+    
+    // batch rendering, generally used internally.
     void startBatch();
     void endBatch();
     void renderInBatch(glm::mat4 *world);

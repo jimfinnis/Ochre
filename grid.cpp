@@ -46,7 +46,7 @@ Grid::Grid(int seed,float waterlevel){
     float seedf = 1000.0f*seed;
 
     memset(grid,1,GRIDSIZE*GRIDSIZE);
-    memset(houses,0,GRIDSIZE*GRIDSIZE*sizeof(House *));
+    memset(objects,0,GRIDSIZE*GRIDSIZE*sizeof(GridObj *));
 
     for(int x=0;x<GRIDSIZE;x++){
         for(int y=0;y<GRIDSIZE;y++){
@@ -578,12 +578,9 @@ float VisLines::getVisibility(float x,float y){
 }
 
 
-
-void Grid::renderHouses(int range){
+void Grid::renderObjects(int range){
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
-    
-    meshes::house1->startBatch();
     
     for(int ox=-range;ox<range;ox++){
         for(int oy=-range;oy<range;oy++){
@@ -593,18 +590,16 @@ void Grid::renderHouses(int range){
             int x = centrex+ox;
             int y = centrey+oy;
             
-            if(houses[x][y]){
+            if(objects[x][y]){
                 if(getVisibility(x,y)>0.5f){
                     pushxform(x+0.5f,y+0.5f,0);
                     ms->rotY(glm::radians(45.0f));
-                    meshes::house1->render(ms->top());
+                    objects[x][y]->queueRender(ms->top());
                     ms->pop();
                 }
             }
         }
     }
-    meshes::house1->endBatch();
-
 }
 
 struct coltable {
@@ -638,7 +633,7 @@ void Grid::writeMapTexture(){
             uint8_t h = grid[x][y];
             uint32_t col = mapvis[x][y] ? cols.colsvis[h] : cols.cols[h];
             
-            if(houses[x][y])
+            if(objects[x][y])
                 col = 0xff0000ff;
             
             // for debugging, replace that with stigmergy
@@ -690,3 +685,13 @@ void Grid::update(float t){
     }
   }
 }
+
+
+void Grid::addHouse(int x,int y,House *h){
+    objects[x][y]=h;
+}
+
+void Grid::removeHouse(int x,int y){
+    objects[x][y]=NULL;
+}
+

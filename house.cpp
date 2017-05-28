@@ -6,6 +6,7 @@
 #include "obj.h"
 #include "game.h"
 #include "globals.h"
+#include "meshes.h"
 #include "house.h"
 
 void House::init(int xx,int yy,Player *pl){
@@ -16,12 +17,17 @@ void House::init(int xx,int yy,Player *pl){
     y=yy;
     
     // add to grid
-    globals::game->grid.houses[x][y]=this;
+    globals::game->grid.addHouse(x,y,this);
 }
 
 House::~House(){
     // remove me from the game's grid
-    globals::game->grid.houses[x][y]=NULL;
+    globals::game->grid.removeHouse(x,y);
+}
+
+
+void House::queueRender(glm::mat4 *world){
+    meshes::house1->queueRender(world);
 }
 
 void House::update(float t){

@@ -122,7 +122,6 @@ class Grid {
     void _down(int x,int y);
     
     
-    
 public:
     int cursorx,cursory; // selected point
     int centrex,centrey;
@@ -134,16 +133,20 @@ public:
     float mapsteps[GRIDSIZE][GRIDSIZE];
     
     
-    /// an array of pointers to houses
-    House *houses[GRIDSIZE][GRIDSIZE];
+    /// an array of pointers to fixed objects
+    GridObj *objects[GRIDSIZE][GRIDSIZE];
     
-    /// return any house in this square
-    House *getHouse(int x,int y){
+    /// return any fixed object in this square
+    GridObj *getObject(int x,int y){
         if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
-            return houses[x][y];
+            return objects[x][y];
         else
             return NULL;
     }
+    
+    void addHouse(int x,int y,House *h);
+    
+    void removeHouse(int x,int y);
         
     /// is a given grid square visible
     bool isVisible(int x,int y){
@@ -209,7 +212,7 @@ public:
     
     // given a lookup table of offsets of the form (x1,y1,x2,y2,...,-999)
     // return whether all those squares are flat.
-    int isFlatAtAllOffsets(int x,int y,const int *lookup){
+    bool isFlatAtAllOffsets(int x,int y,const int *lookup){
         for(int i=0;lookup[i]>-900;i+=2){
             if(!isFlat(x+lookup[i],y+lookup[i+1]))
                 return false;
@@ -253,8 +256,8 @@ public:
 
     // draw the map (will require people to be added)
     void writeMapTexture();
-    // draw the houses (call after genTriangles())
-    void renderHouses(int range);
+    // draw the objects (call after genTriangles())
+    void renderObjects(int range);
 
     // move cursor and move centre if required
     void moveCursor(int dx,int dy){

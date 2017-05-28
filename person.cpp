@@ -91,7 +91,6 @@ void Person::setDirectionToAntiStigmergy(){
     }
 }
 
-
 void Person::updateInfrequent(){
     // repath - this runs infrequently.
     
@@ -101,7 +100,7 @@ void Person::updateInfrequent(){
     
     // are we on a flat square? Which is OK?
     
-    if(!g->houses[ix][iy] &&  // no houses
+    if(!g->objects[ix][iy] &&  // no objects in the way
        (*g)(ix,iy) && // safe
        g->get(ix,iy) &&
        g->isFlat(ix,iy)){ // flat
@@ -109,7 +108,7 @@ void Person::updateInfrequent(){
         House *h = p->houses.alloc();
         if(h){
             h->init(ix,iy,p);
-            printf("House added at %d,%d  %lx\n",ix,iy,p);
+            printf("House added at %d,%d  %p\n",ix,iy,p);
             state = ZOMBIE; // "kill" the villager (he is now the houseowner)
         }
     }

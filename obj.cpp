@@ -24,6 +24,9 @@ const float UNLITVERTEX::UVEPSILON=0.01f;
 static const int VERTEXBUFFER=0;
 static const int INDEXBUFFER=1;
 
+static std::vector<ObjMesh *> allMeshes;
+
+
 static int addvert(std::vector<UNLITVERTEX>& verts,UNLITVERTEX &v){
 //    for(size_t i=0;i<verts.size();i++){
 //        if(verts[i].compare(&v))
@@ -228,6 +231,13 @@ ObjMesh::ObjMesh(const char *dir,const char *name){
     
     chdir(wd);
     printf("Loaded OK\n");
+    allMeshes.push_back(this);
+}
+
+void ObjMesh::renderAll(){
+    for(auto it = allMeshes.begin();it!=allMeshes.end();++it){
+        (*it)->renderQueue();
+    }
 }
 
 ObjMesh::~ObjMesh(){

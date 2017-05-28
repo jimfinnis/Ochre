@@ -7,6 +7,7 @@
 #include "state.h"
 #include "globals.h"
 #include "game.h"
+#include "obj.h"
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
@@ -117,7 +118,8 @@ void GameRegion::render(){
     Grid *g = &game->grid;
     g->genTriangles(visibleGridSize);
     g->render(ms->top());
-    g->renderHouses(visibleGridSize);
+    g->renderObjects(visibleGridSize);
+    ObjMesh::renderAll();
     g->renderCursor();
     
     renderWater();
