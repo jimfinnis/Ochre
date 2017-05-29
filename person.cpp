@@ -104,16 +104,21 @@ void Person::updateInfrequent(){
     if(!g->objects[ix][iy] &&  // no objects in the way
        (*g)(ix,iy) && // safe
        g->get(ix,iy) && // quick flat check
-       !globals::rnd->getInt(50) && // 1 in 5 chance
+       !globals::rnd->getInt(5) && // basic chance
        g->isFlatForBuild(ix,iy)){ // flat
-        // make a new house if we can
-        House *h = p->houses.alloc();
-        if(h){
-            h->init(ix,iy,p);
-//            printf("House added at %d,%d  %p\n",ix,iy,p);
-            // "kill" the villager (he is now the houseowner and moves
-            // into the house)
-            state = ZOMBIE; 
+        // work out a chance we'll actually do it, based on
+        // how big the house will be
+        int c = g->countFlatForBuild(ix,iy);
+        if(globals::rnd->getInt(6)<=c) { // higher chance if bigger result
+            // make a new house if we can
+            House *h = p->houses.alloc();
+            if(h){
+                h->init(ix,iy,p);
+                //            printf("House added at %d,%d  %p\n",ix,iy,p);
+                // "kill" the villager (he is now the houseowner and moves
+                // into the house)
+                state = ZOMBIE; 
+            }
         }
     }
     

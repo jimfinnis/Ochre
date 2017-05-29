@@ -648,7 +648,9 @@ void Grid::writeMapTexture(){
             c.setFromHSV(grid[x][y]?0.5:0,0.5,mapsteps[x][y]*0.1f+0.3f);
             col = c.getABGR32();
 #endif
-//            if(gridmats[x][y])col=0xff0000ff;
+            
+            
+            //            if(gridmats[x][y])col=0xff0000ff;
             
             *p++ = col;
         }
@@ -710,7 +712,7 @@ void Grid::addHouse(int hx,int hy,House *h){
 }
 
 void Grid::removeHouse(int hx,int hy,House *h){
-//    printf("del house %d at %d,%d\n",h->size,hx,hy);
+    //    printf("del house %d at %d,%d\n",h->size,hx,hy);
     objects[hx][hy]=NULL;
     if(h->size>100)return; // is a new house
     for(int ox=-h->size;ox<=h->size;ox++){
@@ -723,3 +725,64 @@ void Grid::removeHouse(int hx,int hy,House *h){
     }
 }
 
+// work out how many squares around me are still flat. We do this
+// with lookup tables for positions, working out from the middle.
+// Tables are terminated with -999.
+
+// worst case - the centre isn't flat!
+static const int lookup0[] = {
+    0,0,-999
+};
+static const int lookup1[] = {
+    -1,-1, 0,-1, 1,-1,
+    -1,0,        1,0,
+    -1,1,  0,1,  1,1,
+    -999};
+static const int lookup2[] = {
+    -2,-2, -2,-1, -2,0, -2,1, -2,2,
+    -1,-2,  -1,2,
+    0,-2,  0,2,
+    1,-2,  1,2,
+    2,-2,  2,-1,  2,0,  2,1,  2,2,
+    -999};
+static const int lookup3[] = {
+    -3,-3,-3,-2,-3,-1,-3,0,-3,1,-3,2,-3,3,
+    -2,-3,-2,3,
+    -1,-3,-1,3,
+    0,-3,0,3,
+    1,-3,1,3,
+    2,-3,2,3,
+    3,-3,3,-2,3,-1,3,0,3,1,3,2,3,3,
+    -999};
+
+int Grid::countFlat(int x,int y){
+    if(!isFlatAtAllOffsets(x,y,lookup0) || !get(x,y)){
+        // this is a disaster; the bloody thing isn't flat at all - or it's in the sea
+        return -1;
+    } else if(!isFlatAtAllOffsets(x,y,lookup1)){
+        // flat at only offset 0
+        return 0;
+    } else if(!isFlatAtAllOffsets(x,y,lookup2)){
+        // flat at only 1
+        return 1;
+    } else if(!isFlatAtAllOffsets(x,y,lookup3)){
+        return 2;
+    } else
+        return 3;
+}
+
+int Grid::countFlatForBuild(int x,int y){
+    if(!isFlatAtAllOffsetsForBuild(x,y,lookup0) || !get(x,y)){
+        // this is a disaster; the bloody thing isn't flat at all - or it's in the sea
+        return -1;
+    } else if(!isFlatAtAllOffsetsForBuild(x,y,lookup1)){
+        // flat at only offset 0
+        return 0;
+    } else if(!isFlatAtAllOffsetsForBuild(x,y,lookup2)){
+        // flat at only 1
+        return 1;
+    } else if(!isFlatAtAllOffsetsForBuild(x,y,lookup3)){
+        return 2;
+    } else
+        return 3;
+}

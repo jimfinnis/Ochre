@@ -16,11 +16,11 @@
 #define MAXPOP 256
 
 /// max houses for each player
-#define MAXHOUSES 256
+#define MAXHOUSES 65536
 
 
 Player::Player() : people(MAXPOP), houses(MAXHOUSES){
-    for(int i=0;i<MAXPOP;i++){
+    for(int i=0;i<4;i++){
         float x = drand48()*20+20;
         float y = drand48()*20+20;
         Person *p = people.alloc();

@@ -16,7 +16,7 @@
 
 /// the grid component of the world from which the heightmap is generated.
 
-#define GRIDSIZE 128
+#define GRIDSIZE 64
 #define MAXVERTS 32767
 
 // the visibility and opaque arrays are bigger than the grid itself
@@ -231,6 +231,13 @@ public:
         return true;
     }
     
+    // return the number of flat, unoccupied squares around here -
+    // farmland is not an obstacle
+    int countFlat(int x,int y);
+    
+    // return the number of flat, unoccupied squares around here -
+    // farmland IS an obstacle
+    int countFlatForBuild(int x,int y);
     
     // does this point lie within a flat square?
     bool isFlat(int x,int y);
@@ -276,6 +283,8 @@ public:
 
     // move cursor and move centre if required
     void moveCursor(int dx,int dy){
+        if(cursorx+dx>=GRIDSIZE || cursorx+dx<0)dx=0;
+        if(cursory+dy>=GRIDSIZE || cursory+dy<0)dy=0;
         cursorx+=dx;
         cursory+=dy;
         if(getVisibility(cursorx,cursory)<0.5){

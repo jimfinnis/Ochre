@@ -17,7 +17,9 @@ struct House : public GridObj {
     uint8_t size; 
     uint8_t pop; // how many people
     uint16_t x,y; // position
-    
+    // when this hits a certain number we increase pop, when pop>=cap
+    // we spawn.
+    float growcounter; 
     struct Player *p; // my owner
     
     void init(int x,int y,Player *pl);
