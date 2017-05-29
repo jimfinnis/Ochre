@@ -178,20 +178,16 @@ void Person::update(float t){
     // adjustment for diagonal speed slowdown
     float diag = (dx && dy) ? 0.707107f : 1;
     
-    float newx = x+PERSONSPEED*t*(float)dx*diag;
-    float newy = y+PERSONSPEED*t*(float)dy*diag;
+    x+=PERSONSPEED*t*(float)dx*diag;
+    y+=PERSONSPEED*t*(float)dy*diag;
     
     // get grid coords
     int ix = (int)x;
     int iy = (int)y;
     
-    if((*g)(ix,iy)){ // uses the operator() used by pathing elsewhere
-        // it's OK to move here - do so.
-        x = newx;
-        y = newy;
-    } else {
-        // something's gone wrong - don't move us, deal with the bad square
-        if(g->getinterp(newx,newy)<0.5f){ // use the actual height where we are, interpolating between the corners
+    if(!(*g)(ix,iy)){ // uses the operator() used by pathing elsewhere
+        // something's gone wrong - move us but deal with the bad square
+        if(g->getinterp(x,y)<0.5f){ // use the actual height where we are, interpolating between the corners
             // we're in the sea!
             drowntime+=t;
             if(drowntime>DROWNSURVIVALTIME){

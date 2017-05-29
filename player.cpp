@@ -20,11 +20,14 @@
 
 
 Player::Player() : people(MAXPOP), houses(MAXHOUSES){
-    for(int i=0;;i++){
+    for(int i=0;i<MAXPOP;i++){
+        float x = drand48()*20+20;
+        float y = drand48()*20+20;
         Person *p = people.alloc();
         if(!p)break;
-        p->init(this,i,drand48()*20+20,drand48()*20+20);
+        p->init(this,i,y,x);
     }
+    
     mode = PLAYER_SETTLE;
     wanderX = GRIDSIZE/2;
     wanderY = GRIDSIZE/2;

@@ -19,6 +19,7 @@ template<class T> class Pool {
     int *freenext;
     int freehead;
     int capacity;
+    int count;
     int *allocprev,*allocnext,allochead;
     bool *snark;
 public:
@@ -29,7 +30,7 @@ public:
         allocnext = new int[cap];
         allocprev = new int[cap];
         snark = new bool[cap];
-        
+        count = 0;
         
         for(int i=0;i<cap;i++){
             if(i<cap-1)
@@ -46,10 +47,15 @@ public:
         delete [] data;
     }
     
+    int size(){
+        return count;
+    }
+    
     T *alloc(){
         if(freehead==-1){
             return NULL;
         }
+        count++;
         
         // add freehead to the alloc list
         
@@ -108,6 +114,7 @@ public:
         
         // run destructor
         o->~T();
+        count--;
     }
     
     T *first(){
