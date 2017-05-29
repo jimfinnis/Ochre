@@ -46,7 +46,7 @@ bool Person::pathTo(float xx,float yy){
 
 // this is how much the player's wander target direction decreases
 // the stigmergic bias.
-static float stigBias=1;
+static float stigBias=1.5f;
 
 void Person::setDirectionToAntiStigmergy(){
     Grid *g = &globals::game->grid;
@@ -73,7 +73,7 @@ void Person::setDirectionToAntiStigmergy(){
                 (*g)(cx+ox,cy+oy)) // safe square (uses the operator() JPS uses for pathing)
             {
                 // add a bit of random to the stigmergy
-                st =g->mapsteps[cx+ox][cy+oy] * globals::rnd->range(1,1.1f);
+                st =g->mapsteps[cx+ox][cy+oy] * globals::rnd->range(1,1.5f);
                 if(targetdx==ox && targetdy==oy)st*=stigBias; // and towards target
                 if(st<minst){
                     minst=st;oxf=ox;oyf=oy;

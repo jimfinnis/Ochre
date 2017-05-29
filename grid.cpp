@@ -643,9 +643,11 @@ void Grid::writeMapTexture(){
                 col = 0xff0000ff;
             
             // for debugging, replace that with stigmergy
-            //            Colour c;
-            //            c.setFromHSV(grid[x][y]?0.5:0,0.5,mapsteps[x][y]*0.1f+0.3f);
-            //            col = c.getABGR32();
+#if 0
+            Colour c;
+            c.setFromHSV(grid[x][y]?0.5:0,0.5,mapsteps[x][y]*0.1f+0.3f);
+            col = c.getABGR32();
+#endif
 //            if(gridmats[x][y])col=0xff0000ff;
             
             *p++ = col;
