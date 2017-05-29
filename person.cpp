@@ -72,6 +72,7 @@ void Person::setDirectionToAntiStigmergy(){
                 && (ox!=-idx && oy!=-idy) &&  // turning around
                 (*g)(cx+ox,cy+oy)) // safe square (uses the operator() JPS uses for pathing)
             {
+                // add a bit of random to the stigmergy
                 st =g->mapsteps[cx+ox][cy+oy] * globals::rnd->range(1,1.1f);
                 if(targetdx==ox && targetdy==oy)st*=stigBias; // and towards target
                 if(st<minst){
@@ -102,7 +103,8 @@ void Person::updateInfrequent(){
     
     if(!g->objects[ix][iy] &&  // no objects in the way
        (*g)(ix,iy) && // safe
-       g->get(ix,iy) &&
+       g->get(ix,iy) && // quick flat check
+       !globals::rnd->getInt(50) && // 1 in 5 chance
        g->isFlatForBuild(ix,iy)){ // flat
         // make a new house if we can
         House *h = p->houses.alloc();

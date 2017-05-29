@@ -86,7 +86,7 @@ public:
         return (getRandom() & 0x100) ? -1 : 1;
     }
     
-    /// get a random integer from 0-n
+    /// get a random integer from 0-(n-1)
     uint32_t getInt(uint32_t n=0xffffffffU)
     {
         return getRandom() % n;
