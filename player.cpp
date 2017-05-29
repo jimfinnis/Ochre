@@ -12,11 +12,6 @@
 #include "globals.h"
 #include "meshes.h"
 
-/// max number of people for each player
-#define MAXPOP 256
-
-/// max houses for each player
-#define MAXHOUSES 65536
 
 
 Player::Player() : people(MAXPOP), houses(MAXHOUSES){

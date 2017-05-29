@@ -11,12 +11,12 @@
 #include "effect.h"
 #include "material.h"
 #include "house.h"
+#include "globals.h"
 
 #include <vector>
 
 /// the grid component of the world from which the heightmap is generated.
 
-#define GRIDSIZE 64
 #define MAXVERTS 32767
 
 // the visibility and opaque arrays are bigger than the grid itself

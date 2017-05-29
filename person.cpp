@@ -45,8 +45,8 @@ bool Person::pathTo(float xx,float yy){
 }
 
 // this is how much the player's wander target direction decreases
-// the stigmergic bias.
-static float stigBias=1.5f;
+// the stigmergic bias. It's multiplicative, so MUST BE LESS THAN 1.
+static float stigBias=0.9f;
 
 void Person::setDirectionToAntiStigmergy(){
     Grid *g = &globals::game->grid;
@@ -74,7 +74,8 @@ void Person::setDirectionToAntiStigmergy(){
             {
                 // add a bit of random to the stigmergy
                 st =g->mapsteps[cx+ox][cy+oy] * globals::rnd->range(1,1.5f);
-                if(targetdx==ox && targetdy==oy)st*=stigBias; // and towards target
+                if(targetdx==ox)st*=stigBias; // and towards target
+                if(targetdy==oy)st*=stigBias; // and towards target
                 if(st<minst){
                     minst=st;oxf=ox;oyf=oy;
                 }
