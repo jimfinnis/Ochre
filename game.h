@@ -9,6 +9,7 @@
 
 #include "grid.h"
 #include "player.h"
+#include "prof.h"
 
 /// a running game level, with data about both players and the world.
 
@@ -21,7 +22,9 @@ struct Game {
 
     void update(float t){
         p.update(t);
+        profbar.mark(0xff0000ff);
         grid.update(t);
+        profbar.mark(0x00ff00ff);
     }
 
     Grid grid;

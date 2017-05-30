@@ -94,6 +94,40 @@ static PRELITVERTEX quad[] = {
     {1,0,0, 1,0},
     {0,0,0, 0,0},
 };
+
+void Region::renderQuadUntex(float x,float y,float w,float h,float *col){
+    EffectManager *em = EffectManager::getInstance();
+    em->flatuntex->begin();
+    glm::mat4 id;
+    em->flatuntex->setWorldMatrix(&id);
+    em->flatuntex->setMaterial(col);
+    
+    PRELITVERTEX *p = quad;
+    p->x = x;	p->y = y;  p++;
+    p->x = x;	p->y = y+h;p++;
+    p->x = x+w;	p->y = y+h;p++;
+    p->x = x+w;	p->y = y+h;p++;
+    p->x = x+w;	p->y = y  ;p++;
+    p->x = x;	p->y = y;
+    
+    GLuint vbo;
+    glGenBuffers(1,&vbo);
+    ERRCHK;
+    glBindBuffer(GL_ARRAY_BUFFER,vbo);
+    ERRCHK;
+    glBufferData(GL_ARRAY_BUFFER,sizeof(PRELITVERTEX)*6,&quad[0],GL_STATIC_DRAW);
+    ERRCHK;
+    
+    em->flatuntex->setArrayOffsetsPrelit();
+    
+    glDrawArrays(GL_TRIANGLES,0,6);
+    ERRCHK;
+    
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+    glDeleteBuffers(1,&vbo);
+    
+    em->flatuntex->end();
+}
         
 void Region::renderQuad(float x,float y,float w,float h,GLuint tex){
     EffectManager *em = EffectManager::getInstance();

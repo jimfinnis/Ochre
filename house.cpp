@@ -57,7 +57,7 @@ void House::update(float t){
     
 //    printf("cap %d, pop %d, gc %f\n",capacity,pop,growcounter);
     growcounter+=t*(float)(1+capacity-pop);
-    if(growcounter>10){
+    if(growcounter>1){
         growcounter=0;
         pop++;
     }

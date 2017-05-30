@@ -25,6 +25,19 @@ public:
         }
         copy();
     }
+    
+    void makePotential(Grid *g){
+        uint32_t *p = &image[0][0];
+        for(int y=0;y<GRIDSIZE;y++){
+            for(int x=0;x<GRIDSIZE;x++){
+                float f = globals::game->p.potential[x][y];
+                Colour c;
+                c.set(f,f,f);
+                *p++ = c.getABGR32();
+            }
+        }
+        copy();
+    }
 };
 
 #endif /* __DEBUGMAP_H */

@@ -161,6 +161,7 @@ public:
     
     Effect *untex; // untextured mesh, to be lit
     Effect *flattex; // prelit textured surface (for text rendering etc.)
+    Effect *flatuntex; // prelit untextured surface 
 };
 
 

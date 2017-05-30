@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170512.1522>
+//  Last Modified : <170530.1410>
 //
 //  Description	
 //
@@ -58,8 +58,11 @@ EffectManager::EffectManager(){
     flattex = new Effect("media/flattex.shr",
                          EDA_POS|EDA_TEXCOORDS|
                          EDU_SAMPLER|EDU_WORLDVIEWPROJ|EDU_DIFFUSECOL);
-    
     flattex->init();
+    
+    flatuntex = new Effect("media/flatuntex.shr",
+                         EDA_POS|EDU_WORLDVIEWPROJ|EDU_DIFFUSECOL);
+    flatuntex->init();
 }
 
 

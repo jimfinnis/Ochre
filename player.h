@@ -28,6 +28,9 @@ struct Player {
     Pool<Person> people;
     Pool<House> houses;
     
+    // potential field produced by my people
+    float potential[GRIDSIZE][GRIDSIZE];
+    
     PlayerMode mode;
     Player();
     

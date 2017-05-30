@@ -65,6 +65,7 @@ public:
     
     /// render a quad into the region using its coordinates (not for iso!)
     void renderQuad(float x,float y,float w,float h,GLuint tex);
+    void renderQuadUntex(float x,float y,float w,float h,float *col);
 };
 
 /// as above, but sets an isometric projection

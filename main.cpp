@@ -21,6 +21,7 @@
 #include "globals.h"
 
 #include "gamescreen.h"
+#include "prof.h"
 
 bool debugtoggle=false;
 
@@ -158,6 +159,7 @@ int main(int argc, char** argv)
     {
         Time::tick();
         double t = Time::now();
+        profbar.start();
         update(t-lastt);
         lastt=t;
         handleInput();

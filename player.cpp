@@ -11,7 +11,8 @@
 #include "game.h"
 #include "globals.h"
 #include "meshes.h"
-
+#include "blur.h"
+#include "prof.h"
 
 
 Player::Player() : people(MAXPOP), houses(MAXHOUSES){
@@ -22,6 +23,8 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
         if(!p)break;
         p->init(this,i,y,x);
     }
+    
+    memset(potential,0,GRIDSIZE*GRIDSIZE*sizeof(float));
     
     mode = PLAYER_SETTLE;
     wanderX = GRIDSIZE/2;
@@ -54,18 +57,31 @@ void Player::update(float t){
     Game *game = globals::game;
     Grid *g = &game->grid;
     
+    float potentialTmp[GRIDSIZE][GRIDSIZE];
+    memset(potentialTmp,0,GRIDSIZE*GRIDSIZE*sizeof(float));
+    
+    // update people and add them to the potential field
     for(Person *q,*p=people.first();p;p=q){
         q=people.next(p);
         p->update(t);
+        potentialTmp[(int)p->x][(int)p->y]=1;
         if(p->state == ZOMBIE)people.free(p);
     }
+    // update houses and add them to the potential field
     for(House *q,*p=houses.first();p;p=q){
         q=houses.next(p);
         p->update(t);
+        potentialTmp[p->x][p->y]=1;
         if(!p->pop){ // houses die when their population hits zero
             houses.free(p);
         }
     }
+    
+    // blur the potential field
+    profbar.mark(0xffffffff);
+    gaussBlur((float*)potentialTmp,(float*)potential,GRIDSIZE,GRIDSIZE,10);
+    profbar.mark(0xff80ffff);
+    
 }
 
 void Player::spawn(int x,int y,int n){

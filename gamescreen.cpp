@@ -7,6 +7,7 @@
 #include "gamescreen.h"
 #include "globals.h"
 #include "game.h"
+#include "prof.h"
 
 GameScreen::GameScreen() {
     globals::game = new Game(10,-2);
@@ -21,15 +22,16 @@ GameScreen::~GameScreen(){
 
 
 void GameScreen::resize(int w,int h){
-    stat.resize(0,h-STATUSHEIGHT,w,STATUSHEIGHT);
+    stat.resize(0,h-STATUSHEIGHT,w-TOOLWIDTH,STATUSHEIGHT);
     tool.resize(w-TOOLWIDTH,0,TOOLWIDTH,h);
     game.resize(0,0,w-TOOLWIDTH,h-STATUSHEIGHT);
 }    
 
 void GameScreen::render(){
+    game.render();
+    profbar.mark(0x0000ffff);
     stat.render();
     tool.render();
-    game.render();
     
 }
 

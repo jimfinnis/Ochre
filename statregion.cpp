@@ -9,6 +9,7 @@
 #include "font.h"
 #include "time.h"
 #include "game.h"
+#include "prof.h"
 
 void StatRegion::onMouseMove(int x,int y){
 }
@@ -36,6 +37,7 @@ void StatRegion::render(){
                           (int)(1.0/ft),
                           Time::ticks(),
                           snark);
-
+    
+    profbar.render(this,0,0,w,20);
 
 }
