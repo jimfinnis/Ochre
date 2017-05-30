@@ -8,8 +8,12 @@
 #define __TOOLREGION_H
 
 #include "region.h"
+#include "maptex.h"
+#include "debugmap.h"
 
 class ToolRegion : public Region {
+    MapTex map;
+    DebugMapTex debugmap;
 public:
     ToolRegion() : Region("tool"){};
     virtual ~ToolRegion(){};

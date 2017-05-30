@@ -55,6 +55,10 @@ struct VisLines {
 /// this is the grid - the heightmap of the world and how to render it.
 
 class Grid {
+    // so the map texture and various debugging classes can access our innards
+    friend class MapTex;
+    friend class DebugMapTex;
+    
     uint8_t grid[GRIDSIZE][GRIDSIZE];     // height map
     uint8_t gridmats[GRIDSIZE][GRIDSIZE]; // material index for square (x,y,x+1,y+1)
     uint8_t gridsafe[GRIDSIZE][GRIDSIZE];  // is SQUARE x,y,x+1,y+1 entirely safe (for pathing)
@@ -109,9 +113,6 @@ class Grid {
     // each material has a vector of ints, which store the triangle indices during
     // mesh generation.
     std::vector<std::vector<GLuint>> buckets;
-
-    // we can write the texture to a map, too.
-    GLuint maptex;
 
     // visibility edges structure
     VisLines vis;
@@ -189,11 +190,6 @@ public:
             return gridmats[x][y];
         else
             return 0;
-    }
-
-    /// get the map texture
-    GLuint getMapTex(){
-        return maptex;
     }
 
 
@@ -276,8 +272,6 @@ public:
         recalc();
     }
 
-    // draw the map (will require people to be added)
-    void writeMapTexture();
     // draw the objects (call after genTriangles())
     void renderObjects(int range);
 

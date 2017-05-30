@@ -19,17 +19,16 @@ void ToolRegion::onMouseMove(int x,int y){
 void ToolRegion::render(){
     setAndClear(Colour(0,0,0.5,1));
     
-    // reset the state manager
-    StateManager *sm = StateManager::getInstance();
-    sm->reset();
-    
-    Grid *g = &globals::game->grid;
-    
     float mapw = w*MAPWIDTH;
     float mapx = (w-mapw)/2.0f;
     float mapy = MAPTOP;
     
-    renderQuad(mapx,mapy,mapw,mapw,g->getMapTex());
+    Grid *g = &globals::game->grid;
+    map.make(g);
+    map.render(this,mapx,mapy,mapw,mapw);
+    
+    debugmap.makeStigmergy(g);
+    debugmap.render(this,mapx,mapy+20+mapw,mapw,mapw);
 }
 
 

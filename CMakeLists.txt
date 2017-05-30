@@ -14,7 +14,7 @@ find_package(OpenGL)
 find_package(SDL2TTF)
 
 add_executable(${PROJECT_NAME} state.cpp context.cpp
-    region.cpp font.cpp time.cpp player.cpp
+    region.cpp font.cpp time.cpp player.cpp maptex.cpp
     effect.cpp obj.cpp maths.cpp grid.cpp meshes.cpp
     gameregion.cpp gamescreen.cpp main.cpp screen.cpp globals.cpp
     statregion.cpp toolregion.cpp person.cpp house.cpp

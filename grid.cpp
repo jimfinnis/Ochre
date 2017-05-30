@@ -73,29 +73,6 @@ Grid::Grid(int seed,float waterlevel){
         buckets.push_back(std::vector<GLuint>());
     }
     
-    glGenTextures(1,&maptex);
-    ERRCHK;
-    glBindTexture(GL_TEXTURE_2D,maptex);
-    ERRCHK;
-    
-    // yes, I'd rather use glTexStorage2D, but my laptop is running
-    // Ubuntu 14.04 (and I can't distupgrade yet, I don't want to break
-    // ROS [I'm a roboticist] and also it's *really old*)
-    // (My normal devbox is up-to-date but I *like* terence [the laptop])
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, GRIDSIZE,GRIDSIZE,
-                 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-    //    glTexStorage2D(GL_TEXTURE_2D,1,GL_RGBA8,);
-    ERRCHK;
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    ERRCHK;
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    ERRCHK;
-    
-    if(!maptex){
-        throw Exception().set("could not create grid map texture: %s",
-                              SDL_GetError());
-    }
-    writeMapTexture();
 }
 
 void Grid::select(int idx){
@@ -107,7 +84,6 @@ void Grid::select(int idx){
 
 Grid::~Grid(){
     if(vbo)glDeleteBuffers(2,&vbo);
-    if(maptex)glDeleteTextures(1,&maptex);
 }
 
 // two versions of the calcnormal routine, one for when no corners are at the cursor,
@@ -427,8 +403,6 @@ void Grid::render(glm::mat4 *world){
     glBindBuffer(GL_ARRAY_BUFFER,0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
     eff->end();
-    
-    writeMapTexture();
 }
 
 int Grid::intersect(const glm::vec3& origin, const glm::vec3& ray){
@@ -608,83 +582,6 @@ void Grid::renderObjects(int range){
     }
 }
 
-struct coltable {
-    uint32_t cols[16]; // normal map colour
-    uint32_t colsvis[16]; // visible map colour
-    coltable(){
-        Colour c;
-        c.setFromHSV(0.5,0.8,0.5f);
-        cols[0] = c.getABGR32();
-        c.setFromHSV(0.5,0.8,1);
-        colsvis[0] = c.getABGR32();
-        
-        for(int i=1;i<16;i++){
-            Colour c;
-            float base = powf(((float)i)/16.0f,0.4f)*0.5f;
-            c.setFromHSV(0,0,base);
-            cols[i] = c.getABGR32();
-            c.setFromHSV(0,0,base*2.0f);
-            colsvis[i] = c.getABGR32();
-        }
-    }
-    
-} cols;
-
-void Grid::writeMapTexture(){
-    uint32_t image[GRIDSIZE][GRIDSIZE];
-    
-    uint32_t *p = &image[0][0];
-    for(int y=0;y<GRIDSIZE;y++){
-        for(int x=0;x<GRIDSIZE;x++){
-            uint8_t h = grid[x][y];
-            uint32_t col = mapvis[x][y] ? cols.colsvis[h] : cols.cols[h];
-            
-            if(objects[x][y])
-                col = 0xff0000ff;
-            
-            // for debugging, replace that with stigmergy
-#if 0
-            Colour c;
-            c.setFromHSV(grid[x][y]?0.5:0,0.5,mapsteps[x][y]*0.1f+0.3f);
-            col = c.getABGR32();
-#endif
-            
-            
-            //            if(gridmats[x][y])col=0xff0000ff;
-            
-            *p++ = col;
-        }
-    }
-    
-    
-    if(1 && globals::game){
-        Player *player = &globals::game->p;
-        for(Person *p=player->people.first();p;p=player->people.next(p)){
-            uint32_t col;
-            switch(p->state){
-            case COARSEPATH:
-                col = 0xff00ffff;break;
-            case FINEPATH:
-                col = 0xffff0000;break;
-            default:
-                col = 0xff00ff00;break;
-            }
-            image[(int)p->y][(int)p->x] = col;
-            
-        }
-        
-    }
-    
-    glBindTexture(GL_TEXTURE_2D,maptex);
-    ERRCHK;
-    glPixelStorei(GL_UNPACK_ALIGNMENT,4);
-    ERRCHK;
-    glTexSubImage2D(GL_TEXTURE_2D,0,0,0,GRIDSIZE,GRIDSIZE,
-                    GL_RGBA,GL_UNSIGNED_BYTE,&image[0][0]);
-    ERRCHK;
-    glBindTexture(GL_TEXTURE_2D,0);
-    ERRCHK;
-}
 
 void Grid::update(float t){
     for(int y=0;y<GRIDSIZE;y++){

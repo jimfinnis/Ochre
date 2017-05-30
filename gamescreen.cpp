@@ -16,7 +16,7 @@ GameScreen::~GameScreen(){
     delete globals::game;
 }
 
-#define TOOLWIDTH 500
+#define TOOLWIDTH 300
 #define STATUSHEIGHT 80
 
 
