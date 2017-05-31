@@ -36,7 +36,7 @@ public:
     
     PlayerMode mode;
     Player();
-    ~Player();
+    virtual ~Player();
     
     // target for wandering - peeps will gradually drift towards this point;
     // NOT a full-on pathing target but more of a bias for the stigmergic wandering.
