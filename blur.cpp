@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "blur.h"
+
 void boxBlurH (float *scl, float *tcl, int w, int h, int r) {
     float iarr = 1.0f / (float)(r+r+1);
     for(int i=0; i<h; i++) {
@@ -79,7 +81,9 @@ void boxesForGauss(int *boxes,float sigma, int n)  // standard deviation, number
     float m = roundf(mIdeal);
     // var sigmaActual = Math.sqrt( (m*wl*wl + (n-m)*wu*wu - n)/12 );
     
-    for(int i=0; i<n; i++) boxes[i] = (i<m?wl:wu);
+    for(int i=0; i<n; i++){
+        boxes[i] = ((i<m?wl:wu)-1)/2 ;
+    }
 }
 
 
@@ -91,6 +95,34 @@ void gaussBlur (float *scl, float *tcl, int w, int h, int r) {
     boxBlur (tcl, scl, w, h, (bxs[1]-1)/2);
     boxBlur (scl, tcl, w, h, (bxs[2]-1)/2);
 }
+
+
+
+MultipassBlur::MultipassBlur(int ww,int hh,int r){
+    w=ww;h=hh;
+    tmp1 = new float[w*h];
+    tmp2 = new float[w*h];
+    boxesForGauss(bxs,r, NUMBOXES);
+}
+MultipassBlur::~MultipassBlur(){
+    delete [] tmp1;
+    delete [] tmp2;
+}
+
+
+bool MultipassBlur::pass(int n,float *src,float *res){
+    switch(n){
+    case 0:boxBlurH(src,tmp1,w,h,bxs[0]);return false;
+    case 1:boxBlurT(tmp1,tmp2,w,h,bxs[0]);return false;
+    case 2:boxBlurH(tmp2,tmp1,w,h,bxs[1]);return false;
+    case 3:boxBlurT(tmp1,tmp2,w,h,bxs[1]);return false;
+    case 4:boxBlurH(tmp2,tmp1,w,h,bxs[2]);return false;
+    case 5:boxBlurT(tmp1,res,w,h,bxs[2]);return true;
+    default:break;
+    }
+}
+
+
 
 /*
 int main(int argc,char *argv[]){

@@ -11,7 +11,6 @@
 #include "game.h"
 #include "globals.h"
 #include "meshes.h"
-#include "blur.h"
 #include "prof.h"
 
 
@@ -25,10 +24,15 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     }
     
     memset(potential,0,GRIDSIZE*GRIDSIZE*sizeof(float));
+    blur = new MultipassBlur(GRIDSIZE,GRIDSIZE,10);
     
     mode = PLAYER_SETTLE;
     wanderX = GRIDSIZE/2;
     wanderY = GRIDSIZE/2;
+}
+
+Player::~Player(){
+    delete blur;
 }
 
 void Player::render(){
@@ -79,7 +83,8 @@ void Player::update(float t){
     
     // blur the potential field
     profbar.mark(0xffffffff);
-    gaussBlur((float*)potentialTmp,(float*)potential,GRIDSIZE,GRIDSIZE,10);
+    blur->pass((float*)potentialTmp,(float*)potential);
+//    gaussBlur((float*)potentialTmp,(float*)potential,GRIDSIZE,GRIDSIZE,10);
     profbar.mark(0xff80ffff);
     
 }

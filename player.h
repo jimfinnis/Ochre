@@ -10,6 +10,7 @@
 #include "pool.h"
 #include "person.h"
 #include "house.h"
+#include "blur.h"
 
 
 /// these are the modes available to the player
@@ -24,7 +25,9 @@ enum PlayerMode {
 /// their people and the player themselves. House information will probably
 /// be here too.
 
-struct Player {
+class Player {
+    MultipassBlur *blur; // potential field blurrer - takes several ticks
+public:
     Pool<Person> people;
     Pool<House> houses;
     
@@ -33,6 +36,7 @@ struct Player {
     
     PlayerMode mode;
     Player();
+    ~Player();
     
     // target for wandering - peeps will gradually drift towards this point;
     // NOT a full-on pathing target but more of a bias for the stigmergic wandering.
