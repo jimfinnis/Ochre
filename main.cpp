@@ -50,9 +50,11 @@ void render(){
 
 
     //        scr.stat.set();
-
+    
+    profbar.start("R",0x00ff00ff);
     curscreen->render();
-
+    profbar.end();
+    curscreen->renderprof();
     context.swap();
 }
 
@@ -159,11 +161,12 @@ int main(int argc, char** argv)
     {
         Time::tick();
         double t = Time::now();
-        profbar.start();
+        profbar.startbar();
         update(t-lastt);
         lastt=t;
         handleInput();
         render();
+    
  //       Time::sleep(0.02); // yeah, frame rate cap.
     };
 

@@ -43,12 +43,7 @@ bool Person::pathTo(float xx,float yy){
         return false;
     }
 }
-
-// this is how much the player's wander target direction decreases
-// the stigmergic bias. It's multiplicative, so MUST BE LESS THAN 1.
-static float stigBias=0.9f;
-
-void Person::setDirectionToAntiStigmergy(){
+void Person::setDirectionFromPotentialField(){
     Grid *g = &globals::game->grid;
     int cx = (int)x;
     int cy = (int)y;
@@ -72,10 +67,11 @@ void Person::setDirectionToAntiStigmergy(){
                 && (ox!=-idx && oy!=-idy) &&  // turning around
                 (*g)(cx+ox,cy+oy)) // safe square (uses the operator() JPS uses for pathing)
             {
-                // add a bit of random to the stigmergy
-                st =p->mapsteps[cx+ox][cy+oy] * globals::rnd->range(1,1.5f);
-                if(targetdx==ox)st*=stigBias; // and towards target
-                if(targetdy==oy)st*=stigBias; // and towards target
+                // add a bit of random to the field
+                st = globals::rnd->range(0.0f,0.1f);
+                st += p->potential[cx+ox][cy+oy];
+                st -= p->op->potential[cx+ox][cy+oy];
+                
                 if(st<minst){
                     minst=st;oxf=ox;oyf=oy;
                 }
@@ -127,7 +123,7 @@ void Person::updateInfrequent(){
     case WANDER:
         // if we're wandering stigmergically - the default behaviour - that's in
         // a separate method.
-        setDirectionToAntiStigmergy();
+        setDirectionFromPotentialField();
         break;
     case COARSEPATH:
         // if we're following a path, and there's some path left, go that way.

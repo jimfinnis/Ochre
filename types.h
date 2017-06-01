@@ -61,6 +61,10 @@ struct Colour
         r=g=b=0;
         a=1;
     }
+    Colour(uint32_t rgba){
+        setFromRGBA32(rgba);
+    }
+        
     
     friend bool operator == (Colour &a, Colour &b)
     {

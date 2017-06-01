@@ -9,23 +9,54 @@
 
 #include <stdint.h>
 #include "types.h"
+#include <stack>
+#include <vector>
 
 class Region;
 
 /// crude profiling bar.
 
 class ProfBar {
-    static const int MAXSLOTS=32;
-    double t[MAXSLOTS];
-    Colour cols[MAXSLOTS];
+    struct Ent {
+        Ent(const char *n,double tt,uint32_t cc){
+            name =n;
+            t = tt;
+            col.setFromRGBA32(cc);
+        }
+        Ent(const char *n,double tt,const Colour& cc){
+            name =n;
+            t = tt;
+            col = cc;
+        }
+        const char *name;
+        double t;
+        Colour col;
+    };
+    
+    struct Reg {
+        Reg(const char *n,double tt,const Colour &cc){
+            t1=tt; // t2 will be filled in later.
+            col=cc;
+            name=n;
+        }
+        double t1,t2;
+        Colour col;
+        const char *name;
+    };
+    
+    std::vector<Reg> regs;
+    std::stack<Ent> stack;
+    
     double tstart;
-    int ct;
 public:
     ProfBar();
-    void start();
-    // mark up to this time - bar from previous time (or start) to
-    // this point is in col.
-    void mark(uint32_t col);
+    void startbar(); // start profiling bar
+    
+    // start of a region
+    void start(const char *name,uint32_t col);
+    // end of a region
+    void end();
+    
     // end and render - remaining time is in black
     void render(Region *r,float x,float y,float w,float h);
 };

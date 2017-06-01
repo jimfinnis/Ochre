@@ -21,7 +21,7 @@ void StatRegion::render(){
     StateManager *sm = StateManager::getInstance();
     sm->reset();
 
-    globals::font->render(10,20,20,"Ochre 0.0 (%s)",__DATE__);
+//    globals::font->render(10,20,20,"Ochre 0.0 (%s)",__DATE__);
 
     static double lastTime=0;
     double t = Time::now();
@@ -31,13 +31,15 @@ void StatRegion::render(){
     Grid *g = &globals::game->grid;
 
     extern float snark;
-    globals::font->render(10,50,20,"curs[%d %d] pop %d fps %d tick %08u snark %.3f",
+    globals::font->render(10,50,20,"curs[%d %d] pop %d+%d fps %d tick %08u snark %.3f",
                           g->cursorx,g->cursory,
-                          globals::game->p.people.size(),
+                          globals::game->p[0].people.size(),
+                          globals::game->p[1].people.size(),
                           (int)(1.0/ft),
                           Time::ticks(),
                           snark);
-    
-    profbar.render(this,0,0,w,20);
-
 }
+
+void StatRegion::renderprof(){
+    profbar.render(this,0,0,w,40);
+}    

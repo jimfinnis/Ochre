@@ -8,6 +8,7 @@
 #include "globals.h"
 #include "game.h"
 #include "obj.h"
+#include "prof.h"
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
@@ -118,13 +119,20 @@ void GameRegion::render(){
     Grid *g = &game->grid;
     g->genTriangles(visibleGridSize);
     g->render(ms->top());
+    
+    profbar.start("RO",0xffff00ff);
     g->renderObjects(visibleGridSize);
     ObjMesh::renderAll();
+    profbar.end();
+    
     g->renderCursor();
     
     renderWater();
     
-    game->p.render();
+    profbar.start("RP",0xff8000ff);
+    game->p[0].render(Colour(1,0.2f,0.2f));
+    game->p[1].render(Colour(0.2f,1,0.2f));
+    profbar.end();
     
     ms->pop();
     

@@ -26,6 +26,10 @@ public:
     virtual void resize(int w,int h);
     virtual void render();
     virtual void onKeyDown(int k);
+    
+    virtual void renderprof(){
+        stat.renderprof();
+    }
 };
 
 #endif /* __GAMESCREEN_H */

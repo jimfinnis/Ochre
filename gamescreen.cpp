@@ -29,9 +29,8 @@ void GameScreen::resize(int w,int h){
 
 void GameScreen::render(){
     game.render();
-    profbar.mark(0x0000ffff);
-    stat.render();
     tool.render();
+    stat.render(); // render last if profiling!
     
 }
 

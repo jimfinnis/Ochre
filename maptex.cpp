@@ -64,6 +64,13 @@ void MapTex::render(Region *r,int x,int y,int w,int h){
 
 MapTex::coltable MapTex::cols;
 
+void MapTex::writePlayer(Player *pl,uint32_t col){
+    for(Person *p=pl->people.first();p;p=pl->people.next(p)){
+        image[(int)p->y][(int)p->x] = col;
+    }
+    
+}
+
 void MapTex::make(Grid *g){
     uint32_t *p = &image[0][0];
     for(int y=0;y<GRIDSIZE;y++){
@@ -80,19 +87,8 @@ void MapTex::make(Grid *g){
     // add peeps
     
     if(1 && globals::game){
-        Player *player = &globals::game->p;
-        for(Person *p=player->people.first();p;p=player->people.next(p)){
-            uint32_t col;
-            switch(p->state){
-            case COARSEPATH:
-                col = 0xff00ffff;break;
-            case FINEPATH:
-                col = 0xffff0000;break;
-            default:
-                col = 0xff00ff00;break;
-            }
-            image[(int)p->y][(int)p->x] = col;
-        }
+        writePlayer(&globals::game->p[0],0xffff0000);
+        writePlayer(&globals::game->p[1],0xff00ff00);
     }
     copy();
 }

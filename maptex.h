@@ -44,6 +44,9 @@ protected:
     // puts the image data into the texture, call at the end of writeTex().
     void copy();
     
+    // writes a player's peeps to image
+    void writePlayer(Player *p,uint32_t col);
+    
 public:
     
     MapTex();

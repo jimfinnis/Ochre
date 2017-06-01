@@ -16,6 +16,9 @@ public:
     
     virtual void onMouseMove(int x,int y);
     virtual void render();
+    
+    void renderprof();
+
 };
 
 

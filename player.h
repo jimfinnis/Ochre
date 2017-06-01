@@ -28,6 +28,8 @@ enum PlayerMode {
 class Player {
     MultipassBlur *blur; // potential field blurrer - takes several ticks
 public:
+    int idx; // which player am I?
+    Player *op; // opposing player
     Pool<Person> people;
     Pool<House> houses;
     
@@ -48,7 +50,7 @@ public:
     float wanderX,wanderY;
     
     // assumes grid transform is stacked.
-    void render();
+    void render(const Colour& col);
     void update(float t);
     
     // spawn some peeps within a given square (at slightly random offsets within it)

@@ -7,6 +7,7 @@
 #include "state.h"
 #include "game.h"
 #include "globals.h"
+#include "prof.h"
 
 // map width as ratio of tool region
 #define MAPWIDTH 0.9
@@ -23,12 +24,21 @@ void ToolRegion::render(){
     float mapx = (w-mapw)/2.0f;
     float mapy = MAPTOP;
     
+    profbar.start("M",0x008000ff);
     Grid *g = &globals::game->grid;
     map.make(g);
     map.render(this,mapx,mapy,mapw,mapw);
+    profbar.end();
     
-    debugmap.makePotential(&globals::game->p);
-    debugmap.render(this,mapx,mapy+20+mapw,mapw,mapw);
+    profbar.start("D1",0x008080ff);
+    debugmap.makePotential(&globals::game->p[0]);
+    debugmap.render(this,mapx,mapy+20+mapw,mapw/2,mapw/2);
+    profbar.end();
+    
+    profbar.start("D2",0x0080a0ff);
+    debugmap.makePotential(&globals::game->p[1]);
+    debugmap.render(this,mapx+mapw/2,mapy+20+mapw,mapw/2,mapw/2);
+    profbar.end();
 }
 
 

@@ -59,7 +59,7 @@ public:
         
         // add freehead to the alloc list
         
-        if(allochead>=-1)
+        if(allochead>-1)
             allocprev[allochead]=freehead;
         
         allocnext[freehead]=allochead;

@@ -52,7 +52,8 @@ struct Person {
     void init(class Player *player, int idx, float xx,float yy);
 
     // used in wandering - sets the direction to where no-one has been
-    void setDirectionToAntiStigmergy();
+    // and also to either attack or move away from the other player.
+    void setDirectionFromPotentialField();
 
     float getrot(){
         extern float dirToRot[3][3];

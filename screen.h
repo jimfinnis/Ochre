@@ -14,6 +14,7 @@ public:
     Screen();
         
     virtual void render()=0;
+    virtual void renderprof(){}
     virtual void resize(int w,int h)=0;
     virtual void onKeyDown(int k);
 };

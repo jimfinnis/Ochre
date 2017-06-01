@@ -13,11 +13,19 @@
 #include "meshes.h"
 #include "prof.h"
 
-
+static int idxct=0;
 Player::Player() : people(MAXPOP), houses(MAXHOUSES){
+    idx=idxct++;
+    float basex,basey;
+    if(idx){
+        basex=basey=GRIDSIZE-30;
+    } else {
+        basex=basey=30;
+    }
+        
     for(int i=0;i<4;i++){
-        float x = drand48()*20+20;
-        float y = drand48()*20+20;
+        float x = drand48()*20+basex;
+        float y = drand48()*20+basey;
         Person *p = people.alloc();
         if(!p)break;
         p->init(this,i,y,x);
@@ -29,7 +37,7 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
         }
     }
     
-    memset(potential,0,GRIDSIZE*GRIDSIZE*sizeof(float));
+    memset(potential,1,GRIDSIZE*GRIDSIZE*sizeof(float));
     blur = new MultipassBlur(GRIDSIZE,GRIDSIZE,10);
     
     mode = PLAYER_SETTLE;
@@ -41,16 +49,20 @@ Player::~Player(){
     delete blur;
 }
 
-void Player::render(){
+void Player::render(const Colour& col){
     // draw all the little folk.
 
     Game *game = globals::game;
     Grid *g = &game->grid;
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
+    
+    sm->push();
+    State *s = sm->get();
+    s->diffuse = col;
+    s->overrides |= STO_DIFFUSE;
 
     meshes::marker->startBatch();
-    State *s = sm->get();
     for(Person *p=people.first();p;p=people.next(p)){
         float opacity = g->getVisibility(p->x,p->y);
         if(opacity>0.001){
@@ -61,6 +73,7 @@ void Player::render(){
             ms->pop();
         }
     }
+    sm->pop();
 }
 
 void Player::update(float t){
@@ -98,10 +111,10 @@ void Player::update(float t){
     }
     
     // blur the potential field
-    profbar.mark(0xffffffff);
+    profbar.start("B",0xff8080ff);
     blur->pass((float*)potentialTmp,(float*)potential);
 //    gaussBlur((float*)potentialTmp,(float*)potential,GRIDSIZE,GRIDSIZE,10);
-    profbar.mark(0xff80ffff);
+    profbar.end();
     
 }
 

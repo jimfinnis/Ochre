@@ -560,7 +560,6 @@ float VisLines::getVisibility(float x,float y){
 void Grid::renderObjects(int range){
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
-    
     for(int ox=-range;ox<range;ox++){
         for(int oy=-range;oy<range;oy++){
             
