@@ -56,7 +56,6 @@ Grid::Grid(int seed,float waterlevel){
             if(v>5)v=5;
             grid[x][y] = v;
             gridmats[x][y] = 0;
-            mapsteps[x][y]=drand48();
         }
     }
     recalc(); // calculate initial "safe squares"
@@ -584,14 +583,6 @@ void Grid::renderObjects(int range){
 
 
 void Grid::update(float t){
-    for(int y=0;y<GRIDSIZE;y++){
-        for(int x=0;x<GRIDSIZE;x++){
-            mapsteps[x][y]*=0.998f;
-            // add a little noise to mess things up a bit, and stop the
-            // little sods making lawnmower stripes
-            //      mapsteps[x][y]+=drand48()*0.001f;
-        }
-    }
 }
 
 

@@ -73,7 +73,7 @@ void Person::setDirectionToAntiStigmergy(){
                 (*g)(cx+ox,cy+oy)) // safe square (uses the operator() JPS uses for pathing)
             {
                 // add a bit of random to the stigmergy
-                st =g->mapsteps[cx+ox][cy+oy] * globals::rnd->range(1,1.5f);
+                st =p->mapsteps[cx+ox][cy+oy] * globals::rnd->range(1,1.5f);
                 if(targetdx==ox)st*=stigBias; // and towards target
                 if(targetdy==oy)st*=stigBias; // and towards target
                 if(st<minst){
@@ -205,7 +205,7 @@ void Person::update(float t){
         }
     }
      
-    g->mapsteps[ix][iy]++;
+    p->mapsteps[ix][iy]++;
     
     if(x<0)x=0;
     if(x>=GRIDSIZE-1)x=GRIDSIZE-2;

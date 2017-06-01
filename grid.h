@@ -129,11 +129,6 @@ public:
 
     float heightFactor; // y is also multiplied by this
 
-    // stigmergic trace - incremented when a peep enters square (x,y,x+1,y+1) and decays
-    // over time. Idea pinched from Populous, so I've kept the name of the variable.
-    float mapsteps[GRIDSIZE][GRIDSIZE];
-    
-    
     /// an array of pointers to fixed objects
     GridObj *objects[GRIDSIZE][GRIDSIZE];
     

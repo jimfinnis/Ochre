@@ -27,7 +27,7 @@ void ToolRegion::render(){
     map.make(g);
     map.render(this,mapx,mapy,mapw,mapw);
     
-    debugmap.makePotential(g);
+    debugmap.makePotential(&globals::game->p);
     debugmap.render(this,mapx,mapy+20+mapw,mapw,mapw);
 }
 

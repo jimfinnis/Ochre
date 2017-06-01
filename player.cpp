@@ -23,6 +23,12 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
         p->init(this,i,y,x);
     }
     
+    for(int y=0;y<GRIDSIZE;y++){
+        for(int x=0;x<GRIDSIZE;x++){
+            mapsteps[x][y]=drand48();
+        }
+    }
+    
     memset(potential,0,GRIDSIZE*GRIDSIZE*sizeof(float));
     blur = new MultipassBlur(GRIDSIZE,GRIDSIZE,10);
     
@@ -63,6 +69,16 @@ void Player::update(float t){
     
     float potentialTmp[GRIDSIZE][GRIDSIZE];
     memset(potentialTmp,0,GRIDSIZE*GRIDSIZE*sizeof(float));
+    
+    for(int y=0;y<GRIDSIZE;y++){
+        for(int x=0;x<GRIDSIZE;x++){
+            mapsteps[x][y]*=0.998f;
+            // add a little noise to mess things up a bit, and stop the
+            // little sods making lawnmower stripes
+            //      mapsteps[x][y]+=drand48()*0.001f;
+        }
+    }
+    
     
     // update people and add them to the potential field
     for(Person *q,*p=people.first();p;p=q){

@@ -33,6 +33,11 @@ public:
     
     // potential field produced by my people
     float potential[GRIDSIZE][GRIDSIZE];
+    // stigmergic trace - incremented when a peep enters square (x,y,x+1,y+1) and decays
+    // over time. Idea pinched from Populous, so I've kept the name of the variable.
+    float mapsteps[GRIDSIZE][GRIDSIZE];
+    
+    
     
     PlayerMode mode;
     Player();
