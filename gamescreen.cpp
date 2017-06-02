@@ -10,7 +10,7 @@
 #include "prof.h"
 
 GameScreen::GameScreen() {
-    globals::game = new Game(100,-3);
+    globals::game = new Game(101,-2);
 }
 
 GameScreen::~GameScreen(){

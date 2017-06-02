@@ -55,7 +55,7 @@ void Person::setDirectionFromPotentialField(){
     int idy=sgn(dy);
     
     float minst = FLT_MAX;
-    float opponentRepel = p->mode==PLAYER_ATTACK?-3.0f:3.0f;
+    float opponentRepel = p->mode==PLAYER_ATTACK?-8.0f:8.0f;
     
     int oxf,oyf;
     for(int ox=-1;ox<=1;ox++){
@@ -72,7 +72,7 @@ void Person::setDirectionFromPotentialField(){
                 (*g)(xx,yy)) // safe square (uses the operator() JPS uses for pathing)
             {
                 // add a bit of random to the field
-                st = globals::rnd->range(0.0f,0.02f);
+                st = globals::rnd->range(0.0f,0.05f);
                 // apply the potential fields
                 st += p->potential[xx][yy];
                 st += (p->op->potentialClose[xx][yy]*5.0f+

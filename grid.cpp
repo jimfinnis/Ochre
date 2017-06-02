@@ -596,8 +596,11 @@ void Grid::update(float t){
 
 void Grid::addHouse(int hx,int hy,House *h){
     //    printf("add house %d at %d,%d\n",h->size,hx,hy);
-    for(int ox=-h->size;ox<=h->size;ox++){
-        for(int oy=-h->size;oy<=h->size;oy++){
+    // REMEMBER if you change how the size works, change the lookup[]
+    // table!
+    int s = h->size+1;
+    for(int ox=-s;ox<=s;ox++){
+        for(int oy=-s;oy<=s;oy++){
             int x = hx+ox;
             int y = hy+oy;
             if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
@@ -611,9 +614,10 @@ void Grid::removeHouse(int hx,int hy,House *h){
     //    printf("del house %d at %d,%d\n",h->size,hx,hy);
     objects[hx][hy]=NULL;
     if(h->size>100)return; // is a new house, don't clear terrain
+    int s = h->size+1;
     h->zombie=true;
-    for(int ox=-h->size;ox<=h->size;ox++){
-        for(int oy=-h->size;oy<=h->size;oy++){
+    for(int ox=-s;ox<=s;ox++){
+        for(int oy=-s;oy<=s;oy++){
             int x = hx+ox;
             int y = hy+oy;
             if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
@@ -626,13 +630,10 @@ void Grid::removeHouse(int hx,int hy,House *h){
 // with lookup tables for positions, working out from the middle.
 // Tables are terminated with -999.
 
-// worst case - the centre isn't flat!
-static const int lookup0[] = {
-    0,0,-999
-};
+static const int lookup0[] = {0,0,-999};
 static const int lookup1[] = {
     -1,-1, 0,-1, 1,-1,
-    -1,0,        1,0,
+    -1,0,   1,0,
     -1,1,  0,1,  1,1,
     -999};
 static const int lookup2[] = {
@@ -650,6 +651,17 @@ static const int lookup3[] = {
     1,-3,1,3,
     2,-3,2,3,
     3,-3,3,-2,3,-1,3,0,3,1,3,2,3,3,
+    -999};
+static const int lookup4[] = {
+    -4,-4,-4,-3,-4,-2,-4,-1,-4,0,-4,1,-4,2,-4,3,-4,4,
+    -4,-3,-4,3,
+    -2,-3,-2,3,
+    -1,-3,-1,3,
+    0,-3,0,3,
+    1,-3,1,3,
+    2,-3,2,3,
+    3,-3,3,3,
+    4,-3,4,-2,4,-1,4,0,4,1,4,2,4,3,4,4,
     -999};
 
 int Grid::countFlat(int x,int y){
