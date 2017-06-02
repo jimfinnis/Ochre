@@ -181,7 +181,7 @@ void Grid::genTriangles(int range){
     // line 8 (left)
     vis.add(centrex-range+2,centrey+1,centrex-range+2,centrey);
     
-    
+    viewRange=range;
     for(int ox=-range;ox<range;ox++){
         for(int oy=-range;oy<range;oy++){
             
@@ -526,22 +526,19 @@ bool Grid::isFlat(int x,int y){
 }
 
 float VisLines::line::getDistSquared(float x,float y){
-    glm::vec2 p(x,y); // get point
+    glm::vec2 p(x,y);
     // project (x,y) onto line
     glm::vec2 proj = (a-p) - glm::dot(a-p,n)*n;
     // get dist squared
     float d =  glm::dot(proj,proj);
     // get side of line (CP of line and start-to-point)
-    // and return 0 if on the wrong side
+    // and return -999 if on the wrong side
     glm::vec2 ap = p-a;
     if(n.x * ap.y - ap.x * n.y < 0)
         return 0;
     return d;
 }
 float VisLines::getVisibility(float x,float y){
-    // calculate minimum distance from each line, bombing out
-    // immediately if we're on the wrong side
-    
     if(ct==0)return 0;
     float md = lines[0].getDistSquared(x,y);
     for(int i=0;i<ct;i++){
@@ -550,7 +547,7 @@ float VisLines::getVisibility(float x,float y){
     }
     if(md>1)md=1;
     
-    md = powf(md,0.2);
+//    md = powf(md,0.2);
     
     
     return md;
@@ -580,8 +577,22 @@ void Grid::renderObjects(int range){
     }
 }
 
+void Grid::populatePeople(const Player &pl){
+    memset(people,0,GRIDSIZE*GRIDSIZE*sizeof(GridObj *));
+    for(Person *p=pl.people.first();p;p=pl.people.next(p)){
+        int x = p->x;
+        int y = p->y;
+        
+        p->next = people[x][y];
+        people[x][y] = p;
+    }
+}
 
 void Grid::update(float t){
+    // populate the people lists
+    populatePeople(globals::game->p[0]);
+    populatePeople(globals::game->p[0]);
+    
 }
 
 
@@ -601,7 +612,8 @@ void Grid::addHouse(int hx,int hy,House *h){
 void Grid::removeHouse(int hx,int hy,House *h){
     //    printf("del house %d at %d,%d\n",h->size,hx,hy);
     objects[hx][hy]=NULL;
-    if(h->size>100)return; // is a new house
+    if(h->size>100)return; // is a new house, don't clear terrain
+    h->zombie=true;
     for(int ox=-h->size;ox<=h->size;ox++){
         for(int oy=-h->size;oy<=h->size;oy++){
             int x = hx+ox;

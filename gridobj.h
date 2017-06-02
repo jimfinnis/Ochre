@@ -9,10 +9,13 @@
 
 #include "gfx.h"
 
-/// fixed objects on the grid (house, etc) derive from this
+/// different sorts of grid object
+enum GridObjType {GO_HOUSE};
 
+/// fixed objects on the grid (house, etc) derive from this
 class GridObj {
 public:
+    GridObjType type;
     virtual void queueRender(glm::mat4 *world) = 0;
 };
 

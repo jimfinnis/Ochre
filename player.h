@@ -16,8 +16,12 @@
 /// these are the modes available to the player
 enum PlayerMode {
     // In settle mode, we look nearby for a flat piece of land. If we can't find
-    // one we wander about - away from the enemy.
+    // one we wander about - away from the enemy: we are repelled
+    // by the opponent's potential field; but also away from ourselves.
     PLAYER_SETTLE,
+    // In attack mode, we are attracted by the opponent's PF, but still
+    // repelled by our own.
+    PLAYER_ATTACK
 };
 
 
@@ -35,11 +39,6 @@ public:
     
     // potential field produced by my people
     float potential[GRIDSIZE][GRIDSIZE];
-    // stigmergic trace - incremented when a peep enters square (x,y,x+1,y+1) and decays
-    // over time. Idea pinched from Populous, so I've kept the name of the variable.
-    float mapsteps[GRIDSIZE][GRIDSIZE];
-    
-    
     
     PlayerMode mode;
     Player();

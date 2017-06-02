@@ -14,6 +14,7 @@
 #include "globals.h"
 
 #include <vector>
+#include <math.h>
 
 /// the grid component of the world from which the heightmap is generated.
 
@@ -64,6 +65,9 @@ class Grid {
     uint8_t gridsafe[GRIDSIZE][GRIDSIZE];  // is SQUARE x,y,x+1,y+1 entirely safe (for pathing)
     uint8_t mapvis[GRIDSIZE][GRIDSIZE]; // visibility of node
     uint8_t isflat[GRIDSIZE][GRIDSIZE]; // flatness of SQUARE x,y,x+1,y+1 
+    
+    
+    class Person *people[GRIDSIZE][GRIDSIZE]; // head of linked list of peeps here
     
     // vertex data goes in here
     UNLITVERTEX verts[MAXVERTS];
@@ -122,6 +126,10 @@ class Grid {
     // lower at x,y (and neighbours if necessary) (internal, does the work)
     void _down(int x,int y);
     
+    float viewRange;
+    
+    // populate the people lists with this player
+    void populatePeople(const Player& p);
     
 public:
     int cursorx,cursory; // selected point
@@ -148,9 +156,12 @@ public:
     bool isVisible(int x,int y){
         return true;
     }
-
+    
     float getVisibility(float x, float y){
-        return vis.getVisibility(x,y);
+        if(fabsf(x-centrex)>viewRange+2 || fabsf(y-centrey)>viewRange+2)
+            return false;
+        else
+            return vis.getVisibility(x,y);
     }
 
     Grid(int seed,float waterlevel);
@@ -162,6 +173,16 @@ public:
         else
             return 0;
     }
+    
+    // get head of linked list of people in this square, updated
+    // every grid update.
+    class Person *getPeople(int x,int y){
+        if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
+            return people[x][y];
+        else
+            return NULL;
+    }
+        
 
     // called every update tick.
     void update(float t);

@@ -103,6 +103,7 @@ MultipassBlur::MultipassBlur(int ww,int hh,int r){
     tmp1 = new float[w*h];
     tmp2 = new float[w*h];
     boxesForGauss(bxs,r, NUMBOXES);
+    npass=0;
 }
 MultipassBlur::~MultipassBlur(){
     delete [] tmp1;

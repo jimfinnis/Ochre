@@ -78,8 +78,13 @@ void MapTex::make(Grid *g){
             uint8_t h = g->grid[x][y];
             uint32_t col = g->mapvis[x][y] ? cols.colsvis[h] : cols.cols[h];
             // add objects
-            if(g->objects[x][y])
-                col = 0xff0000ff;
+            GridObj *o = g->objects[x][y];
+            if(o){
+                if(o->type == GO_HOUSE){
+                    House *h = (House *)o;
+                    col = h->p->idx ? 0xff008080 : 0xffff8000;
+                }
+            }
             *p++ = col;
         }
     }
@@ -88,7 +93,7 @@ void MapTex::make(Grid *g){
     
     if(1 && globals::game){
         writePlayer(&globals::game->p[0],0xffff0000);
-        writePlayer(&globals::game->p[1],0xff00ff00);
+        writePlayer(&globals::game->p[1],0xff00ffff);
     }
     copy();
 }

@@ -21,6 +21,7 @@ struct House : public GridObj {
     // we spawn.
     float growcounter; 
     struct Player *p; // my owner
+    bool zombie; // kill me with fire
     
     void init(int x,int y,Player *pl);
     void update(float t);

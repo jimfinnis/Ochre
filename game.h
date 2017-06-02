@@ -20,17 +20,20 @@ struct Game {
         grid.recentre();
         p[0].op = &p[1];
         p[1].op = &p[0];
+        p[0].mode = PLAYER_ATTACK;
     }
 
     void update(float t){
+        // update grid first, to populate the "people" fields.
+        profbar.start("G",0x00ff00ff);
+        grid.update(t);
+        profbar.end();
+        
         profbar.start("P",0xff0000ff);
         p[0].update(t);
         p[1].update(t);
         profbar.end();
         
-        profbar.start("G",0x00ff00ff);
-        grid.update(t);
-        profbar.end();
     }
 
     Grid grid;

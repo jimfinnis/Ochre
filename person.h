@@ -35,7 +35,7 @@ enum PersonState {
 /// ctor and dtor will run.
 
 struct Person {
-
+    Person *next; // used to link the "people" lists in the grid
     float x,y; // note these are in gridspace
     float dx,dy; // direction
     float drowntime; // "and how long have you been in the sea, Sir?"

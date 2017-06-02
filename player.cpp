@@ -31,14 +31,8 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
         p->init(this,i,y,x);
     }
     
-    for(int y=0;y<GRIDSIZE;y++){
-        for(int x=0;x<GRIDSIZE;x++){
-            mapsteps[x][y]=drand48();
-        }
-    }
-    
     memset(potential,1,GRIDSIZE*GRIDSIZE*sizeof(float));
-    blur = new MultipassBlur(GRIDSIZE,GRIDSIZE,10);
+    blur = new MultipassBlur(GRIDSIZE,GRIDSIZE,GRIDSIZE/4);
     
     mode = PLAYER_SETTLE;
     wanderX = GRIDSIZE/2;
@@ -66,6 +60,7 @@ void Player::render(const Colour& col){
     for(Person *p=people.first();p;p=people.next(p)){
         float opacity = g->getVisibility(p->x,p->y);
         if(opacity>0.001){
+            s->diffuse.a = opacity;
             g->pushxforminterp(p->x,p->y,-0.2f);
             ms->rotY(p->getrot()+glm::radians(90.0f));
             ms->scale(0.2);
@@ -83,15 +78,6 @@ void Player::update(float t){
     float potentialTmp[GRIDSIZE][GRIDSIZE];
     memset(potentialTmp,0,GRIDSIZE*GRIDSIZE*sizeof(float));
     
-    for(int y=0;y<GRIDSIZE;y++){
-        for(int x=0;x<GRIDSIZE;x++){
-            mapsteps[x][y]*=0.998f;
-            // add a little noise to mess things up a bit, and stop the
-            // little sods making lawnmower stripes
-            //      mapsteps[x][y]+=drand48()*0.001f;
-        }
-    }
-    
     
     // update people and add them to the potential field
     for(Person *q,*p=people.first();p;p=q){
@@ -105,7 +91,7 @@ void Player::update(float t){
         q=houses.next(p);
         p->update(t);
         potentialTmp[p->x][p->y]=1;
-        if(!p->pop){ // houses die when their population hits zero
+        if(!p->pop || p->zombie){ // houses die when their population hits zero
             houses.free(p);
         }
     }

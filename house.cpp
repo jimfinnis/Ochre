@@ -17,6 +17,8 @@ void House::init(int xx,int yy,Player *pl){
     y=yy;
     size=255;
     growcounter=0;
+    zombie=false;
+    type = GO_HOUSE;
     // add to grid will be done in first update
 }
 

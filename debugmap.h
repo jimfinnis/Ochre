@@ -14,25 +14,11 @@
 
 class DebugMapTex : public MapTex {
 public:
-    void makeStigmergy(Player *pl){
-        Grid *g = &globals::game->grid;
-        uint32_t *p = &image[0][0];
-        for(int y=0;y<GRIDSIZE;y++){
-            for(int x=0;x<GRIDSIZE;x++){
-                Colour c;
-                c.setFromHSV(g->grid[x][y]?0.5:0,0.5,
-                             pl->mapsteps[x][y]*0.1f+0.3f);
-                *p++ = c.getABGR32();
-            }
-        }
-        copy();
-    }
-    
     void makePotential(Player *pl){
         uint32_t *p = &image[0][0];
         for(int y=0;y<GRIDSIZE;y++){
             for(int x=0;x<GRIDSIZE;x++){
-                float f = pl->potential[x][y];
+                float f = powf(pl->potential[x][y],0.5f);
                 Colour c;
                 c.set(f,f,f);
                 *p++ = c.getABGR32();

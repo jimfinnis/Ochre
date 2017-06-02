@@ -117,11 +117,11 @@ public:
         count--;
     }
     
-    T *first(){
+    T *first() const {
         return allochead>=0 ? data+allochead : NULL;
     }
     
-    T *next(T *o){
+    T *next(T *o) const {
         int idx = o-data;
         return (allocnext[idx]>=0) ? data+allocnext[idx] : NULL;
     }

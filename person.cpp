@@ -55,6 +55,7 @@ void Person::setDirectionFromPotentialField(){
     int idy=sgn(dy);
     
     float minst = FLT_MAX;
+    float opponentRepel = p->mode==PLAYER_ATTACK?-3.0f:3.0f;
     
     int oxf,oyf;
     for(int ox=-1;ox<=1;ox++){
@@ -68,9 +69,10 @@ void Person::setDirectionFromPotentialField(){
                 (*g)(cx+ox,cy+oy)) // safe square (uses the operator() JPS uses for pathing)
             {
                 // add a bit of random to the field
-                st = globals::rnd->range(0.0f,0.1f);
+                st = globals::rnd->range(0.0f,0.02f);
+                // apply the two potential fields
                 st += p->potential[cx+ox][cy+oy];
-                st -= p->op->potential[cx+ox][cy+oy];
+                st += p->op->potential[cx+ox][cy+oy]*opponentRepel;
                 
                 if(st<minst){
                     minst=st;oxf=ox;oyf=oy;
@@ -117,6 +119,26 @@ void Person::updateInfrequent(){
                 state = ZOMBIE; 
             }
         }
+    }
+    
+    // PICK A FIGHT!
+    for(Person *pp = globals::game->grid.getPeople(ix,iy);pp;pp=pp->next){
+        if(pp->p != p){ // different player
+            // quick fight.
+            //            if(rand()%2){
+            if(p->mode == PLAYER_SETTLE){
+                state = ZOMBIE;
+            } else {
+                pp->state = ZOMBIE;
+            }
+        }
+    }
+    GridObj *obj=globals::game->grid.getObject(ix,iy);
+    if(obj && obj->type == GO_HOUSE){
+        House *h = (House *)obj;
+        if(h->p != p)
+            // FIGHT HOUSE (always win)
+            globals::game->grid.removeHouse(ix,iy,h);
     }
     
     switch(state){
@@ -201,8 +223,6 @@ void Person::update(float t){
         }
     }
      
-    p->mapsteps[ix][iy]++;
-    
     if(x<0)x=0;
     if(x>=GRIDSIZE-1)x=GRIDSIZE-2;
     if(y<0)y=0;
