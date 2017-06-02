@@ -559,13 +559,11 @@ void Grid::renderObjects(int range){
     MatrixStack *ms = sm->getx();
     for(int ox=-range;ox<range;ox++){
         for(int oy=-range;oy<range;oy++){
-            
             if(abs(ox)+abs(oy)>=range)continue;
             
             int x = centrex+ox;
             int y = centrey+oy;
-            
-            if(objects[x][y]){
+            if(x>=0 && y>=0 && x<GRIDSIZE && y<GRIDSIZE && objects[x][y]){
                 if(getVisibility(x,y)>0.5f){
                     pushxform(x+0.5f,y+0.5f,0);
                     ms->rotY(glm::radians(45.0f));

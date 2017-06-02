@@ -31,6 +31,7 @@ enum PlayerMode {
 
 class Player {
     MultipassBlur *blur; // potential field blurrer - takes several ticks
+    MultipassBlur *blurClose; // potential field blurrer - takes several ticks
 public:
     int idx; // which player am I?
     Player *op; // opposing player
@@ -39,6 +40,9 @@ public:
     
     // potential field produced by my people
     float potential[GRIDSIZE][GRIDSIZE];
+    // potential field produced by my people, this one blurred less - 
+    // it's for close range avoidance/attraction.
+    float potentialClose[GRIDSIZE][GRIDSIZE];
     
     PlayerMode mode;
     Player();

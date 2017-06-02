@@ -61,18 +61,22 @@ void Person::setDirectionFromPotentialField(){
     for(int ox=-1;ox<=1;ox++){
         for(int oy=-1;oy<=1;oy++){
             float st=1000;
+            int xx=cx+ox;
+            int yy=cy+oy;
+                
             // do not scan my own area, do not permit us to turn around
             // or go into the sea. The middle rule there is to avoid
             // stuckage.
             if( (ox||oy)  // my own square
                 && (ox!=-idx && oy!=-idy) &&  // turning around
-                (*g)(cx+ox,cy+oy)) // safe square (uses the operator() JPS uses for pathing)
+                (*g)(xx,yy)) // safe square (uses the operator() JPS uses for pathing)
             {
                 // add a bit of random to the field
                 st = globals::rnd->range(0.0f,0.02f);
-                // apply the two potential fields
-                st += p->potential[cx+ox][cy+oy];
-                st += p->op->potential[cx+ox][cy+oy]*opponentRepel;
+                // apply the potential fields
+                st += p->potential[xx][yy];
+                st += (p->op->potentialClose[xx][yy]*5.0f+
+                       p->op->potential[xx][yy])*opponentRepel;
                 
                 if(st<minst){
                     minst=st;oxf=ox;oyf=oy;

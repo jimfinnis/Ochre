@@ -31,8 +31,11 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
         p->init(this,i,y,x);
     }
     
-    memset(potential,1,GRIDSIZE*GRIDSIZE*sizeof(float));
+    memset(potential,0,GRIDSIZE*GRIDSIZE*sizeof(float));
+    memset(potentialClose,0,GRIDSIZE*GRIDSIZE*sizeof(float));
+    
     blur = new MultipassBlur(GRIDSIZE,GRIDSIZE,GRIDSIZE/4);
+    blurClose = new MultipassBlur(GRIDSIZE,GRIDSIZE,2);
     
     mode = PLAYER_SETTLE;
     wanderX = GRIDSIZE/2;
@@ -41,6 +44,7 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
 
 Player::~Player(){
     delete blur;
+    delete blurClose;
 }
 
 void Player::render(const Colour& col){
@@ -99,7 +103,7 @@ void Player::update(float t){
     // blur the potential field
     profbar.start("B",0xff8080ff);
     blur->pass((float*)potentialTmp,(float*)potential);
-//    gaussBlur((float*)potentialTmp,(float*)potential,GRIDSIZE,GRIDSIZE,10);
+    blurClose->pass((float*)potentialTmp,(float*)potentialClose);
     profbar.end();
     
 }

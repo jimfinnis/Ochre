@@ -18,7 +18,8 @@ public:
         uint32_t *p = &image[0][0];
         for(int y=0;y<GRIDSIZE;y++){
             for(int x=0;x<GRIDSIZE;x++){
-                float f = powf(pl->potential[x][y],0.5f);
+                float f = powf(pl->potential[x][y]+
+                               pl->potentialClose[x][y]*5.0f,0.5f);
                 Colour c;
                 c.set(f,f,f);
                 *p++ = c.getABGR32();
