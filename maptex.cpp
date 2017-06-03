@@ -30,10 +30,12 @@ MapTex::MapTex(){
         throw Exception().set("could not create grid map texture: %s",
                               SDL_GetError());
     }
+    vid=NULL;
 }
 
 MapTex::~MapTex(){
     if(tex)glDeleteTextures(1,&tex);
+    if(vid)delete vid;
 }
 
 void MapTex::copy(){
@@ -71,7 +73,7 @@ void MapTex::writePlayer(Player *pl,uint32_t col){
     
 }
 
-void MapTex::make(Grid *g){
+void MapTex::make(Grid *g,bool writeframe){
     uint32_t *p = &image[0][0];
     for(int y=0;y<GRIDSIZE;y++){
         for(int x=0;x<GRIDSIZE;x++){
@@ -96,4 +98,5 @@ void MapTex::make(Grid *g){
         writePlayer(&globals::game->p[1],0xff00ffff);
     }
     copy();
+    if(vid && writeframe)vid->write((uint32_t*)&image[0][0]);
 }

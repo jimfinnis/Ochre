@@ -21,12 +21,22 @@ struct Game {
         p[0].op = &p[1];
         p[1].op = &p[0];
         p[0].mode = PLAYER_ATTACK;
+        p[1].mode = PLAYER_ATTACK;
     }
 
     void update(float t){
         // update grid first, to populate the "people" fields.
         profbar.start("G",0x00ff00ff);
         grid.update(t);
+        profbar.end();
+        
+    
+        // do this before updating the player so all the data is there
+        
+        profbar.start("HT",0x808080ff);
+        p[0].updateHouseTerrain();
+        p[1].updateHouseTerrain();
+        grid.removeNonFlatFarm();
         profbar.end();
         
         profbar.start("P",0xff0000ff);

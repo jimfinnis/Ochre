@@ -12,9 +12,9 @@
 struct House : public GridObj {
     /// size of house (determines capacity, and is determined by landscape)
     /// it's the number of clear, flat spaces around me in all directions,
-    /// and is typically 0,1,2 or 3.
+    /// and is typically 0,1,2 or 3. -1 means it shouldn't be there.
     
-    uint8_t size; 
+    int size;
     uint8_t pop; // how many people
     uint16_t x,y; // position
     // when this hits a certain number we increase pop, when pop>=cap

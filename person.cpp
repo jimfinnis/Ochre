@@ -108,10 +108,10 @@ void Person::updateInfrequent(){
        (*g)(ix,iy) && // safe
        g->get(ix,iy) && // quick flat check
        !globals::rnd->getInt(5) && // basic chance
-       g->isFlatForBuild(ix,iy)){ // flat
+       g->isFlatGrass(ix,iy)){ // flat
         // work out a chance we'll actually do it, based on
         // how big the house will be
-        int c = g->countFlatForBuild(ix,iy);
+        int c = g->countFlatGrass(ix,iy);
         if(globals::rnd->getInt(6)<=c) { // higher chance if bigger result
             // make a new house if we can
             House *h = p->houses.alloc();
@@ -129,8 +129,7 @@ void Person::updateInfrequent(){
     for(Person *pp = globals::game->grid.getPeople(ix,iy);pp;pp=pp->next){
         if(pp->p != p){ // different player
             // quick fight.
-            //            if(rand()%2){
-            if(p->mode == PLAYER_SETTLE){
+            if(rand()%2){
                 state = ZOMBIE;
             } else {
                 pp->state = ZOMBIE;
@@ -140,9 +139,14 @@ void Person::updateInfrequent(){
     GridObj *obj=globals::game->grid.getObject(ix,iy);
     if(obj && obj->type == GO_HOUSE){
         House *h = (House *)obj;
-        if(h->p != p)
-            // FIGHT HOUSE (always win)
-            globals::game->grid.removeHouse(ix,iy,h);
+        if(h->p != p){
+            // FIGHT HOUSE
+            if(rand()%2){
+                state = ZOMBIE;
+            } else {
+                globals::game->grid.removeHouse(ix,iy,h);
+            }
+        }
     }
     
     switch(state){

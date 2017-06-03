@@ -19,7 +19,7 @@ void House::init(int xx,int yy,Player *pl){
     growcounter=0;
     zombie=false;
     type = GO_HOUSE;
-    // add to grid will be done in first update
+    globals::game->grid.addHouse(x,y,this);
 }
 
 House::~House(){
@@ -41,21 +41,14 @@ void House::update(float t){
         1,2,4,5
     };
     
-    int newsize = (size==255)?
-          g->countFlatForBuild(x,y) : g->countFlat(x,y);
+    size = (size==255)?
+          g->countFlatGrass(x,y) : g->countFlat(x,y);
     
-    // the house has changed size
-    if(newsize != size && newsize>=0){
-//        printf("Size calculated is %d, old size %d\n",newsize,size);
-        // don't do this if we're going to destroy the house,
-        // the player will destroy the house and that removes
-        // it from the grid.
-        globals::game->grid.removeHouse(x,y,this);
-        size=newsize;
-        globals::game->grid.addHouse(x,y,this);
+    if(size<0){
+        zombie=true; // no room! 
     }
     
-    int capacity = capacities[newsize+1];
+    int capacity = capacities[size+1];
     
 //    printf("cap %d, pop %d, gc %f\n",capacity,pop,growcounter);
     growcounter+=t*(float)(1+capacity-pop);

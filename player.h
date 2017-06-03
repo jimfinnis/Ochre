@@ -56,6 +56,8 @@ public:
     void render(const Colour& col);
     void update(float t);
     
+    void updateHouseTerrain();
+    
     // spawn some peeps within a given square (at slightly random offsets within it)
     void spawn(int x,int y,int n);
 };

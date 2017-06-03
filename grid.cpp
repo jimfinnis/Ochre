@@ -45,6 +45,7 @@ Grid::Grid(int seed,float waterlevel){
     centrex=centrey=cursorx;
     float seedf = 1000.0f*seed;
     
+    memset(gridmats,0,GRIDSIZE*GRIDSIZE);
     memset(grid,1,GRIDSIZE*GRIDSIZE);
     memset(objects,0,GRIDSIZE*GRIDSIZE*sizeof(GridObj *));
     
@@ -511,7 +512,7 @@ void Grid::pushxforminterp(float fx,float fy,float offset){
     ms->translate(fx,r*heightFactor,fy);
 }
 
-bool Grid::isFlatForBuild(int x,int y){
+bool Grid::isFlatGrass(int x,int y){
     if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
         return isflat[x][y] && gridmats[x][y]==GMAT_GRASS;
     else
@@ -590,40 +591,26 @@ void Grid::update(float t){
     // populate the people lists
     populatePeople(globals::game->p[0]);
     populatePeople(globals::game->p[0]);
+    // clear the terrain if farmland (houses set it later)
+    for(int x=0;x<GRIDSIZE;x++){
+        for(int y=0;y<GRIDSIZE;y++){
+            if(gridmats[x][y]==GMAT_FARM)gridmats[x][y]=GMAT_GRASS;
+        }
+    }
+    // next stage is that the houses add their farms
+    // and after that we remove non-flat farm.
+    
     
 }
 
 
 void Grid::addHouse(int hx,int hy,House *h){
-    //    printf("add house %d at %d,%d\n",h->size,hx,hy);
-    // REMEMBER if you change how the size works, change the lookup[]
-    // table!
-    int s = h->size+1;
-    for(int ox=-s;ox<=s;ox++){
-        for(int oy=-s;oy<=s;oy++){
-            int x = hx+ox;
-            int y = hy+oy;
-            if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
-                gridmats[x][y]=GMAT_FARM;
-        }
-    }
     objects[hx][hy]=h;
 }
 
 void Grid::removeHouse(int hx,int hy,House *h){
-    //    printf("del house %d at %d,%d\n",h->size,hx,hy);
     objects[hx][hy]=NULL;
-    if(h->size>100)return; // is a new house, don't clear terrain
-    int s = h->size+1;
     h->zombie=true;
-    for(int ox=-s;ox<=s;ox++){
-        for(int oy=-s;oy<=s;oy++){
-            int x = hx+ox;
-            int y = hy+oy;
-            if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
-                gridmats[x][y]=GMAT_GRASS;
-        }
-    }
 }
 
 // work out how many squares around me are still flat. We do this
@@ -680,17 +667,17 @@ int Grid::countFlat(int x,int y){
         return 3;
 }
 
-int Grid::countFlatForBuild(int x,int y){
-    if(!isFlatAtAllOffsetsForBuild(x,y,lookup0) || !get(x,y)){
+int Grid::countFlatGrass(int x,int y){
+    if(!isFlatGrassAtAllOffsets(x,y,lookup0) || !get(x,y)){
         // this is a disaster; the bloody thing isn't flat at all - or it's in the sea
         return -1;
-    } else if(!isFlatAtAllOffsetsForBuild(x,y,lookup1)){
+    } else if(!isFlatGrassAtAllOffsets(x,y,lookup1)){
         // flat at only offset 0
         return 0;
-    } else if(!isFlatAtAllOffsetsForBuild(x,y,lookup2)){
+    } else if(!isFlatGrassAtAllOffsets(x,y,lookup2)){
         // flat at only 1
         return 1;
-    } else if(!isFlatAtAllOffsetsForBuild(x,y,lookup3)){
+    } else if(!isFlatGrassAtAllOffsets(x,y,lookup3)){
         return 2;
     } else
         return 3;

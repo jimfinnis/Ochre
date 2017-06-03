@@ -15,7 +15,7 @@ class ToolRegion : public Region {
     MapTex map;
     DebugMapTex debugmap;
 public:
-    ToolRegion() : Region("tool"){};
+    ToolRegion();
     virtual ~ToolRegion(){};
     
     virtual void onMouseMove(int x,int y);

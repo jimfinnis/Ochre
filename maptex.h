@@ -10,6 +10,7 @@
 #include "grid.h"
 #include "region.h"
 #include "game.h"
+#include "videofile.h"
 
 /// a map texture. Used for the main game map, but also for debugging.
 
@@ -47,17 +48,25 @@ protected:
     // writes a player's peeps to image
     void writePlayer(Player *p,uint32_t col);
     
+    Video *vid;
 public:
     
     MapTex();
     virtual ~MapTex();
+    
+    // if CV is linked in, write this map to a video. Call once only.
+    void saveVideo(const char *fn){
+        vid = new Video(fn,GRIDSIZE,GRIDSIZE);
+    }
     
     // draw the thing into a screen region - will reset all transforms so this is screen coords
     void render(Region *r,int x,int y,int w,int h);
     
     // override to actually do something different - this will perform the standard
     // behaviour - but remember to call copy() at the end.
-    virtual void make(Grid *g);
+    // If writerame is true AND saveVideo was called,
+    // write frame to video too.
+    virtual void make(Grid *g,bool writeframe=false);
 };
 
 #endif /* __MAPTEX_H */

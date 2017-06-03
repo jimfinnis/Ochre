@@ -75,6 +75,20 @@ void Player::render(const Colour& col){
     sm->pop();
 }
 
+void Player::updateHouseTerrain(){
+    Game *game = globals::game;
+    Grid *g = &game->grid;
+    
+    for(House *p=houses.first();p;p=houses.next(p)){
+        if(p->size<255)
+            g->setMaterialAroundIfGrass(p->x,p->y,p->size+1,GMAT_FARM);
+    }
+    // later code will remove non-flat farms
+}    
+    
+    
+    
+
 void Player::update(float t){
     Game *game = globals::game;
     Grid *g = &game->grid;

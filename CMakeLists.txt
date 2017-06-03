@@ -10,14 +10,16 @@ include(FindPkgConfig)
 pkg_search_module(SDL2 REQUIRED sdl2)
 pkg_search_module(SD2_TTF REQUIRED sdl2)
 
-find_package(OpenGL)
-find_package(SDL2TTF)
+find_package(OpenGL REQUIRED)
+find_package(SDL2TTF REQUIRED)
+
 
 add_executable(${PROJECT_NAME} state.cpp context.cpp
     region.cpp font.cpp time.cpp player.cpp maptex.cpp
     effect.cpp obj.cpp maths.cpp grid.cpp meshes.cpp prof.cpp
     gameregion.cpp gamescreen.cpp main.cpp screen.cpp globals.cpp
     statregion.cpp toolregion.cpp person.cpp house.cpp blur.cpp
+    videofile.cpp
 )
 
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2TTF_INCLUDE_DIRS}

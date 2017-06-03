@@ -186,6 +186,15 @@ public:
 
     // called every update tick.
     void update(float t);
+    // called to clean up after player house update
+    void removeNonFlatFarm(){
+        for(int x=0;x<GRIDSIZE;x++){
+            for(int y=0;y<GRIDSIZE;y++){
+                if(gridmats[x][y]==GMAT_FARM && !isflat[x][y])
+                    gridmats[x][y]=GMAT_GRASS;
+            }
+        }
+    }
 
     // call this every time the terrain changes to recalculate
     // the safe grid squares for pathing, and also to calculate which
@@ -222,12 +231,27 @@ public:
         }
     }
     
+    // set terrain around a point IF it is grass (empty). Used
+    // for houses.
+    void setMaterialAroundIfGrass(int x,int y,int size,int mat){
+        int minx=x-size;if(minx<0)minx=0;
+        int miny=y-size;if(miny<0)miny=0;
+        int maxx=x+size;if(maxx>=GRIDSIZE)maxx=GRIDSIZE-1;
+        int maxy=y+size;if(maxy>=GRIDSIZE)maxy=GRIDSIZE-1;
+        for(x=minx;x<=maxx;x++){
+            for(y=miny;y<=maxy;y++){
+                if(gridmats[x][y]==GMAT_GRASS)
+                    gridmats[x][y]=mat;
+            }
+        }
+    }
+    
     // given a lookup table of offsets of the form (x1,y1,x2,y2,...,-999)
     // return whether all those squares are flat. Also checks for objects
     // and farmland, which are obstacles too.
-    bool isFlatAtAllOffsetsForBuild(int x,int y,const int *lookup){
+    bool isFlatGrassAtAllOffsets(int x,int y,const int *lookup){
         for(int i=0;lookup[i]>-900;i+=2){
-            if(!isFlatForBuild(x+lookup[i],y+lookup[i+1]))
+            if(!isFlatGrass(x+lookup[i],y+lookup[i+1]))
                 return false;
         }
         return true;
@@ -249,13 +273,13 @@ public:
     
     // return the number of flat, unoccupied squares around here -
     // farmland IS an obstacle
-    int countFlatForBuild(int x,int y);
+    int countFlatGrass(int x,int y);
     
     // does this point lie within a flat square?
     bool isFlat(int x,int y);
     
-    // does this point lie within a flat square and is not farm?
-    bool isFlatForBuild(int x,int y);
+    // does this point lie within a flat square and is grass?
+    bool isFlatGrass(int x,int y);
     
     // get the height at x,y doing bilinear interpolation between the corners
     float getinterp(float x,float y);

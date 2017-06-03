@@ -14,6 +14,10 @@
 // map top in tool region
 #define MAPTOP 20
 
+ToolRegion::ToolRegion() : Region("tool"){
+    map.saveVideo("foo.mpg");
+}
+
 void ToolRegion::onMouseMove(int x,int y){
 }
 
@@ -26,7 +30,7 @@ void ToolRegion::render(){
     
     profbar.start("M",0x008000ff);
     Grid *g = &globals::game->grid;
-    map.make(g);
+    map.make(g,true);
     map.render(this,mapx,mapy,mapw,mapw);
     profbar.end();
     
