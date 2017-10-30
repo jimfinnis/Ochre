@@ -577,7 +577,6 @@ void Grid::renderObjects(int range){
 }
 
 void Grid::populatePeople(const Player &pl){
-    memset(people,0,GRIDSIZE*GRIDSIZE*sizeof(GridObj *));
     for(Person *p=pl.people.first();p;p=pl.people.next(p)){
         int x = p->x;
         int y = p->y;
@@ -589,8 +588,9 @@ void Grid::populatePeople(const Player &pl){
 
 void Grid::update(float t){
     // populate the people lists
+    memset(people,0,GRIDSIZE*GRIDSIZE*sizeof(GridObj *));
     populatePeople(globals::game->p[0]);
-    populatePeople(globals::game->p[0]);
+    populatePeople(globals::game->p[1]);
     // clear the terrain if farmland (houses set it later)
     for(int x=0;x<GRIDSIZE;x++){
         for(int y=0;y<GRIDSIZE;y++){

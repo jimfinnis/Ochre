@@ -15,7 +15,7 @@ struct House : public GridObj {
     /// and is typically 0,1,2 or 3. -1 means it shouldn't be there.
     
     int size;
-    uint8_t pop; // how many people
+    int pop; // how many people
     uint16_t x,y; // position
     // when this hits a certain number we increase pop, when pop>=cap
     // we spawn.

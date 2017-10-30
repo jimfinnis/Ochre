@@ -26,6 +26,7 @@ void Person::init(class Player *player, int idx, float xx,float yy){
     x=xx;y=yy;
     dx=dy=0;
     p=player;
+    strength=1;
     drowntime=0;
     nextInfrequentUpdate = globals::timeNow+INFREQUENTUPDATEINTERVAL*0.2*(double)(idx%10);
 }
@@ -63,7 +64,7 @@ void Person::setDirectionFromPotentialField(){
             float st=1000;
             int xx=cx+ox;
             int yy=cy+oy;
-                
+            
             // do not scan my own area, do not permit us to turn around
             // or go into the sea. The middle rule there is to avoid
             // stuckage.
@@ -117,6 +118,7 @@ void Person::updateInfrequent(){
             House *h = p->houses.alloc();
             if(h){
                 h->init(ix,iy,p);
+                h->pop = strength;
                 //            printf("House added at %d,%d  %p\n",ix,iy,p);
                 // "kill" the villager (he is now the houseowner and moves
                 // into the house)
@@ -127,12 +129,21 @@ void Person::updateInfrequent(){
     
     // PICK A FIGHT!
     for(Person *pp = globals::game->grid.getPeople(ix,iy);pp;pp=pp->next){
-        if(pp->p != p){ // different player
-            // quick fight.
-            if(rand()%2){
-                state = ZOMBIE;
-            } else {
-                pp->state = ZOMBIE;
+        if(pp != this){
+            if(pp->p == p){ // same player as me
+                // we sometimes merge with the other person, if the
+                // combined strength would be sane.
+                if(pp->strength + strength < 10 && !(rand()%3)){
+                    pp->state = ZOMBIE;
+                    strength += pp->strength;
+                }
+            } else { // different player
+                // Fight! There's a 50% chance of either player losing
+                // a strength point; and if you get to zero you die.
+                if(rand()%2)
+                    damage(1);
+                else
+                    pp->damage(1);
             }
         }
     }
@@ -230,9 +241,18 @@ void Person::update(float t){
             }
         }
     }
-     
+    
     if(x<0)x=0;
     if(x>=GRIDSIZE-1)x=GRIDSIZE-2;
     if(y<0)y=0;
     if(y>=GRIDSIZE-1)y=GRIDSIZE-2;
 }
+
+void Person::damage(int n){
+    strength -= n;
+    if(strength<0){
+        strength=0;
+        state = ZOMBIE;
+    }
+}
+        

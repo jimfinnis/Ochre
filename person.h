@@ -41,6 +41,8 @@ struct Person {
     float drowntime; // "and how long have you been in the sea, Sir?"
     float destx,desty; // full destination for path
     int pathidx; // current index of path
+    // how many actual "people" this is - they merge and sometimes split!
+    int strength; 
 
     PersonState state;
     double nextInfrequentUpdate;
@@ -68,6 +70,9 @@ private:
     /// an update which doesn't happen very often, but at least once per traversed
     /// map square.
     void updateInfrequent();
+    
+    /// damage me by n points of strength; zombie me if <=0.
+    void damage(int n);
 
     class Player *p;
     JPS::PathVector path;

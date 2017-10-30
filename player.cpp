@@ -67,7 +67,7 @@ void Player::render(const Colour& col){
             s->diffuse.a = opacity;
             g->pushxforminterp(p->x,p->y,-0.2f);
             ms->rotY(p->getrot()+glm::radians(90.0f));
-            ms->scale(0.2);
+            ms->scale(0.2 + 0.02 * p->strength);
             meshes::marker->render(ms->top());
             ms->pop();
         }
