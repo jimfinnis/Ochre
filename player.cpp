@@ -37,7 +37,7 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     blur = new MultipassBlur(GRIDSIZE,GRIDSIZE,GRIDSIZE/4);
     blurClose = new MultipassBlur(GRIDSIZE,GRIDSIZE,2);
     
-    mode = PLAYER_SETTLE;
+    mode = PLAYER_ATTACK;
     wanderX = GRIDSIZE/2;
     wanderY = GRIDSIZE/2;
 }
@@ -81,7 +81,7 @@ void Player::updateHouseTerrain(){
     
     for(House *p=houses.first();p;p=houses.next(p)){
         if(p->size<255)
-            g->setMaterialAroundIfGrass(p->x,p->y,p->size+1,GMAT_FARM);
+            g->setTerrainAroundIfGrass(p->x,p->y,p->size+1,GTERR_FARM,idx);
     }
     // later code will remove non-flat farms
 }    

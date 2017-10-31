@@ -24,7 +24,7 @@ void House::init(int xx,int yy,Player *pl){
 
 House::~House(){
     // remove me from the game's grid
-    globals::game->grid.removeHouse(x,y,this);
+    globals::game->grid.removeHouse(this);
     evict(pop);
 }
 
@@ -69,4 +69,11 @@ void House::evict(int n){
         pop -= n;
         p->spawn(x,y,n);
     }
+}
+
+void House::damage(int n){
+    pop -= n;
+    if(pop<=0)
+        globals::game->grid.removeHouse(this);
+        
 }

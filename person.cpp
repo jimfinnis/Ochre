@@ -12,6 +12,8 @@
 #include "time.h"
 
 #define PERSONSPEED 3.1f
+// was 8
+#define OPPONENT_FIELD 10.0f
 
 // table mapping direction onto rotation (in degrees, but gets
 // switched to radians)
@@ -56,7 +58,7 @@ void Person::setDirectionFromPotentialField(){
     int idy=sgn(dy);
     
     float minst = FLT_MAX;
-    float opponentRepel = p->mode==PLAYER_ATTACK?-8.0f:8.0f;
+    float opponentRepel = (p->mode==PLAYER_ATTACK)?-OPPONENT_FIELD:OPPONENT_FIELD;
     
     int oxf,oyf;
     for(int ox=-1;ox<=1;ox++){
@@ -74,8 +76,13 @@ void Person::setDirectionFromPotentialField(){
             {
                 // add a bit of random to the field
                 st = globals::rnd->range(0.0f,0.05f);
-                // apply the potential fields
+                
+                // apply the potential fields. First, we are repelled by
+                // our own kind.
                 st += p->potential[xx][yy];
+                // and either repelled or attracted by others, with
+                // the effect 5 times stronger on the less-blurred
+                // field.
                 st += (p->op->potentialClose[xx][yy]*5.0f+
                        p->op->potential[xx][yy])*opponentRepel;
                 
@@ -151,11 +158,13 @@ void Person::updateInfrequent(){
     if(obj && obj->type == GO_HOUSE){
         House *h = (House *)obj;
         if(h->p != p){
-            // FIGHT HOUSE
-            if(rand()%2){
-                state = ZOMBIE;
+            // FIGHT HOUSE - similar logic to the above, but houses
+            // are tougher.
+            
+            if(rand()%3){ // more likely attacker will be damaged
+                damage(1);
             } else {
-                globals::game->grid.removeHouse(ix,iy,h);
+                h->damage(1);
             }
         }
     }

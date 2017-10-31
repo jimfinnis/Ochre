@@ -25,6 +25,8 @@ struct House : public GridObj {
     
     void init(int x,int y,Player *pl);
     void update(float t);
+    // take n point of damage (i.e. lose n people) and destroy if zero.
+    void damage(int n); 
     virtual void queueRender(glm::mat4 *world);
     virtual ~House();
     

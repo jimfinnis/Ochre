@@ -45,7 +45,8 @@ Grid::Grid(int seed,float waterlevel){
     centrex=centrey=cursorx;
     float seedf = 1000.0f*seed;
     
-    memset(gridmats,0,GRIDSIZE*GRIDSIZE);
+    memset(gridterr,0,GRIDSIZE*GRIDSIZE);
+    memset(gridowner,0,GRIDSIZE*GRIDSIZE);
     memset(grid,1,GRIDSIZE*GRIDSIZE);
     memset(objects,0,GRIDSIZE*GRIDSIZE*sizeof(GridObj *));
     
@@ -56,7 +57,7 @@ Grid::Grid(int seed,float waterlevel){
             if(v<0)v=0;
             if(v>5)v=5;
             grid[x][y] = v;
-            gridmats[x][y] = 0;
+            gridterr[x][y] = 0;
         }
     }
     recalc(); // calculate initial "safe squares"
@@ -64,7 +65,8 @@ Grid::Grid(int seed,float waterlevel){
     
     // same order as GMAT_ constants
     materials.push_back(Material(0,0.7,0.7,0.7)); // grass
-    materials.push_back(Material(0,0.9,0.0,0.9)); // farm
+    materials.push_back(Material(0,0.9,0.0,0.9)); // farm, ply 0
+    materials.push_back(Material(0,0.0,0.9,0.9)); // farm, ply 1
     
     // once we know how many mats we need we can allocate the buckets for the triangles
     // vertices for each material.
@@ -514,7 +516,7 @@ void Grid::pushxforminterp(float fx,float fy,float offset){
 
 bool Grid::isFlatGrass(int x,int y){
     if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
-        return isflat[x][y] && gridmats[x][y]==GMAT_GRASS;
+        return isflat[x][y] && gridterr[x][y]==GTERR_GRASS;
     else
         return false;
 }
@@ -594,7 +596,7 @@ void Grid::update(float t){
     // clear the terrain if farmland (houses set it later)
     for(int x=0;x<GRIDSIZE;x++){
         for(int y=0;y<GRIDSIZE;y++){
-            if(gridmats[x][y]==GMAT_FARM)gridmats[x][y]=GMAT_GRASS;
+            gridterr[x][y]=GTERR_GRASS;
         }
     }
     // next stage is that the houses add their farms
@@ -608,8 +610,8 @@ void Grid::addHouse(int hx,int hy,House *h){
     objects[hx][hy]=h;
 }
 
-void Grid::removeHouse(int hx,int hy,House *h){
-    objects[hx][hy]=NULL;
+void Grid::removeHouse(House *h){
+    objects[h->x][h->y]=NULL;
     h->zombie=true;
 }
 

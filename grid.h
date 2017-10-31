@@ -23,10 +23,17 @@
 // the visibility and opaque arrays are bigger than the grid itself
 #define VISBORDER 16
 
-// these are the predefined grid materials
+// these are the grid square terrains
+
+#define GTERR_GRASS 0
+#define GTERR_FARM 1
+
+// these are the grid graphics materials in the same order in which
+// they are added to the materials array
 
 #define GMAT_GRASS 0
-#define GMAT_FARM 1
+#define GMAT_FARMPLAYER0 1
+#define GMAT_FARMPLAYER1 2
 
 
 /// this class manages visibility lines - we tell how visible an entity
@@ -61,7 +68,8 @@ class Grid {
     friend class DebugMapTex;
     
     uint8_t grid[GRIDSIZE][GRIDSIZE];     // height map
-    uint8_t gridmats[GRIDSIZE][GRIDSIZE]; // material index for square (x,y,x+1,y+1)
+    uint8_t gridterr[GRIDSIZE][GRIDSIZE]; // terrain (grass, farm etc) for square (x,y,x+1,y+1)
+    uint8_t gridowner[GRIDSIZE][GRIDSIZE]; // if owned (typically farm) which player is it?
     uint8_t gridsafe[GRIDSIZE][GRIDSIZE];  // is SQUARE x,y,x+1,y+1 entirely safe (for pathing)
     uint8_t mapvis[GRIDSIZE][GRIDSIZE]; // visibility of node
     uint8_t isflat[GRIDSIZE][GRIDSIZE]; // flatness of SQUARE x,y,x+1,y+1 
@@ -150,7 +158,7 @@ public:
     
     void addHouse(int x,int y,House *h);
     
-    void removeHouse(int x,int y,House *h);
+    void removeHouse(House *h);
         
     /// is a given grid square visible
     bool isVisible(int x,int y){
@@ -190,8 +198,8 @@ public:
     void removeNonFlatFarm(){
         for(int x=0;x<GRIDSIZE;x++){
             for(int y=0;y<GRIDSIZE;y++){
-                if(gridmats[x][y]==GMAT_FARM && !isflat[x][y])
-                    gridmats[x][y]=GMAT_GRASS;
+                if(gridterr[x][y]==GTERR_FARM && !isflat[x][y])
+                    gridterr[x][y]=GTERR_GRASS;
             }
         }
     }
@@ -209,11 +217,19 @@ public:
         else
             return 0;
     }
-
+    
+    // get the material associated with a grid square
     inline int getmat(int x,int y){
-        if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
-            return gridmats[x][y];
-        else
+        if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0){
+            uint8_t t = gridterr[x][y];
+            switch(t){
+            default:
+            case GTERR_GRASS:
+                return GMAT_GRASS;
+            case GTERR_FARM:
+                return GMAT_FARMPLAYER0+gridowner[x][y];
+            }
+        } else
             return 0;
     }
 
@@ -232,16 +248,18 @@ public:
     }
     
     // set terrain around a point IF it is grass (empty). Used
-    // for houses.
-    void setMaterialAroundIfGrass(int x,int y,int size,int mat){
+    // for houses. WILL ALSO SET THE OWNER TO ply.
+    void setTerrainAroundIfGrass(int x,int y,int size,int mat,int ply){
         int minx=x-size;if(minx<0)minx=0;
         int miny=y-size;if(miny<0)miny=0;
         int maxx=x+size;if(maxx>=GRIDSIZE)maxx=GRIDSIZE-1;
         int maxy=y+size;if(maxy>=GRIDSIZE)maxy=GRIDSIZE-1;
         for(x=minx;x<=maxx;x++){
             for(y=miny;y<=maxy;y++){
-                if(gridmats[x][y]==GMAT_GRASS)
-                    gridmats[x][y]=mat;
+                if(gridterr[x][y]==GTERR_GRASS){
+                    gridterr[x][y]=mat;
+                    gridowner[x][y]=ply;
+                }
             }
         }
     }
