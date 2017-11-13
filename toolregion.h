@@ -21,6 +21,8 @@ public:
     virtual void onMouseMove(int x,int y);
     virtual void onLeftClick(int x,int y);
     virtual void render();
+    
+    virtual void onButtonClick(int id);
 };
 
 #endif /* __TOOLREGION_H */

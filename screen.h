@@ -7,6 +7,8 @@
 #ifndef __SCREEN_H
 #define __SCREEN_H
 
+#include <vector>
+
 /// A collection of regions associated with a game mode
 
 class Screen {

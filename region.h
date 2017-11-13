@@ -9,6 +9,8 @@
 
 #include "types.h"
 #include "gfx.h"
+#include "button.h"
+
 #include <vector>
 #include <algorithm>
 
@@ -17,8 +19,27 @@
 /// flipped so topleft = 0,0
 
 class Region {
+    /// a list of all the regions; we iterate over these when
+    /// the mouse is clicked or moved.
     static std::vector<Region *> regions;
+    
     const char *name;
+    
+    /// a list of all our buttons
+    std::vector<Button *> buttons;
+    
+    Button *getButtonForCoords(int x,int y);
+
+    void setButtonInMutex(Button *b);
+    
+protected:
+    
+    Button *addButton(int id,const char *texname, int bx,int by,int bw,int bh){
+        Button *b = new Button(id,this,texname,bx,by,bw,bh);
+        buttons.push_back(b);
+        return b;
+    }
+    
 public:
     float x,y,w,h;
     
@@ -36,10 +57,12 @@ public:
         x=xx;y=yy;w=ww;h=hh;
     }
     
+    void drawButtons();
     virtual void onMouseMove(int x, int y){};
     virtual void onLeftClick(int w,int h){};
     virtual void onRightClick(int w,int h){};
     virtual void onMiddleClick(int w,int h){};
+    virtual void onButtonClick(int id){};
     
     /// convert a 0-1 into region coords - only used where appropriate
     int getx(float xx){

@@ -8,6 +8,7 @@
 #include "globals.h"
 #include "game.h"
 #include "prof.h"
+#include "button.h"
 
 GameScreen::GameScreen() {
     globals::game = new Game(101,-2);
@@ -31,7 +32,6 @@ void GameScreen::render(){
     game.render();
     tool.render();
     stat.render(); // render last if profiling!
-    
 }
 
 void GameScreen::onKeyDown(int k){

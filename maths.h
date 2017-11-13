@@ -282,6 +282,10 @@ public:
         stack[ct] = glm::scale(stack[ct],glm::vec3(s));
     }
     
+    void flipY(){
+        stack[ct] = glm::scale(stack[ct],glm::vec3(1,-1,1));
+    }
+    
     glm::mat4 *top(); // get top
     void identity(); // loads into top slot
 };

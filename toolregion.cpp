@@ -14,11 +14,37 @@
 // map top in tool region
 #define MAPTOP 20
 
+// top of buttons row
+#define BUTTON_TOP 500
+// left edge of buttons row
+#define BUTTON_LEFT 10
+// button separation
+#define BUTTON_SEP 55
+
+#define BUT_ATTACK 1
+#define BUT_SETTLE 2
+
 ToolRegion::ToolRegion() : Region("tool"){
-    map.saveVideo("foo.mpg");
+    int x = BUTTON_LEFT;
+    int y = BUTTON_TOP;
+    addButton(BUT_SETTLE,"media/tex/shield.png",x,y,-1,-1)->setMutex(0)->setHighlight();
+    x+=BUTTON_SEP;
+    addButton(BUT_ATTACK,"media/tex/sword.png",x,y,-1,-1)->setMutex(0);
 }
 
 void ToolRegion::onMouseMove(int x,int y){
+}
+
+void ToolRegion::onButtonClick(int id){
+    Game *game = globals::game;
+    
+    switch(id){
+    case BUT_SETTLE:
+        game->p[0].mode = PLAYER_SETTLE;break;
+    case BUT_ATTACK:
+        game->p[0].mode = PLAYER_ATTACK;break;
+    }
+              
 }
 
 void ToolRegion::render(){
@@ -42,6 +68,10 @@ void ToolRegion::render(){
     profbar.start("D2",0x0080a0ff);
     debugmap.makePotential(&globals::game->p[1]);
     debugmap.render(this,mapx+mapw/2,mapy+20+mapw,mapw/2,mapw/2);
+    profbar.end();
+    
+    profbar.start("B",0x0080a0a0);
+    drawButtons();
     profbar.end();
 }
 
