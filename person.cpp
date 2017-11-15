@@ -70,7 +70,7 @@ void Person::setDirectionFromPotentialField(){
     
     float minst = FLT_MAX;
     float opponentRepel = (mode==PLAYER_SETTLE)?OPPONENT_FIELD:-OPPONENT_FIELD;
-    float anchorBump = (mode==PLAYER_COLLECT)?0.1:0.7;
+    float anchorBump = (mode==PLAYER_COLLECT)?0.05:0.7;
     
     int oxf,oyf;
     for(int ox=-1;ox<=1;ox++){
@@ -99,8 +99,8 @@ void Person::setDirectionFromPotentialField(){
                        p->op->potential[xx][yy])*opponentRepel;
                 
                 // and a bump if this is in the anchor direction
-//           if(ox==targetdx || oy==targetdy)
-//                    st *= anchorBump;
+                if(ox==targetdx || oy==targetdy)
+                    st *= anchorBump;
                 
                 if(st<minst){
                     minst=st;oxf=ox;oyf=oy;
