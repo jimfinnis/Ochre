@@ -8,7 +8,7 @@
 #define __GLOBALS_H
 
 /// max number of people for each player
-#define MAXPOP 2048
+#define MAXPOP 1024
 /// max houses for each player
 #define MAXHOUSES 65536
 /// map size

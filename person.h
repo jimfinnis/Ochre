@@ -77,6 +77,7 @@ struct Person {
 
     void update(float t);
 
+    JPS::PathVector path;
 private:
     /// an update which doesn't happen very often, but at least once per traversed
     /// map square.
@@ -86,7 +87,6 @@ private:
     void damage(int n);
 
     class Player *p;
-    JPS::PathVector path;
 };
 
 #endif /* __PERSON_H */

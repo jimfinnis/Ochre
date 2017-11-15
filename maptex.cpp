@@ -76,7 +76,13 @@ void MapTex::writePlayer(Player *pl,uint32_t col){
         default:c=0xfffffff;break;
         }
         image[(int)p->y][(int)p->x] = c;
-    }
+/*        
+        if(p->state == COARSEPATH){
+            for(int i=0;i<p->path.size();i++){
+                image[p->path[i].y][p->path[i].x]=0xffffffff;
+            }
+        }
+*/    }
     
     if(pl->anchorX>=0){
         int ax = (int)pl->anchorX;

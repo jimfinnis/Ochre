@@ -212,10 +212,10 @@ public:
     // this is required for JPS pathing library - uses the gridsafe array
     // to see if a square is safe to walk on
     inline bool operator()(unsigned x, unsigned y) const {
-        if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
+        if(x<GRIDSIZE && y<GRIDSIZE){
             return gridsafe[x][y];
-        else
-            return 0;
+        } else
+            return false;
     }
     
     // get the material associated with a grid square

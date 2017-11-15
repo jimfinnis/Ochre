@@ -35,7 +35,8 @@ void Person::init(class Player *player, int idx, float xx,float yy){
 
 
 bool Person::pathTo(float xx,float yy){
-    if(JPS::findPath(path,globals::game->grid,x,y,(int)xx,(int)yy)){
+    path.clear();
+    if(JPS::findPath(path,globals::game->grid,(int)x,(int)y,(int)xx,(int)yy)){
         pathidx=0;
         destx = xx;
         desty = yy;
@@ -126,7 +127,6 @@ void Person::updateInfrequent(){
     int iy = (int)y;
     
     // are we on a flat square? Which is OK?
-    
     if(!g->objects[ix][iy] &&  // no objects in the way
        (*g)(ix,iy) && // safe
        g->get(ix,iy) && // quick flat check
