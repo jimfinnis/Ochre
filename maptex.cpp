@@ -67,8 +67,15 @@ void MapTex::render(Region *r,int x,int y,int w,int h){
 MapTex::coltable MapTex::cols;
 
 void MapTex::writePlayer(Player *pl,uint32_t col){
+    uint32_t c;
     for(Person *p=pl->people.first();p;p=pl->people.next(p)){
-        image[(int)p->y][(int)p->x] = col;
+        switch(p->state){
+        case WANDER:c=col;break;
+        case COARSEPATH:c=0xff00ff00;break;
+        case FINEPATH:c=0xff0000ff;break;
+        default:c=0xfffffff;break;
+        }
+        image[(int)p->y][(int)p->x] = c;
     }
     
     if(pl->anchorX>=0){
@@ -77,7 +84,7 @@ void MapTex::writePlayer(Player *pl,uint32_t col){
         for(int x=ax-2;x<=ax+2;x++){
             for(int y=ay-2;y<=ay+2;y++){
                 if(x>=0 && x<GRIDSIZE && y>=0 && y<GRIDSIZE){
-                    image[x][y] = col;
+                    image[y][x] = col;
                 }
             }
         }

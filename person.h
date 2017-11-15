@@ -55,6 +55,7 @@ struct Person {
 
     // used in wandering - sets the direction to where no-one has been
     // and also to either attack or move away from the other player.
+    // Will also take into account the anchor.
     void setDirectionFromPotentialField();
 
     float getrot(){
@@ -63,6 +64,16 @@ struct Person {
     }
 
     bool pathTo(float xx,float yy);
+    
+    /// return true if we're not following a path
+    bool hasNoValidPath(){
+        return state!=COARSEPATH && state!=FINEPATH;
+    }
+    
+    /// this gets called when the player mode gets changed
+    void resetToWander(){
+        state = WANDER;
+    }
 
     void update(float t);
 

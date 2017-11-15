@@ -36,6 +36,7 @@ enum PlayerMode {
 class Player {
     MultipassBlur *blur; // potential field blurrer - takes several ticks
     MultipassBlur *blurClose; // potential field blurrer - takes several ticks
+    PlayerMode mode;
 public:
     int idx; // which player am I?
     Player *op; // opposing player
@@ -51,13 +52,21 @@ public:
     // it's for close range avoidance/attraction.
     float potentialClose[GRIDSIZE][GRIDSIZE];
     
-    PlayerMode mode;
     Player();
     virtual ~Player();
     
-    // target for wandering - peeps will gradually drift towards this point;
-    // NOT a full-on pathing target but more of a bias for the stigmergic wandering.
-    float wanderX,wanderY;
+    void setMode(PlayerMode m);
+    PlayerMode getMode(){
+        return mode;
+    }
+    
+    void resetToWander(){
+        // reset all peeps to wander; used when anchor or mode changed
+        // also reset all peeps to wandering
+        for(Person *p=people.first();p;p=people.next(p)){
+            p->resetToWander();
+        }
+    }
     
     // assumes grid transform is stacked.
     void render(const Colour& col);
@@ -74,6 +83,7 @@ public:
             anchorX = x;
             anchorY = y;
         }
+        resetToWander();
     }
                                 
 };

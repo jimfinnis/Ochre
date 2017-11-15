@@ -20,8 +20,8 @@ struct Game {
         grid.recentre();
         p[0].op = &p[1];
         p[1].op = &p[0];
-        p[0].mode = PLAYER_ATTACK;
-        p[1].mode = PLAYER_ATTACK;
+        p[0].setMode(PLAYER_ATTACK);
+        p[1].setMode(PLAYER_ATTACK);
     }
 
     void update(float t){

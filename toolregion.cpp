@@ -55,11 +55,11 @@ void ToolRegion::onButtonClick(int id){
     switch(id){
     // player modes
     case BUT_SETTLE:
-        game->p[0].mode = PLAYER_SETTLE;break;
+        game->p[0].setMode(PLAYER_SETTLE);break;
     case BUT_ATTACK:
-        game->p[0].mode = PLAYER_ATTACK;break;
+        game->p[0].setMode(PLAYER_ATTACK);break;
     case BUT_COLLECT:
-        game->p[0].mode = PLAYER_COLLECT;break;
+        game->p[0].setMode(PLAYER_COLLECT);break;
         
     // modal player actions
     case BUT_MODE_ANCHOR:

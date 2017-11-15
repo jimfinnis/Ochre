@@ -39,8 +39,6 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     blurClose = new MultipassBlur(GRIDSIZE,GRIDSIZE,2);
     
     mode = PLAYER_ATTACK;
-    wanderX = GRIDSIZE/2;
-    wanderY = GRIDSIZE/2;
     anchorX=anchorY=-1;
 }
 
@@ -101,7 +99,10 @@ void Player::updateHouseTerrain(){
     // later code will remove non-flat farms
 }    
     
-    
+void Player::setMode(PlayerMode m){
+    mode = m;
+    resetToWander();
+}
     
 
 void Player::update(float t){

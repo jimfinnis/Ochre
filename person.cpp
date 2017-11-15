@@ -46,19 +46,30 @@ bool Person::pathTo(float xx,float yy){
         return false;
     }
 }
+
 void Person::setDirectionFromPotentialField(){
+    PlayerMode mode = p->getMode();
     Grid *g = &globals::game->grid;
     int cx = (int)x;
     int cy = (int)y;
     
-    int targetdx = sgn(p->wanderX-x);
-    int targetdy = sgn(p->wanderY-y);
+    int tx,ty;
+    
+    if(p->anchorX<0){
+        tx = ty = GRIDSIZE/2;
+    } else {
+        tx = p->anchorX; ty = p->anchorY;
+    }
+    
+    int targetdx = sgn(tx-x);
+    int targetdy = sgn(ty-y);
     
     int idx=sgn(dx); // blee.
     int idy=sgn(dy);
     
     float minst = FLT_MAX;
-    float opponentRepel = (p->mode==PLAYER_ATTACK)?-OPPONENT_FIELD:OPPONENT_FIELD;
+    float opponentRepel = (mode==PLAYER_SETTLE)?OPPONENT_FIELD:-OPPONENT_FIELD;
+    float anchorBump = (mode==PLAYER_COLLECT)?0.1:0.7;
     
     int oxf,oyf;
     for(int ox=-1;ox<=1;ox++){
@@ -85,6 +96,10 @@ void Person::setDirectionFromPotentialField(){
                 // field.
                 st += (p->op->potentialClose[xx][yy]*5.0f+
                        p->op->potential[xx][yy])*opponentRepel;
+                
+                // and a bump if this is in the anchor direction
+//           if(ox==targetdx || oy==targetdy)
+//                    st *= anchorBump;
                 
                 if(st<minst){
                     minst=st;oxf=ox;oyf=oy;
@@ -171,8 +186,6 @@ void Person::updateInfrequent(){
     
     switch(state){
     case WANDER:
-        // if we're wandering stigmergically - the default behaviour - that's in
-        // a separate method.
         setDirectionFromPotentialField();
         break;
     case COARSEPATH:
@@ -221,10 +234,19 @@ void Person::updateInfrequent(){
 
 void Person::update(float t){
     Grid *g = &globals::game->grid;
-    
+    PlayerMode mode = p->getMode();
     if(globals::timeNow > nextInfrequentUpdate){
         nextInfrequentUpdate = globals::timeNow + INFREQUENTUPDATEINTERVAL;
         updateInfrequent();
+    }
+    
+    // every now and then, if we are heading to an anchor, try to
+    // path to it. Otherwise wandering will draw us there. Note that
+    // this will cause all villagers to repath.
+    if(mode == PLAYER_COLLECT){
+        if(drand48()<0.01){
+            pathTo(p->anchorX,p->anchorY);
+        }
     }
     
     // adjustment for diagonal speed slowdown
