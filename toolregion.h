@@ -11,10 +11,17 @@
 #include "maptex.h"
 #include "debugmap.h"
 
+
+#define BUTSET_MODES 0
+#define BUTSET_ACTIONS 1
+
 class ToolRegion : public Region {
+    friend class GameScreen;
     MapTex map;
     DebugMapTex debugmap;
+    class GameScreen *screen;
 public:
+    
     ToolRegion();
     virtual ~ToolRegion(){};
     

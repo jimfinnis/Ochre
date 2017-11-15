@@ -19,9 +19,13 @@ enum PlayerMode {
     // one we wander about - away from the enemy: we are repelled
     // by the opponent's potential field; but also away from ourselves.
     PLAYER_SETTLE,
-    // In attack mode, we are attracted by the opponent's PF, but still
-    // repelled by our own.
-    PLAYER_ATTACK
+          // In attack mode, we are attracted by the opponent's PF, but still
+          // repelled by our own.
+          PLAYER_ATTACK,
+          // In this mode, we are attracted by a fixed anchor. If not
+          // present, works like "settle".
+          PLAYER_COLLECT,
+          
 };
 
 
@@ -37,6 +41,9 @@ public:
     Player *op; // opposing player
     Pool<Person> people;
     Pool<House> houses;
+    
+    // the "collect" anchor, -1 means not set.
+    int anchorX,anchorY;
     
     // potential field produced by my people
     float potential[GRIDSIZE][GRIDSIZE];
@@ -60,6 +67,15 @@ public:
     
     // spawn some peeps within a given square (at slightly random offsets within it)
     void spawn(int x,int y,int n);
+    
+    // set the anchor
+    void setAnchor(int x,int y){
+        if(x>=0 && x<GRIDSIZE && y>=0 && y<GRIDSIZE){
+            anchorX = x;
+            anchorY = y;
+        }
+    }
+                                
 };
 
 #endif /* __PLAYER_H */

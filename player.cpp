@@ -17,6 +17,7 @@ static int idxct=0;
 Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     idx=idxct++;
     float basex,basey;
+    
     if(idx){
         basex=basey=GRIDSIZE-30;
     } else {
@@ -40,6 +41,7 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     mode = PLAYER_ATTACK;
     wanderX = GRIDSIZE/2;
     wanderY = GRIDSIZE/2;
+    anchorX=anchorY=-1;
 }
 
 Player::~Player(){
@@ -72,6 +74,19 @@ void Player::render(const Colour& col){
             ms->pop();
         }
     }
+    
+    // draw the anchor if set
+    if(anchorX>=0){
+        float opacity = g->getVisibility(anchorX,anchorY);
+        if(opacity>=0.001){
+            s->diffuse.a = opacity;
+            g->pushxforminterp(anchorX,anchorY,-0.2f);
+            ms->scale(1);
+            meshes::marker->render(ms->top());
+            ms->pop();
+        }
+    }
+    
     sm->pop();
 }
 

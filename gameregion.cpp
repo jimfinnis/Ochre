@@ -9,12 +9,15 @@
 #include "game.h"
 #include "obj.h"
 #include "prof.h"
+#include "gamescreen.h"
+
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
 
 GameRegion::GameRegion() : IsoRegion("game") {
     rotAngle=0;
+    mode = GRM_TERRAIN;
 }
 
 void GameRegion::onMouseMove(int sx,int sy){
@@ -43,13 +46,33 @@ void GameRegion::onMouseMove(int sx,int sy){
 }
 
 void GameRegion::onLeftClick(int x,int y){
-    Grid *g = &globals::game->grid;
-    g->up(g->cursorx,g->cursory);
+    Game *game = globals::game;
+    Grid *g = &game->grid;
+    ToolRegion *tr = &screen->tool;
+    switch(mode){
+    case GRM_TERRAIN:
+        g->up(g->cursorx,g->cursory);
+        break;
+    case GRM_SET_ANCHOR:
+        game->p[0].setAnchor(g->cursorx,g->cursory);
+        tr->clearButtonHighlights(BUTSET_ACTIONS);
+        mode = GRM_TERRAIN;
+    default:break;
+    }
 }
 
 void GameRegion::onRightClick(int x,int y){
     Grid *g = &globals::game->grid;
-    g->down(g->cursorx,g->cursory);
+    ToolRegion *tr = &screen->tool;
+    switch(mode){
+    case GRM_TERRAIN:
+        g->down(g->cursorx,g->cursory);
+        break;
+    case GRM_SET_ANCHOR:
+        tr->clearButtonHighlights(BUTSET_ACTIONS);
+        mode = GRM_TERRAIN;
+    default:break;
+    }
 }
 
 void GameRegion::renderWater(){

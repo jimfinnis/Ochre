@@ -71,6 +71,17 @@ void MapTex::writePlayer(Player *pl,uint32_t col){
         image[(int)p->y][(int)p->x] = col;
     }
     
+    if(pl->anchorX>=0){
+        int ax = (int)pl->anchorX;
+        int ay = (int)pl->anchorY;
+        for(int x=ax-2;x<=ax+2;x++){
+            for(int y=ay-2;y<=ay+2;y++){
+                if(x>=0 && x<GRIDSIZE && y>=0 && y<GRIDSIZE){
+                    image[x][y] = col;
+                }
+            }
+        }
+    }
 }
 
 void MapTex::make(Grid *g,bool writeframe){

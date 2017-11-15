@@ -12,6 +12,9 @@
 
 GameScreen::GameScreen() {
     globals::game = new Game(101,-2);
+    
+    tool.screen = this;
+    game.screen = this;
 }
 
 GameScreen::~GameScreen(){

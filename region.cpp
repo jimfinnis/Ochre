@@ -73,16 +73,10 @@ void Region::notifyClick(int x,int cy,int b){
 }
 
 void Region::setButtonInMutex(Button *b){
-    int sid = b->setid;
     // first, turn off all highlights in the mutex
-    for(auto it = buttons.begin();it!=buttons.end();++it){
-        Button *bb = *it;
-        if(sid == bb->setid)
-            bb->highlight = false;
-    }
+    clearButtonHighlights(b->setid);
     // then highlight the button we now have
     b->highlight = true;
-    
 }
 
 

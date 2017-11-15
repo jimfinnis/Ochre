@@ -15,6 +15,9 @@
 /// The main game screen
 
 class GameScreen : public Screen {
+    friend class ToolRegion;
+    friend class GameRegion;
+    
     GameRegion game;
     ToolRegion tool;
     StatRegion stat;

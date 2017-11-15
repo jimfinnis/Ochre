@@ -51,6 +51,15 @@ public:
         return this;
     }
     
+    /// clear a button highlight; used for "modal" buttons - those
+    /// which select an action to be performed when the map
+    /// is clicked.
+    Button *clrHighlight(){
+        highlight=true;
+        return this;
+    }
+    
+    
     /// render the button image
     virtual void render();
 };

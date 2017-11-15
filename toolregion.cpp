@@ -6,6 +6,7 @@
 #include "toolregion.h"
 #include "state.h"
 #include "game.h"
+#include "gamescreen.h"
 #include "globals.h"
 #include "prof.h"
 
@@ -21,15 +22,28 @@
 // button separation
 #define BUTTON_SEP 55
 
+// mode button IDs
 #define BUT_ATTACK 1
 #define BUT_SETTLE 2
+#define BUT_COLLECT 3
+
+// modal action button ID
+#define BUT_MODE_ANCHOR 4
 
 ToolRegion::ToolRegion() : Region("tool"){
     int x = BUTTON_LEFT;
     int y = BUTTON_TOP;
-    addButton(BUT_SETTLE,"media/tex/shield.png",x,y,-1,-1)->setMutex(0)->setHighlight();
+    
+    // player modes
+    addButton(BUT_SETTLE,"media/tex/shield.png",x,y,-1,-1)->setMutex(BUTSET_MODES)->setHighlight();
     x+=BUTTON_SEP;
-    addButton(BUT_ATTACK,"media/tex/sword.png",x,y,-1,-1)->setMutex(0);
+    addButton(BUT_ATTACK,"media/tex/sword.png",x,y,-1,-1)->setMutex(BUTSET_MODES);
+    x+=BUTTON_SEP;
+    addButton(BUT_COLLECT,"media/tex/collect.png",x,y,-1,-1)->setMutex(BUTSET_MODES);
+    
+    // player actions
+    x = BUTTON_LEFT; y += BUTTON_SEP;
+    addButton(BUT_MODE_ANCHOR,"media/tex/collect.png",x,y,-1,-1)->setMutex(BUTSET_ACTIONS);
 }
 
 void ToolRegion::onMouseMove(int x,int y){
@@ -37,12 +51,20 @@ void ToolRegion::onMouseMove(int x,int y){
 
 void ToolRegion::onButtonClick(int id){
     Game *game = globals::game;
-    
+    GameRegion *gr = &screen->game;
     switch(id){
+    // player modes
     case BUT_SETTLE:
         game->p[0].mode = PLAYER_SETTLE;break;
     case BUT_ATTACK:
         game->p[0].mode = PLAYER_ATTACK;break;
+    case BUT_COLLECT:
+        game->p[0].mode = PLAYER_COLLECT;break;
+        
+    // modal player actions
+    case BUT_MODE_ANCHOR:
+        gr->setMode(GRM_SET_ANCHOR);
+        break;
     }
               
 }

@@ -43,6 +43,15 @@ protected:
 public:
     float x,y,w,h;
     
+    /// clear button hilights in a given set
+    void clearButtonHighlights(int sid){
+        for(auto it = buttons.begin();it!=buttons.end();++it){
+            Button *bb = *it;
+            if(sid == bb->setid)
+                bb->highlight = false;
+        }
+    }
+    
     static void notifyMouseMove(int x,int y);
     static void notifyClick(int x,int y,int b); // b is the SDL mouse button ID
     static void notifyResize();
