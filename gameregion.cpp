@@ -24,10 +24,10 @@ void GameRegion::onMouseMove(int sx,int sy){
     // get norm. dev. coords
     sx=sx-x;
     sy=sy-y;
-//    printf("POS %d %d - ",sx,sy);
+    printf("POS %d %d - ",sx,sy);
     float ndx=(2.0f * sx)/w-1.0f;
     float ndy=(2.0f * sy)/h-1.0f; // this is already reversed (see region::notifymousemove)
-//    printf("%f %f\n",ndx,ndy);
+    printf("%f %f\n",ndx,ndy);
     
     set(); // to make sure the effect manager has the correct projection
     glm::vec4 ray_clip(ndx,ndy,-1.0f,1.0f);
@@ -44,6 +44,11 @@ void GameRegion::onMouseMove(int sx,int sy){
 //    printf("%d\n",pt);
     globals::game->grid.select(pt);
 }
+
+void GameRegion::recentre(int x,int y){
+    globals::game->grid.recentre();
+}
+
 
 void GameRegion::onLeftClick(int x,int y){
     Game *game = globals::game;

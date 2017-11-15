@@ -40,6 +40,9 @@ protected:
         return b;
     }
     
+    // in-region coords of mouse, useful for tracking.
+    int mouseX,mouseY;
+    
 public:
     float x,y,w,h;
     

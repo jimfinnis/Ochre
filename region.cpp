@@ -25,7 +25,9 @@ void Region::notifyMouseMove(int x,int y){
     for(i=regions.begin();i!=regions.end();++i){
         Region *r = *i;
         if(x >= r->x && x<r->x+r->w && y>=r->y && y<r->y+r->h){
-            r->onMouseMove(x-r->x,y-r->y);
+            r->mouseX = x-r->x;
+            r->mouseY = y-r->y;
+            r->onMouseMove(r->mouseX,r->mouseY);
             break;
         }
     }
@@ -85,6 +87,7 @@ Region::Region(const char *nm){
     // initially invalid
     name = nm;
     x=-1; y=-1;w=1;h=1;
+    mouseX=mouseY=0;
     regions.push_back(this);
 }
 Region::~Region(){

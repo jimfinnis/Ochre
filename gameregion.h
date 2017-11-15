@@ -19,7 +19,7 @@ class GameRegion : public IsoRegion {
     friend class GameScreen;
     
     void renderWater();
-    static const int visibleGridSize=8;
+    static const int visibleGridSize=10;
     glm::mat4 view;
     GameRegionMode mode;
     class GameScreen *screen;
@@ -34,6 +34,8 @@ public:
     virtual void onLeftClick(int x,int y);
     virtual void onRightClick(int x,int y);
     virtual void render();
+    
+    void recentre(int x,int y);
     
     float rotAngle;
 };

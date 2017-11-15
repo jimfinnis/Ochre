@@ -28,7 +28,7 @@ bool debugtoggle=false;
 Screen *curscreen;
 
 // this creates all the graphics and does initialisation, etc.
-Context context(800,600);
+Context context(1200,800);
 
 
 void render(){
