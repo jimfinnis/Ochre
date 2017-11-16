@@ -38,7 +38,7 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     blur = new MultipassBlur(GRIDSIZE,GRIDSIZE,GRIDSIZE/4);
     blurClose = new MultipassBlur(GRIDSIZE,GRIDSIZE,2);
     
-    mode = PLAYER_ATTACK;
+    mode = PLAYER_SETTLE;
     anchorX=anchorY=-1;
 }
 

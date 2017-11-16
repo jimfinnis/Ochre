@@ -12,7 +12,7 @@
 /// max houses for each player
 #define MAXHOUSES 65536
 /// map size
-#define GRIDSIZE 128
+#define GRIDSIZE 256
 
 
 class Font;

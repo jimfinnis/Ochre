@@ -70,8 +70,6 @@ void GameScreen::onKeyDown(int k){
         break;
     case SDLK_SPACE:
         game.recentre(g->cursorx,g->cursory);
-        // this SHOULD reset the cursor under the mouse
-//        game.onMouseMove(game.mouseX,game.mouseY);
         break;
     case SDLK_PERIOD:
         game.rotAngle+=0.1f;break;

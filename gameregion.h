@@ -36,6 +36,9 @@ public:
     virtual void render();
     
     void recentre(int x,int y);
+    // this is a separate method so we can invoke it to force a grid
+    // regen for recentering the cursor when SPACE is hit.
+    void regenGrid();
     
     float rotAngle;
 };

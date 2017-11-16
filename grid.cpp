@@ -151,7 +151,6 @@ void Grid::genTriangles(int range){
     // and this is a quick and dirty piece of code. Also, the mesh is miniscule
     // so it's not worth it. In fact, we're just going to render all the triangles
     // in order so there's no point even having an index buffer.
-    
     initGridVerts();
     memset(mapvis,0,GRIDSIZE*GRIDSIZE);
     
@@ -431,11 +430,9 @@ int Grid::intersect(const glm::vec3& origin, const glm::vec3& ray){
 }
 
 
-float snark=0;
 void Grid::renderCursor(){
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
-    
     State *s = sm->push();
     s->light.col[0] = Colour(1,1,1,1);
     s->light.col[1] = Colour(1,1,1,1);
@@ -446,8 +443,6 @@ void Grid::renderCursor(){
     meshes::cursor->render(sm->getx()->top());
     ms->pop();
     sm->pop();
-    
-    snark = vis.getVisibility(cursorx,cursory);
 }
 
 void Grid::_up(int x,int y){

@@ -12,8 +12,30 @@
 #include "time.h"
 
 #define PERSONSPEED 3.1f
-// was 8
+
+// was 8 - this is the amount the opponent field attracts/repels
 #define OPPONENT_FIELD 10.0f
+// the amount we are repelled by our own kind in attack mode
+#define SELF_FIELD_ATTACK 0.1f
+// the amount we are repelled by our own kind otherwise
+#define SELF_FIELD_OTHER 1.0f
+
+// how likely we are to make a house in settle mode
+// This is an N-sided dice roll, so 10 is one chance in 10.
+#define HOUSE_CHANCE_SETTLE 4
+// how likely we are to make a house in other modes
+// This is an N-sided dice roll, so 10 is one chance in 10.
+#define HOUSE_CHANCE_OTHER 10
+
+
+// this is the amount by which field is artifically skewed in the
+// direction of the anchor. It should be very small under normal
+// conditions and larger under PLAYER_COLLECT (i.e. move towards anchor)
+#define ANCHOR_BUMP_NORMAL 0.001f
+#define ANCHOR_BUMP_COLLECT 0.01f
+
+#define PERSON_MERGE_LIMIT 10
+
 
 // table mapping direction onto rotation (in degrees, but gets
 // switched to radians)
@@ -70,7 +92,8 @@ void Person::setDirectionFromPotentialField(){
     
     float minst = FLT_MAX;
     float opponentRepel = (mode==PLAYER_SETTLE)?OPPONENT_FIELD:-OPPONENT_FIELD;
-    float anchorBump = (mode==PLAYER_COLLECT)?0.05:0.7;
+    float selfRepel = (mode==PLAYER_ATTACK)?SELF_FIELD_ATTACK:SELF_FIELD_OTHER;
+    float anchorBump = (mode==PLAYER_COLLECT)?ANCHOR_BUMP_COLLECT:ANCHOR_BUMP_NORMAL;
     
     int oxf,oyf;
     for(int ox=-1;ox<=1;ox++){
@@ -91,7 +114,7 @@ void Person::setDirectionFromPotentialField(){
                 
                 // apply the potential fields. First, we are repelled by
                 // our own kind.
-                st += p->potential[xx][yy];
+                st += p->potential[xx][yy]*selfRepel;
                 // and either repelled or attracted by others, with
                 // the effect 5 times stronger on the less-blurred
                 // field.
@@ -120,20 +143,27 @@ void Person::setDirectionFromPotentialField(){
 }
 
 void Person::updateInfrequent(){
-    // repath - this runs infrequently.
+    // various infrequent things - repathing, picking a fight,
+    // turning into a house etc.
     
     Grid *g = &globals::game->grid;
     int ix = (int)x;
     int iy = (int)y;
     
+    PlayerMode pmode = p->getMode();
+    
+    /*
+     * Turning into a house
+     */
+    
     // are we on a flat square? Which is OK?
     if(!g->objects[ix][iy] &&  // no objects in the way
        (*g)(ix,iy) && // safe
        g->get(ix,iy) && // quick flat check
-       !globals::rnd->getInt(5) && // basic chance
+       !globals::rnd->getInt(p->getMode() == PLAYER_SETTLE?HOUSE_CHANCE_SETTLE:HOUSE_CHANCE_OTHER) && // basic chance
        g->isFlatGrass(ix,iy)){ // flat
         // work out a chance we'll actually do it, based on
-        // how big the house will be
+        // how big the house will be. Big houses are more likely!
         int c = g->countFlatGrass(ix,iy);
         if(globals::rnd->getInt(6)<=c) { // higher chance if bigger result
             // make a new house if we can
@@ -149,13 +179,16 @@ void Person::updateInfrequent(){
         }
     }
     
-    // PICK A FIGHT!
+    /*
+     * Picking a fight with a person, OR merging with a person!
+     */
+    
     for(Person *pp = globals::game->grid.getPeople(ix,iy);pp;pp=pp->next){
         if(pp != this){
             if(pp->p == p){ // same player as me
                 // we sometimes merge with the other person, if the
                 // combined strength would be sane.
-                if(pp->strength + strength < 10 && !(rand()%3)){
+                if(pp->strength + strength < PERSON_MERGE_LIMIT && !(rand()%3)){
                     pp->state = ZOMBIE;
                     strength += pp->strength;
                 }
@@ -169,6 +202,11 @@ void Person::updateInfrequent(){
             }
         }
     }
+    
+    /*
+     * Picking a fight with a house!
+     */
+    
     GridObj *obj=globals::game->grid.getObject(ix,iy);
     if(obj && obj->type == GO_HOUSE){
         House *h = (House *)obj;
@@ -183,6 +221,8 @@ void Person::updateInfrequent(){
             }
         }
     }
+    
+    // repath - this runs infrequently.
     
     switch(state){
     case WANDER:

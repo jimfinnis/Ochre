@@ -24,10 +24,10 @@ void GameRegion::onMouseMove(int sx,int sy){
     // get norm. dev. coords
     sx=sx-x;
     sy=sy-y;
-    printf("POS %d %d - ",sx,sy);
+//    printf("POS %d %d - ",sx,sy);
     float ndx=(2.0f * sx)/w-1.0f;
     float ndy=(2.0f * sy)/h-1.0f; // this is already reversed (see region::notifymousemove)
-    printf("%f %f\n",ndx,ndy);
+//    printf("%f %f\n",ndx,ndy);
     
     set(); // to make sure the effect manager has the correct projection
     glm::vec4 ray_clip(ndx,ndy,-1.0f,1.0f);
@@ -47,6 +47,8 @@ void GameRegion::onMouseMove(int sx,int sy){
 
 void GameRegion::recentre(int x,int y){
     globals::game->grid.recentre();
+    regenGrid();
+    onMouseMove(mouseX,mouseY);
 }
 
 
@@ -124,7 +126,12 @@ void GameRegion::renderWater(){
     glDeleteBuffers(1,&vbo);
     em->untex->end();
     ms->pop();
- }
+}
+
+void GameRegion::regenGrid(){
+    Grid *g = &globals::game->grid;
+    g->genTriangles(visibleGridSize);
+}
 
 void GameRegion::render(){
     setAndClear(Colour(0,0,0.2,1));
@@ -145,7 +152,8 @@ void GameRegion::render(){
     Game *game = globals::game;
     
     Grid *g = &game->grid;
-    g->genTriangles(visibleGridSize);
+    
+    regenGrid();
     g->render(ms->top());
     
     profbar.start("RO",0xffff00ff);
