@@ -74,9 +74,6 @@ class Grid {
     uint8_t mapvis[GRIDSIZE][GRIDSIZE]; // visibility of node
     uint8_t isflat[GRIDSIZE][GRIDSIZE]; // flatness of SQUARE x,y,x+1,y+1 
     
-    
-    class Person *people[GRIDSIZE][GRIDSIZE]; // head of linked list of peeps here
-    
     // vertex data goes in here
     UNLITVERTEX verts[MAXVERTS];
     int vertidxs[MAXVERTS][2]; // positions of verts in grid space
@@ -139,12 +136,14 @@ class Grid {
     // populate the people lists with this player
     void populatePeople(const Player& p);
     
+    class Person *people[GRIDSIZE][GRIDSIZE]; // head of linked list of peeps here
+    
 public:
     int cursorx,cursory; // selected point
     int centrex,centrey;
 
     float heightFactor; // y is also multiplied by this
-
+    
     /// an array of pointers to fixed objects
     GridObj *objects[GRIDSIZE][GRIDSIZE];
     

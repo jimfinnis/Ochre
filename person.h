@@ -40,6 +40,7 @@ struct Person {
     float dx,dy; // direction
     float drowntime; // "and how long have you been in the sea, Sir?"
     float destx,desty; // full destination for path
+    float speed; // my personal speed
     int pathidx; // current index of path
     // how many actual "people" this is - they merge and sometimes split!
     int strength; 
@@ -62,6 +63,10 @@ struct Person {
         extern float dirToRot[3][3];
         return dirToRot[sgn(-dx)+1][sgn(-dy)+1];
     }
+    
+    /// find a possible enemy nearby. Within sight. It's a bit
+    /// expensive on a dense grid. Careful now.
+    Person *locateEnemy();
 
     bool pathTo(float xx,float yy);
     

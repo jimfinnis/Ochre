@@ -11,9 +11,14 @@
 #include "player.h"
 #include "time.h"
 
-#define PERSONSPEED 3.1f
+//#define BASEPERSONSPEED 3.1f
+#define BASEPERSONSPEED 3.1f
 
-// was 8 - this is the amount the opponent field attracts/repels
+// was 8 - this is the amount the opponent field attracts in attack
+#define OPPONENT_FIELD_ATTACK 10.0f
+// was 8 - this is the amount the opponent field repels in other
+#define OPPONENT_FIELD_SETTLE -5.0f
+// was 8 - this is the amount the opponent field attracts in attack
 #define OPPONENT_FIELD 10.0f
 // the amount we are repelled by our own kind in attack mode
 #define SELF_FIELD_ATTACK 0.1f
@@ -22,20 +27,24 @@
 
 // how likely we are to make a house in settle mode
 // This is an N-sided dice roll, so 10 is one chance in 10.
-#define HOUSE_CHANCE_SETTLE 4
+#define HOUSE_CHANCE_SETTLE 1
 // how likely we are to make a house in other modes
 // This is an N-sided dice roll, so 10 is one chance in 10.
-#define HOUSE_CHANCE_OTHER 10
+#define HOUSE_CHANCE_OTHER 200
 
 
 // this is the amount by which field is artifically skewed in the
 // direction of the anchor. It should be very small under normal
 // conditions and larger under PLAYER_COLLECT (i.e. move towards anchor)
-#define ANCHOR_BUMP_NORMAL 0.001f
-#define ANCHOR_BUMP_COLLECT 0.01f
+// TAKE CARE - MULTIPLICATIVE, NOT ADDITIVE like the others.
+#define ANCHOR_BUMP_NORMAL 1.0f
+#define ANCHOR_BUMP_COLLECT 0.99f
 
+// how big a merged pair can be
 #define PERSON_MERGE_LIMIT 10
 
+// search range for pathing to enemy
+#define ENEMY_SEARCH_RANGE 10
 
 // table mapping direction onto rotation (in degrees, but gets
 // switched to radians)
@@ -52,9 +61,26 @@ void Person::init(class Player *player, int idx, float xx,float yy){
     p=player;
     strength=1;
     drowntime=0;
+    speed = globals::rnd->range(0.9f,1.1f)*BASEPERSONSPEED;
     nextInfrequentUpdate = globals::timeNow+INFREQUENTUPDATEINTERVAL*0.2*(double)(idx%10);
 }
 
+Person *Person::locateEnemy(){
+    int ix = (int)x;
+    int iy = (int)y;
+    Grid *g = &globals::game->grid;
+    
+    for(int i=-ENEMY_SEARCH_RANGE;i<=ENEMY_SEARCH_RANGE;i++){
+        for(int j=-ENEMY_SEARCH_RANGE;j<=ENEMY_SEARCH_RANGE;j++){
+            for(Person *pers = g->getPeople(ix+i,iy+j);pers;pers=pers->next){
+                if(pers->p != p){
+                    return pers;
+                }
+            }
+        }
+    }
+    return NULL;
+}
 
 bool Person::pathTo(float xx,float yy){
     path.clear();
@@ -91,14 +117,19 @@ void Person::setDirectionFromPotentialField(){
     int idy=sgn(dy);
     
     float minst = FLT_MAX;
-    float opponentRepel = (mode==PLAYER_SETTLE)?OPPONENT_FIELD:-OPPONENT_FIELD;
-    float selfRepel = (mode==PLAYER_ATTACK)?SELF_FIELD_ATTACK:SELF_FIELD_OTHER;
-    float anchorBump = (mode==PLAYER_COLLECT)?ANCHOR_BUMP_COLLECT:ANCHOR_BUMP_NORMAL;
+    float opponentRepel = (mode==PLAYER_SETTLE)?
+          OPPONENT_FIELD_SETTLE:-OPPONENT_FIELD_ATTACK;
+    float selfRepel = (mode==PLAYER_ATTACK)?
+          SELF_FIELD_ATTACK:SELF_FIELD_OTHER;
+    float anchorBump = (mode==PLAYER_COLLECT)?
+          ANCHOR_BUMP_COLLECT:ANCHOR_BUMP_NORMAL;
+    
+    opponentRepel=0;
+    selfRepel=0;
     
     int oxf,oyf;
     for(int ox=-1;ox<=1;ox++){
         for(int oy=-1;oy<=1;oy++){
-            float st=1000;
             int xx=cx+ox;
             int yy=cy+oy;
             
@@ -110,8 +141,7 @@ void Person::setDirectionFromPotentialField(){
                 (*g)(xx,yy)) // safe square (uses the operator() JPS uses for pathing)
             {
                 // add a bit of random to the field
-                st = globals::rnd->range(0.0f,0.05f);
-                
+                float st = globals::rnd->range(0.0f,10.5f);
                 // apply the potential fields. First, we are repelled by
                 // our own kind.
                 st += p->potential[xx][yy]*selfRepel;
@@ -151,6 +181,13 @@ void Person::updateInfrequent(){
     int iy = (int)y;
     
     PlayerMode pmode = p->getMode();
+    
+    
+    if(!globals::rnd->getInt(100)){
+        Person *others = locateEnemy();
+    }
+    
+    
     
     /*
      * Turning into a house
@@ -292,8 +329,8 @@ void Person::update(float t){
     // adjustment for diagonal speed slowdown
     float diag = (dx && dy) ? 0.707107f : 1;
     
-    x+=PERSONSPEED*t*(float)dx*diag;
-    y+=PERSONSPEED*t*(float)dy*diag;
+    x+=speed*t*(float)dx*diag;
+    y+=speed*t*(float)dy*diag;
     
     // get grid coords
     int ix = (int)x;
