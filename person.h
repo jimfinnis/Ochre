@@ -67,6 +67,8 @@ struct Person {
     /// find a possible enemy nearby. Within sight. It's a bit
     /// expensive on a dense grid. Careful now.
     Person *locateEnemy();
+    //// less expensive, locates enemy houses
+    House *locateEnemyHouse();
 
     bool pathTo(float xx,float yy);
     

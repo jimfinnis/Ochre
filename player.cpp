@@ -124,7 +124,7 @@ void Player::update(float t){
     for(House *q,*p=houses.first();p;p=q){
         q=houses.next(p);
         p->update(t);
-        potentialTmp[p->x][p->y]=1;
+        potentialTmp[p->x][p->y]=2; // houses are more er.. targety.
         if(!p->pop || p->zombie){ // houses die when their population hits zero
             houses.free(p);
         }

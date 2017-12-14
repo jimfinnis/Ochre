@@ -43,8 +43,12 @@
 // how big a merged pair can be
 #define PERSON_MERGE_LIMIT 10
 
-// search range for pathing to enemy
+// search range for pathing to enemy (UNUSED)
 #define ENEMY_SEARCH_RANGE 10
+
+// search range for pathing to house
+#define ENEMY_HOUSE_SEARCH_RANGE 10
+
 
 // table mapping direction onto rotation (in degrees, but gets
 // switched to radians)
@@ -80,6 +84,32 @@ Person *Person::locateEnemy(){
         }
     }
     return NULL;
+}
+
+House *Person::locateEnemyHouse(){
+    int ix = (int)x;
+    int iy = (int)y;
+    Grid *g = &globals::game->grid;
+    
+    int mindist = 1000000;
+    House *rv = NULL;
+    
+    for(int i=-ENEMY_SEARCH_RANGE;i<=ENEMY_SEARCH_RANGE;i++){
+        for(int j=-ENEMY_SEARCH_RANGE;j<=ENEMY_SEARCH_RANGE;j++){
+            GridObj *o = g->getObject(ix+i,iy+j);
+            if(o && o->type == GO_HOUSE ){
+                House *h = (House*)o;
+                if(h->p != p){
+                    int d = ix*ix+iy*iy;
+                    if(d<mindist){
+                        mindist=d;
+                        rv = h;
+                    }
+                }
+            }
+        }
+    }
+    return rv;
 }
 
 bool Person::pathTo(float xx,float yy){
@@ -162,8 +192,6 @@ void Person::setDirectionFromPotentialField(){
         }
     }
     
-    
-    
     if(minst<FLT_MAX){
         dx = oxf;
         dy = oyf;
@@ -183,9 +211,14 @@ void Person::updateInfrequent(){
     PlayerMode pmode = p->getMode();
     
     
-    if(!globals::rnd->getInt(100)){
-        Person *others = locateEnemy();
+    if(state==WANDER && !globals::rnd->getInt(10)){
+        if(p->getMode()==PLAYER_ATTACK){
+            if(House *h = locateEnemyHouse()){
+                pathTo(h->x,h->y);
+            }
+        }
     }
+    
     
     
     
@@ -292,10 +325,9 @@ void Person::updateInfrequent(){
         {
             float deltax = (destx-x);
             float deltay = (desty-y);
-            if(deltax*deltax+deltay*deltay < 0.001f){
+            if(deltax*deltax+deltay*deltay < 0.1f){
                 dx=dy=0;
-                //                printf("%f %f\n",x,y);
-                state = DEBUGSTOP;
+                state = WANDER;
             } else {
                 // Zeno's person.
                 dx = deltax*0.5f;
