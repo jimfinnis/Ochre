@@ -6,7 +6,7 @@
 
 #include "gfx.h"
 #include "context.h"
-#include "exception.h"
+#include "except.h"
 #include "screen.h"
 #include "effect.h"
 

@@ -3,7 +3,7 @@
 
 #include <assert.h>
 #include "types.h"
-#include "exception.h"
+#include "except.h"
 
 #include <math.h>
 #include <string.h>

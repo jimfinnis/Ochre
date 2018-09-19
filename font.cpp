@@ -9,7 +9,7 @@
 
 #include "context.h"
 #include "font.h"
-#include "exception.h"
+#include "except.h"
 
 Font::Font(const char *file,int size){
     font = TTF_OpenFont(file,size);

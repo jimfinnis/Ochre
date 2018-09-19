@@ -12,7 +12,7 @@
 #include "state.h"
 #include "effect.h"
 #include "vertexdata.h"
-#include "exception.h"
+#include "except.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"

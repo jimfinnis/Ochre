@@ -16,7 +16,7 @@
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/gl.h> 
 #include <GL/glext.h> 
-#include "exception.h"
+#include "except.h"
 
 /// debugging macro for openGL error checks
 #define ERRCHK GLerrorcheck(__FILE__,__LINE__)

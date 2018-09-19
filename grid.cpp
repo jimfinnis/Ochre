@@ -20,6 +20,7 @@
 #include "game.h"
 #include "player.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/normal.hpp>
 #include <glm/gtc/noise.hpp>
 
