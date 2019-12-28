@@ -22,7 +22,7 @@ void State::resetLights(){
 }
 
 void State::resetView(){
-    view=glm::translate(glm::mat4(),glm::vec3(0,0,0));
+    view=glm::translate(glm::mat4(1.0f),glm::vec3(0,0,0));
 }
 
 void State::setDefault(){

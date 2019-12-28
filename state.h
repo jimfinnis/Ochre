@@ -42,7 +42,7 @@ struct State {
     } fog;
     
     /// view matrix
-    glm::mat4 view;
+    glm::mat4 view = glm::mat4(1.0f);
     
     // texture if any (texID0 overrides material)
     GLuint texID0,texID1;

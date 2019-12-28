@@ -139,7 +139,7 @@ static PRELITVERTEX quad[] = {
 void Region::renderQuadUntex(float x,float y,float w,float h,float *col){
     EffectManager *em = EffectManager::getInstance();
     em->flatuntex->begin();
-    glm::mat4 id;
+    glm::mat4 id(1.0f);
     em->flatuntex->setWorldMatrix(&id);
     em->flatuntex->setMaterial(col);
     
@@ -173,7 +173,7 @@ void Region::renderQuadUntex(float x,float y,float w,float h,float *col){
 void Region::renderQuad(float x,float y,float w,float h,GLuint tex){
     EffectManager *em = EffectManager::getInstance();
     em->flattex->begin();
-    glm::mat4 id;
+    glm::mat4 id(1.0f);
     em->flattex->setWorldMatrix(&id);
     em->flattex->setMaterial(whiteCol,tex);
     
@@ -217,8 +217,8 @@ void IsoRegion::set(){
        
        EffectManager::projection = 
        glm::ortho(-2.0f*aspect,2.0f*aspect,  -2.0f,2.0f,  -10.0f,10.0f) *
-       glm::rotate(glm::mat4(),glm::radians(pitch),glm::vec3(1.0f, 0.0f, 0.0f))*
-       glm::rotate(glm::mat4(),glm::radians(yaw),glm::vec3(0.0f,1.0f,0.0f));
+       glm::rotate(glm::mat4(1.0f),glm::radians(pitch),glm::vec3(1.0f, 0.0f, 0.0f))*
+       glm::rotate(glm::mat4(1.0f),glm::radians(yaw),glm::vec3(0.0f,1.0f,0.0f));
      */
     
     

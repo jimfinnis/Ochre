@@ -324,5 +324,5 @@ glm::mat4 *MatrixStack::top()
 
 void MatrixStack::identity()
 {
-    stack[ct] = glm::mat4();
+    stack[ct] = glm::mat4(1.0);
 }

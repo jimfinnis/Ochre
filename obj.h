@@ -13,15 +13,18 @@
 #include "maths.h"
 #include "material.h"
 #include <vector>
+#include <iostream>
+
+using namespace std;
 
 class ObjMesh {
     Material *mats;
     
     struct QueueEntry {
+        glm::mat4 world;
         QueueEntry(glm::mat4 *w){
             world = *w;
         }
-        glm::mat4 world;
     };
     
     GLuint buffers[2];
@@ -43,7 +46,8 @@ public:
     void renderQueue(){
         startBatch();
         for(auto it = queue.begin();it!=queue.end();++it){
-            renderInBatch(&(*it).world);
+            glm::mat4 *w = &(*it).world;
+            renderInBatch(w);
         }
         endBatch();
         queue.clear();

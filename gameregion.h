@@ -20,7 +20,7 @@ class GameRegion : public IsoRegion {
     
     void renderWater();
     static const int visibleGridSize=10;
-    glm::mat4 view;
+    glm::mat4 view = glm::mat4(1.0f);
     GameRegionMode mode;
     class GameScreen *screen;
 public:

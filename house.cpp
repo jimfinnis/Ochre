@@ -10,6 +10,8 @@
 #include "house.h"
 #include "font.h"
 
+#define POP_GROW_RATE 0.1
+
 void House::init(int xx,int yy,Player *pl){
     pop = 1;
     p = pl;
@@ -28,14 +30,43 @@ House::~House(){
     evict(pop);
 }
 
-
 void House::queueRender(glm::mat4 *world){
+    StateManager *sm = StateManager::getInstance();
+    MatrixStack *ms = sm->getx();
+    
     meshes::house1->queueRender(world);
+    ms->push();
+    ms->rotY(globals::timeNow);
+    
+    // NOTE: STO_DIFFUSE and other overrides have no effect in batched
+    // rendering, which is a pain. So this doesn't work.
+    
+    State *s = sm->push();
+    s->overrides |= STO_DIFFUSE;
+    s->diffuse = Colour(0.1,0.1,0.5);
+    ms->push();
+    ms->translate(0,pop+0.4,0);
+    ms->scale(0.2);
+    meshes::ico->queueRender(ms->top());
+    ms->pop();
+    
+    
+    s->diffuse = Colour(0.5,0.1,0.1);
+    ms->push();
+    ms->translate(0,size+0.6,0);
+    ms->scale(0.2);
+    meshes::ico->queueRender(ms->top());
+    ms->pop();
+    
+    
+    
+    ms->pop();
+    sm->pop();
+    
 }
 
 void House::update(float t){
     Grid *g = &globals::game->grid;
-    //    printf("House update at %d,%d\n",x,y);
     static const int capacities[]={
         0,
         1,2,4,5
@@ -51,7 +82,7 @@ void House::update(float t){
     int capacity = capacities[size+1];
     
 //    printf("cap %d, pop %d, gc %f\n",capacity,pop,growcounter);
-    growcounter+=t*(float)(1+capacity-pop);
+    growcounter+=t*(float)capacity*POP_GROW_RATE;
     if(growcounter>1){
         growcounter=0;
         pop++;

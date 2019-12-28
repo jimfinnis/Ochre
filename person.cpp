@@ -30,7 +30,7 @@
 #define HOUSE_CHANCE_SETTLE 1
 // how likely we are to make a house in other modes
 // This is an N-sided dice roll, so 10 is one chance in 10.
-#define HOUSE_CHANCE_OTHER 200
+#define HOUSE_CHANCE_OTHER 20
 
 
 // this is the amount by which field is artifically skewed in the
@@ -211,7 +211,7 @@ void Person::updateInfrequent(){
     PlayerMode pmode = p->getMode();
     
     
-    if(state==WANDER && !globals::rnd->getInt(10)){
+    if(state==WANDER && !globals::rnd->getInt(4)){
         if(p->getMode()==PLAYER_ATTACK){
             if(House *h = locateEnemyHouse()){
                 pathTo(h->x,h->y);

@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <170530.1410>
+//  Last Modified : <180919.2117>
 //
 //  Description	
 //
@@ -101,6 +101,7 @@ static int loadShader(GLenum type,const char *src)
         glDeleteShader(shader);
         throw Exception().set("cannot compile shader: %s",log);
     }
+    printf("Shader compiled OK\n");
     return shader;
 }
 
@@ -149,6 +150,7 @@ void Effect::compile(){
         glDeleteProgram(program);
         throw Exception().set("cannot link program %s: %s",mName,log);
     }
+    printf("Shader linked OK\n");
     
 }
 
