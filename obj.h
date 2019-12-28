@@ -12,6 +12,7 @@
 #include "gfx.h"
 #include "maths.h"
 #include "material.h"
+#include "state.h"
 #include <vector>
 #include <iostream>
 
@@ -22,8 +23,10 @@ class ObjMesh {
     
     struct QueueEntry {
         glm::mat4 world;
-        QueueEntry(glm::mat4 *w){
+        State state; // state when added to queue
+        QueueEntry(glm::mat4 *w,State *s){
             world = *w;
+            state = *s;
         }
     };
     
@@ -38,20 +41,18 @@ public:
     // standard render method
     void render(glm::mat4 *world);
     
-    // queue a render, and then render the queue using batching
+    // queue a render, and then render the queue using batching.
+    // we can override the colour here, but not much else.
+    
     void queueRender(glm::mat4 *world){
-        queue.push_back(QueueEntry(world));
+        State *s = StateManager::getInstance()->get();
+        queue.push_back(QueueEntry(world,s));
     }
     
-    void renderQueue(){
-        startBatch();
-        for(auto it = queue.begin();it!=queue.end();++it){
-            glm::mat4 *w = &(*it).world;
-            renderInBatch(w);
-        }
-        endBatch();
-        queue.clear();
-    }
+    // render this mesh's queued objects
+    void renderQueue();
+    
+    
     // render all object mesh queues
     static void renderAll();
     

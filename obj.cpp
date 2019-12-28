@@ -28,10 +28,10 @@ static std::vector<ObjMesh *> allMeshes;
 
 
 static int addvert(std::vector<UNLITVERTEX>& verts,UNLITVERTEX &v){
-//    for(size_t i=0;i<verts.size();i++){
-//        if(verts[i].compare(&v))
-//            return i;
-//    }
+    //    for(size_t i=0;i<verts.size();i++){
+    //        if(verts[i].compare(&v))
+    //            return i;
+    //    }
     verts.push_back(v);
     return verts.size()-1;
 }
@@ -74,11 +74,11 @@ ObjMesh::ObjMesh(const char *dir,const char *name){
         printf("Mat %ld : tex %s\n",i,texname.c_str());
         // load the texture if any
         if(!texname.empty()){
-/*            m->texture = TextureManager::getInstance()->createOrFind(texname.c_str());
-            if(!m->t){
-                printf("cannot load %s\n",texname.c_str());
-   }
- */
+            /*            m->texture = TextureManager::getInstance()->createOrFind(texname.c_str());
+               if(!m->t){
+               printf("cannot load %s\n",texname.c_str());
+               }
+             */
             m->texture = 0;
         }else
               m->texture = 0;
@@ -98,41 +98,41 @@ ObjMesh::ObjMesh(const char *dir,const char *name){
     // and materials (which will have indices / 3, since triangles.
     std::vector<int> matidx;
     
- /*   // find centroid (which we're not using at the mo)
-    float cx=0,cy=0,cz=0;
-    int ct=0;
-    for(size_t s=0;s<shapes.size();s++){
-        // for each face..
-        int indexoffset=0;
-        printf("Processing shape of %d polys\n",(int)
-               shapes[s].mesh.num_face_vertices.size());
-               
-        for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
-            if(shapes[s].mesh.num_face_vertices[f]!=3)
-                throw Exception("ooh, non-triangular face!");
-            for(int i=0;i<3;i++){
-                // build a vertex and add it, or get the index of the old
-                // one if it was used before. This combines all the elements
-                // into one.
-                tinyobj::index_t idx = shapes[s].mesh.indices[indexoffset+i];
-                cx += attrib.vertices[3*idx.vertex_index+0];
-                cy += attrib.vertices[3*idx.vertex_index+1];
-                cz += attrib.vertices[3*idx.vertex_index+2];
-                ct++;
-            }
-            indexoffset+=3;
-        }
-    }
-    
-    cx/=(float)ct;
-    cy/=(float)ct;
-    cz/=(float)ct;
-*/    
+    /*   // find centroid (which we're not using at the mo)
+       float cx=0,cy=0,cz=0;
+       int ct=0;
+       for(size_t s=0;s<shapes.size();s++){
+       // for each face..
+       int indexoffset=0;
+       printf("Processing shape of %d polys\n",(int)
+       shapes[s].mesh.num_face_vertices.size());
+       
+       for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
+       if(shapes[s].mesh.num_face_vertices[f]!=3)
+       throw Exception("ooh, non-triangular face!");
+       for(int i=0;i<3;i++){
+       // build a vertex and add it, or get the index of the old
+       // one if it was used before. This combines all the elements
+       // into one.
+       tinyobj::index_t idx = shapes[s].mesh.indices[indexoffset+i];
+       cx += attrib.vertices[3*idx.vertex_index+0];
+       cy += attrib.vertices[3*idx.vertex_index+1];
+       cz += attrib.vertices[3*idx.vertex_index+2];
+       ct++;
+       }
+       indexoffset+=3;
+       }
+       }
+       
+       cx/=(float)ct;
+       cy/=(float)ct;
+       cz/=(float)ct;
+     */    
     
     // next step - build out of this mess a unified set of vertices
     // and indices into them (as triples), and a material index list.
     
-//    for(size_t s=0;s<10;s++){
+    //    for(size_t s=0;s<10;s++){
     for(size_t s=0;s<shapes.size();s++){
         // for each face..
         int indexoffset=0;
@@ -147,9 +147,9 @@ ObjMesh::ObjMesh(const char *dir,const char *name){
                 // into one.
                 tinyobj::index_t idx = shapes[s].mesh.indices[indexoffset+i];
                 /*
-                v.x = attrib.vertices[3*idx.vertex_index+0]-cx;
-                v.y = attrib.vertices[3*idx.vertex_index+1]-cy;
-                v.z = attrib.vertices[3*idx.vertex_index+2]-cz;
+                   v.x = attrib.vertices[3*idx.vertex_index+0]-cx;
+                   v.y = attrib.vertices[3*idx.vertex_index+1]-cy;
+                   v.z = attrib.vertices[3*idx.vertex_index+2]-cz;
                  */
                 v.x = attrib.vertices[3*idx.vertex_index+0];
                 v.y = attrib.vertices[3*idx.vertex_index+1];
@@ -170,9 +170,9 @@ ObjMesh::ObjMesh(const char *dir,const char *name){
                 int vertidx = addvert(verts,v);
                 // now add the index of the combined vertex
                 indx.push_back(vertidx);
-//                printf("%f,%f,%f %f,%f,%f %f,%f\n",
-//                       v.x,v.y,v.z,v.nx,v.ny,v.nz);
-
+                //                printf("%f,%f,%f %f,%f,%f %f,%f\n",
+                //                       v.x,v.y,v.z,v.nx,v.ny,v.nz);
+                
             }
             indexoffset+=3;
             matidx.push_back(shapes[s].mesh.material_ids[f]);
@@ -272,7 +272,6 @@ void ObjMesh::startBatch(){
 void ObjMesh::renderInBatch(glm::mat4 *world){
     eff->setWorldMatrix(world);
     
-    
     // and iterate over the transitions
     
     for(std::vector<Transition>::iterator
@@ -287,12 +286,30 @@ void ObjMesh::renderInBatch(glm::mat4 *world){
     }
 }
 
+void ObjMesh::renderQueue(){
+    startBatch();
+    StateManager *sm = StateManager::getInstance();
+    State *s = sm->get();
+    
+    sm->push();
+    for(auto it = queue.begin();it!=queue.end();++it){
+        QueueEntry *e = &*it;
+        *s = e->state;
+        glm::mat4 *w = &e->world;
+        renderInBatch(w);
+    }
+    sm->pop();
+    endBatch();
+    queue.clear();
+}
+
+
 void ObjMesh::endBatch(){
     eff->end();
     glBindBuffer(GL_ARRAY_BUFFER,0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 }    
-    
+
 
 
 void ObjMesh::render(glm::mat4 *world){
