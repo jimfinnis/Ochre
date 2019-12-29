@@ -152,7 +152,15 @@ int main(int argc, char** argv)
 
     globals::init();
 
-    curscreen = new GameScreen();
+    // 101,4 is good.
+    // 110,8: two continents
+    // 114,0: archipelago, away advantage
+    // 130,10: archipelago, away advantage
+    // 131,10: chain!
+    // 132,8: archipelago, away
+    // 
+    
+    curscreen = new GameScreen(atoi(argv[1]),atof(argv[2]));
 
     meshes::load();
 

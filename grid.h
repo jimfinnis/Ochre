@@ -246,6 +246,28 @@ public:
         }
     }
     
+    // Ray trace (no need for anything fancy like Bresenham) to
+    // scan between to points and check it's all dry.
+    // Might not work entirely because we occupy a fractional position.
+    
+    bool isLineSafe(float x0,float y0,float x1,float y1){
+        float dx = x1-x0;
+        float dy = y1-y0;
+        float rlen = 1.0f/sqrt(dx*dx+dy*dy);
+        dx *= rlen; dy *= rlen; // get unit vector
+        float x = x0;
+        float y = y0;
+        for(;;){
+            x+=dx;
+            y+=dy;
+            if(getinterp(x,y)<0.5f)
+                return false;
+            if(x>x1)break;
+        }
+        return true;
+    }
+        
+    
     // set terrain around a point IF it is grass (empty). Used
     // for houses. WILL ALSO SET THE OWNER TO ply.
     void setTerrainAroundIfGrass(int x,int y,int size,int mat,int ply){

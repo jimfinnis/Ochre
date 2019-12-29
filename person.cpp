@@ -43,7 +43,7 @@
 // how big a merged pair can be
 #define PERSON_MERGE_LIMIT 10
 
-// search range for pathing to enemy (UNUSED)
+// search range for pathing to enemy
 #define ENEMY_SEARCH_RANGE 10
 
 // search range for pathing to house
@@ -210,11 +210,31 @@ void Person::updateInfrequent(){
     
     PlayerMode pmode = p->getMode();
     
+    if(state==COARSEPATH && pmode!=PLAYER_COLLECT){
+        // we might be randomly pathing to the anchor. We might just
+        // go off to pick daisies, or decide the Crusades are Not For Us.
+        if(!globals::rnd->getInt(100))
+            state = WANDER;
+    }
     
-    if(state==WANDER && !globals::rnd->getInt(4)){
-        if(p->getMode()==PLAYER_ATTACK){
-            if(House *h = locateEnemyHouse()){
-                pathTo(h->x,h->y);
+    
+    if(/*state==WANDER && */!globals::rnd->getInt(4)){
+        /* if(pmode==PLAYER_ATTACK) */
+        {
+            // look for a house or a player
+            
+            if(globals::rnd->getInt(2)){
+                if(Person *p = locateEnemy()){
+                    // make sure we can get a safe line to the other
+                    if(g->isLineSafe(x,y,p->x,p->y)){
+                        target = p;
+                        state = HUNT;
+                    }
+                }
+            } else {
+                if(House *h = locateEnemyHouse()){
+                    pathTo(h->x,h->y);
+                }
             }
         }
     }
@@ -355,6 +375,21 @@ void Person::update(float t){
     if(mode == PLAYER_COLLECT){
         if(drand48()<0.01){
             pathTo(p->anchorX,p->anchorY);
+        }
+    } else {
+        // very rarely, a person in another mode might do this.
+        if(p->anchorX>=0 && drand48()<0.0001){
+            pathTo(p->anchorX,p->anchorY);
+        }
+    }
+    
+    
+    if(state == HUNT){
+        if(target->state == ZOMBIE)
+            state = WANDER;
+        else {
+            dx = sgn(target->x - x);
+            dy = sgn(target->y - y);
         }
     }
     

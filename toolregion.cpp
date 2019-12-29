@@ -30,6 +30,9 @@
 // modal action button ID
 #define BUT_MODE_ANCHOR 4
 
+// action button ID
+#define BUT_STOPANCHOR 5
+
 ToolRegion::ToolRegion() : Region("tool"){
     int x = BUTTON_LEFT;
     int y = BUTTON_TOP;
@@ -44,6 +47,8 @@ ToolRegion::ToolRegion() : Region("tool"){
     // player actions
     x = BUTTON_LEFT; y += BUTTON_SEP;
     addButton(BUT_MODE_ANCHOR,"media/tex/collect.png",x,y,-1,-1)->setMutex(BUTSET_ACTIONS);
+    x+=BUTTON_SEP;
+    addButton(BUT_STOPANCHOR,"media/tex/stopcollect.png",x,y,-1,-1);
 }
 
 void ToolRegion::onMouseMove(int x,int y){
@@ -60,6 +65,10 @@ void ToolRegion::onButtonClick(int id){
         game->p[0].setMode(PLAYER_ATTACK);break;
     case BUT_COLLECT:
         game->p[0].setMode(PLAYER_COLLECT);break;
+        
+    // player actions
+    case BUT_STOPANCHOR:
+        game->p[0].removeAnchor();break;
         
     // modal player actions
     case BUT_MODE_ANCHOR:

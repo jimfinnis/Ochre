@@ -23,7 +23,7 @@ class GameScreen : public Screen {
     StatRegion stat;
     
 public:
-    GameScreen();
+    GameScreen(int seed,float waterlevel);
     virtual ~GameScreen();
     
     virtual void resize(int w,int h);

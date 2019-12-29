@@ -71,9 +71,10 @@ void MapTex::writePlayer(Player *pl,uint32_t col){
     for(Person *p=pl->people.first();p;p=pl->people.next(p)){
         switch(p->state){
         case WANDER:c=col;break;
-        case COARSEPATH:c=0xff00ff00;break;
-        case FINEPATH:c=0xff0000ff;break;
-        default:c=0xfffffff;break;
+        case COARSEPATH:  c=0xff00ff00;break;
+        case FINEPATH:    c=0xff0000ff;break;
+        case HUNT:        c=0xffff00ff;break;
+        default:          c=0xffffffff;break;
         }
         image[(int)p->y][(int)p->x] = c;
 /*        

@@ -21,6 +21,9 @@ enum PersonState {
           // getting to the absolute location within a square
           FINEPATH,
           
+          // looking for a particular enemy bod!
+          HUNT,
+          
           // not a path finding mode as such, more a state
           ZOMBIE,
           DEBUGSTOP
@@ -47,6 +50,8 @@ struct Person {
 
     PersonState state;
     double nextInfrequentUpdate;
+    
+    Person *target; // if HUNT, who we're after stabbing
 
     Person(){
         state = WANDER;

@@ -10,8 +10,8 @@
 #include "prof.h"
 #include "button.h"
 
-GameScreen::GameScreen() {
-    globals::game = new Game(101,-2);
+GameScreen::GameScreen(int seed,float waterlevel) {
+    globals::game = new Game(seed,waterlevel);
     
     tool.screen = this;
     game.screen = this;

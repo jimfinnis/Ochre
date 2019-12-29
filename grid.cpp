@@ -53,7 +53,8 @@ Grid::Grid(int seed,float waterlevel){
     
     for(int x=0;x<GRIDSIZE;x++){
         for(int y=0;y<GRIDSIZE;y++){
-            float v = noise(1093.0f+seedf+x*0.1f,y*0.1f)*5-waterlevel;
+            float v = noise(1093.0f+seedf+x*0.1f,y*0.1f)*5-
+                  (waterlevel-12.0f)*0.25f;
             
             if(v<0)v=0;
             if(v>5)v=5;

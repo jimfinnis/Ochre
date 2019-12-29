@@ -60,6 +60,13 @@ public:
         return mode;
     }
     
+    // remove the anchor completely
+    void removeAnchor(){
+        anchorX = -1;
+        anchorY = -1;
+        resetToWander();
+    }
+    
     void resetToWander(){
         // reset all peeps to wander; used when anchor or mode changed
         // also reset all peeps to wandering
