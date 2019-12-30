@@ -4,6 +4,7 @@
 - SDL 2
 - SDL 2 TTF
 - OpenGL GLM
+- DevIL crossplatform image library (libdevil-dev)
 
 # Build steps on Linux
 
