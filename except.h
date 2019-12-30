@@ -1,11 +1,11 @@
 /**
- * @file exception.h
+ * @file except.h
  * @brief  Brief description of file.
  *
  */
 
-#ifndef __EXCEPTION_H
-#define __EXCEPTION_H
+#ifndef __EXCEPT_H
+#define __EXCEPT_H
 
 #include <stdio.h>
 #include <string.h>
@@ -80,4 +80,4 @@ inline void GLerrorcheck(const char *file,int line){
 void GLerrorcheck(const char *file,int line);
 
 
-#endif /* __EXCEPTION_H */
+#endif /* __EXCEPT_H */
