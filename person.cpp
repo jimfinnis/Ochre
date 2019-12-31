@@ -49,6 +49,30 @@
 // search range for pathing to house
 #define ENEMY_HOUSE_SEARCH_RANGE 10
 
+// a way of searching a spiral around a point. This spirals out
+// from 0,0 as next() is called. Layer is how far from the centre
+// we are.
+
+class SpiralSearch {
+    int leg;
+public:
+    int x,y,layer;
+    void start(){
+        x=y=0;
+        layer=1;leg=0;
+    }
+    void next(){
+        switch(leg){
+        case 0:if(++x==layer)++leg;break;
+        case 1:if(++y==layer)++leg;break;
+        case 2:if(-(--x)==layer)++leg;break;
+        case 3:if(-(--y)==layer){leg=0;++layer;}break;
+        }
+    }
+};
+
+static SpiralSearch spiral;
+
 
 // table mapping direction onto rotation (in degrees, but gets
 // switched to radians)
@@ -74,12 +98,11 @@ Person *Person::locateEnemy(){
     int iy = (int)y;
     Grid *g = &globals::game->grid;
     
-    for(int i=-ENEMY_SEARCH_RANGE;i<=ENEMY_SEARCH_RANGE;i++){
-        for(int j=-ENEMY_SEARCH_RANGE;j<=ENEMY_SEARCH_RANGE;j++){
-            for(Person *pers = g->getPeople(ix+i,iy+j);pers;pers=pers->next){
-                if(pers->p != p){
-                    return pers;
-                }
+    for(spiral.start();spiral.layer<ENEMY_SEARCH_RANGE;spiral.next()){
+        for(Person *pers = g->getPeople(ix+spiral.x,iy+spiral.y);
+            pers;pers=pers->next){
+            if(pers->p != p){
+                return pers;
             }
         }
     }
@@ -91,25 +114,15 @@ House *Person::locateEnemyHouse(){
     int iy = (int)y;
     Grid *g = &globals::game->grid;
     
-    int mindist = 1000000;
-    House *rv = NULL;
-    
-    for(int i=-ENEMY_SEARCH_RANGE;i<=ENEMY_SEARCH_RANGE;i++){
-        for(int j=-ENEMY_SEARCH_RANGE;j<=ENEMY_SEARCH_RANGE;j++){
-            GridObj *o = g->getObject(ix+i,iy+j);
-            if(o && o->type == GO_HOUSE ){
-                House *h = (House*)o;
-                if(h->p != p){
-                    int d = ix*ix+iy*iy;
-                    if(d<mindist){
-                        mindist=d;
-                        rv = h;
-                    }
-                }
-            }
+    for(spiral.start();spiral.layer<ENEMY_SEARCH_RANGE;spiral.next()){
+        GridObj *o = g->getObject(ix+spiral.x,iy+spiral.y);
+        if(o && o->type == GO_HOUSE ){
+            House *h = (House*)o;
+            if(h->p != p)
+                return h;
         }
     }
-    return rv;
+    return NULL;
 }
 
 bool Person::pathTo(float xx,float yy){
@@ -430,4 +443,4 @@ void Person::damage(int n){
         state = ZOMBIE;
     }
 }
-        
+
