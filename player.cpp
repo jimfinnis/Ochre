@@ -26,7 +26,7 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
         basex=basey=30;
     }
         
-    for(int i=0;i<400;i++){
+    for(int i=0;i<4;i++){
         float x = drand48()*20+basex;
         float y = drand48()*20+basey;
         Person *p = people.alloc();
