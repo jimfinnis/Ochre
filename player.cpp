@@ -13,6 +13,8 @@
 #include "meshes.h"
 #include "prof.h"
 
+#include "time.h"
+
 static int idxct=0;
 Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     idx=idxct++;
@@ -24,7 +26,7 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
         basex=basey=30;
     }
         
-    for(int i=0;i<4;i++){
+    for(int i=0;i<400;i++){
         float x = drand48()*20+basex;
         float y = drand48()*20+basey;
         Person *p = people.alloc();
@@ -47,6 +49,82 @@ Player::~Player(){
     delete blurClose;
 }
 
+float snark = 3.2;
+void Player::renderPerson(Person *p){
+    Grid *g = &globals::game->grid;
+    StateManager *sm = StateManager::getInstance();
+    MatrixStack *ms = sm->getx();
+    
+    meshes::marker->startBatch();
+//    printf("Snark %f\n",snark);
+    g->pushxforminterp(p->x,p->y,snark); // grid pos
+    ms->scale(0.2);
+    ms->rotY(p->getSmoothedRot());
+    
+    
+    
+    // render body and head
+    ms->push();
+    ms->push();
+    ms->scale(1,1,0.6); // body
+    meshes::toppivotcube->render(ms->top());
+    ms->pop();
+    ms->scale(0.5);
+    ms->translate(0,1.8,0); // head
+    meshes::toppivotcube->render(ms->top());
+    ms->pop();
+    
+    //arms
+    
+    float armswing = p->walkCycle*4;
+    float legswing = p->walkCycle*6;
+    static const float legswingamount=0.2;
+    static const float armswingamount=0.4f;
+    static const float armheight=0.1;
+    
+    
+    ms->push(); //  arm
+    ms->translate(1.2,-armheight,0);
+    ms->rotX(sinf(armswing)*armswingamount);
+    ms->scale(0.2,1,0.3);
+    meshes::toppivotcube->render(ms->top());
+    ms->pop();
+    
+    ms->push(); //  arm
+    ms->translate(-1.2,-armheight,0);
+    ms->rotX(-sinf(armswing)*armswingamount);
+    ms->scale(0.2,1,0.3);
+    meshes::toppivotcube->render(ms->top());
+    ms->pop();
+    
+    // legs
+    static const float leglength = 0.6;
+    static const float legsep = 0.5;
+    ms->push();
+    ms->translate(0,-2,0);
+    
+    ms->push(); // leg
+    ms->translate(legsep,0,0);
+    ms->rotX(sinf(legswing)*legswingamount);
+    ms->scale(0.2,leglength,0.3);
+    meshes::toppivotcube->render(ms->top());
+    ms->pop();
+    
+    ms->push(); // leg
+    ms->translate(-legsep,0,0);
+    ms->rotX(-sinf(legswing)*legswingamount);
+    ms->scale(0.2,leglength,0.3);
+    meshes::toppivotcube->render(ms->top());
+    ms->pop();
+    
+    ms->pop();
+    
+    
+    
+    
+    ms->pop();    // grid pos
+}
+
 void Player::render(const Colour& col){
     // draw all the little folk.
 
@@ -59,19 +137,18 @@ void Player::render(const Colour& col){
     State *s = sm->get();
     s->diffuse = col;
     s->overrides |= STO_DIFFUSE;
-
-    meshes::marker->startBatch();
+    
+    
+    // try to render people nicely
     for(Person *p=people.first();p;p=people.next(p)){
         float opacity = g->getVisibility(p->x,p->y);
         if(opacity>0.001){
             s->diffuse.a = opacity;
-            g->pushxforminterp(p->x,p->y,-0.2f);
-            ms->rotY(p->getrot()+glm::radians(90.0f));
-            ms->scale(0.2 + 0.02 * p->strength);
-            meshes::marker->render(ms->top());
-            ms->pop();
+            renderPerson(p);
         }
     }
+    
+    
     
     // draw the anchor if set
     if(anchorX>=0){

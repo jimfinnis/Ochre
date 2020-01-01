@@ -281,6 +281,9 @@ public:
     void scale(float s){
         stack[ct] = glm::scale(stack[ct],glm::vec3(s));
     }
+    void scale(float x,float y,float z){
+        stack[ct] = glm::scale(stack[ct],glm::vec3(x,y,z));
+    }
     
     void flipY(){
         stack[ct] = glm::scale(stack[ct],glm::vec3(1,-1,1));

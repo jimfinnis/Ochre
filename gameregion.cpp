@@ -173,6 +173,8 @@ void GameRegion::render(){
     game->p[1].render(Colour(0.2f,1,0.2f));
     profbar.end();
     
+//    Player::renderPerson(g->cursorx,g->cursory,0);
+    
     ms->pop();
     
 }

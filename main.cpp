@@ -160,7 +160,14 @@ int main(int argc, char** argv)
     // 132,8: archipelago, away
     // 
     
-    curscreen = new GameScreen(atoi(argv[1]),atof(argv[2]));
+    int map = 130;
+    int water = 10;
+    
+    if(argc>2){
+        map = atoi(argv[1]);
+        water = atof(argv[2]);
+    }
+    curscreen = new GameScreen(map,water);
 
     meshes::load();
 

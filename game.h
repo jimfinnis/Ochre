@@ -22,9 +22,15 @@ struct Game {
         p[1].op = &p[0];
         p[0].setMode(PLAYER_SETTLE);
         p[1].setMode(PLAYER_SETTLE);
+        paused=false;
+    }
+    
+    void togglePause(){
+        paused=!paused;
     }
 
     void update(float t){
+        if(paused)return;
         // update grid first, to populate the "people" fields.
         profbar.start("G",0x00ff00ff);
         grid.update(t);
@@ -47,6 +53,7 @@ struct Game {
     }
 
     Grid grid;
+    bool paused;
 
     Player p[2];
 };

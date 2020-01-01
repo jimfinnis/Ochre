@@ -15,6 +15,9 @@ void load();
 
 extern class ObjMesh *ico,*cursor,*house1,*marker;
 
+// 2x2 cube with pivot at centre of top face
+extern class ObjMesh *toppivotcube;
+
 }
 
 

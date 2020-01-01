@@ -89,6 +89,7 @@ void Person::init(class Player *player, int idx, float xx,float yy){
     p=player;
     strength=1;
     drowntime=0;
+    walkCycle=0;
     speed = globals::rnd->range(0.9f,1.1f)*BASEPERSONSPEED;
     nextInfrequentUpdate = globals::timeNow+INFREQUENTUPDATEINTERVAL*0.2*(double)(idx%10);
 }
@@ -412,6 +413,8 @@ void Person::update(float t){
     x+=speed*t*(float)dx*diag;
     y+=speed*t*(float)dy*diag;
     
+    walkCycle += speed*0.01f;
+    
     // get grid coords
     int ix = (int)x;
     int iy = (int)y;
@@ -443,4 +446,5 @@ void Person::damage(int n){
         state = ZOMBIE;
     }
 }
+
 

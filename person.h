@@ -47,7 +47,9 @@ struct Person {
     int pathidx; // current index of path
     // how many actual "people" this is - they merge and sometimes split!
     int strength; 
-
+    float walkCycle; // where we are in the walk cycle. Just keeps increasing.
+    float smoothRot;
+    
     PersonState state;
     double nextInfrequentUpdate;
     
@@ -63,10 +65,17 @@ struct Person {
     // and also to either attack or move away from the other player.
     // Will also take into account the anchor.
     void setDirectionFromPotentialField();
-
+    
     float getrot(){
         extern float dirToRot[3][3];
         return dirToRot[sgn(-dx)+1][sgn(-dy)+1];
+    }
+    
+    float getSmoothedRot(){
+        return getrot();
+        float r = getrot();
+        smoothRot = 0.9f*smoothRot+0.1f*r;
+        return smoothRot;
     }
     
     /// find a possible enemy nearby. Within sight. It's a bit
@@ -88,7 +97,7 @@ struct Person {
     }
 
     void update(float t);
-
+    
     JPS::PathVector path;
 private:
     /// an update which doesn't happen very often, but at least once per traversed

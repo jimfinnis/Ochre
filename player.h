@@ -37,6 +37,8 @@ class Player {
     MultipassBlur *blur; // potential field blurrer - takes several ticks
     MultipassBlur *blurClose; // potential field blurrer - takes several ticks
     PlayerMode mode;
+    
+    
 public:
     int idx; // which player am I?
     Player *op; // opposing player
@@ -93,6 +95,7 @@ public:
         resetToWander();
     }
                                 
+    static void renderPerson(Person *p);
 };
 
 #endif /* __PLAYER_H */
