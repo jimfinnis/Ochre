@@ -274,7 +274,10 @@ public:
     bool isLineSafe(float x0,float y0,float x1,float y1){
         float dx = x1-x0;
         float dy = y1-y0;
-        float rlen = 1.0f/sqrt(dx*dx+dy*dy);
+        float magsq = dx*dx+dy*dy;
+        if(magsq<0.001f)return true; // in the same place!
+        
+        float rlen = 1.0f/sqrt(magsq);
         dx *= rlen; dy *= rlen; // get unit vector
         float x = x0;
         float y = y0;
