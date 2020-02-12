@@ -13,7 +13,8 @@ namespace meshes {
 
 void load();
 
-extern class ObjMesh *ico,*cursor,*house1,*marker;
+extern class ObjMesh *ico,*cursor,*marker;
+extern class ObjMesh *house1,*house2,*house3,*house4;
 
 // 2x2 cube with pivot at centre of top face
 extern class ObjMesh *toppivotcube;

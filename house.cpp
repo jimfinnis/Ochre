@@ -34,12 +34,19 @@ void House::queueRender(glm::mat4 *world){
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
     
-    meshes::house1->queueRender(world);
+    ObjMesh *m;
+    switch(size){
+    default:
+    case 0:m=meshes::house1;break;
+    case 1:m=meshes::house2;break;
+    case 2:m=meshes::house3;break;
+    case 3:m=meshes::house4;break;
+    case 4:m=meshes::house4;break;
+    }
+    
+    m->queueRender(world);
     ms->push();
     ms->rotY(globals::timeNow);
-    
-    // NOTE: STO_DIFFUSE and other overrides have no effect in batched
-    // rendering, which is a pain. So this doesn't work.
     
     State *s = sm->push();
     s->overrides |= STO_DIFFUSE;
@@ -81,7 +88,7 @@ void House::update(float t){
     
     int capacity = capacities[size+1];
     
-//    printf("cap %d, pop %d, gc %f\n",capacity,pop,growcounter);
+    //    printf("cap %d, pop %d, gc %f\n",capacity,pop,growcounter);
     growcounter+=t*(float)capacity*POP_GROW_RATE;
     if(growcounter>1){
         growcounter=0;
@@ -106,5 +113,5 @@ void House::damage(int n){
     pop -= n;
     if(pop<=0)
         globals::game->grid.removeHouse(this);
-        
+    
 }
