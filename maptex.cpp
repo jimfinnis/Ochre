@@ -96,6 +96,11 @@ void MapTex::writePlayer(Player *pl,uint32_t col){
             }
         }
     }
+    
+    // for debugging, write the levelling points
+    if(pl->levelx>0)
+        image[pl->levely][pl->levelx]= 0xffffffff;
+
 }
 
 void MapTex::make(Grid *g,bool writeframe){

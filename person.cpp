@@ -11,6 +11,8 @@
 #include "player.h"
 #include "time.h"
 
+#include "spiral.h"
+
 //#define BASEPERSONSPEED 3.1f
 #define BASEPERSONSPEED 3.1f
 
@@ -49,27 +51,6 @@
 // search range for pathing to house
 #define ENEMY_HOUSE_SEARCH_RANGE 10
 
-// a way of searching a spiral around a point. This spirals out
-// from 0,0 as next() is called. Layer is how far from the centre
-// we are.
-
-class SpiralSearch {
-    int leg;
-public:
-    int x,y,layer;
-    void start(){
-        x=y=0;
-        layer=1;leg=0;
-    }
-    void next(){
-        switch(leg){
-        case 0:if(++x==layer)++leg;break;
-        case 1:if(++y==layer)++leg;break;
-        case 2:if(-(--x)==layer)++leg;break;
-        case 3:if(-(--y)==layer){leg=0;++layer;}break;
-        }
-    }
-};
 
 static SpiralSearch spiral;
 

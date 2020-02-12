@@ -55,9 +55,9 @@ struct VisLines {
         lines[ct].a=glm::vec2(x1,y1);
         lines[ct++].n=glm::normalize(glm::vec2(x2-x1,y2-y1));
     }
-
+    
     float getVisibility(float x,float y);
-
+    
 };
 
 /// this is the grid - the heightmap of the world and how to render it.
@@ -78,11 +78,11 @@ class Grid {
     UNLITVERTEX verts[MAXVERTS];
     int vertidxs[MAXVERTS][2]; // positions of verts in grid space
     int vertct;
-
+    
     void initGridVerts(){
         vertct=0;
     }
-
+    
     void addtri(UNLITVERTEX *v0,UNLITVERTEX *v1,UNLITVERTEX *v2,int matidx){
         int i0 = v0-verts;
         int i1 = v1-verts;
@@ -91,14 +91,14 @@ class Grid {
         buckets[matidx].push_back(i1);
         buckets[matidx].push_back(i2);
     }
-
+    
     UNLITVERTEX *addvert(int gx,int gy,float x,float y,float z,float u,float v){
         if(vertct>=MAXVERTS)
             FATAL("Too many verts in grid!");
-
+        
         vertidxs[vertct][0] = gx;
         vertidxs[vertct][1] = gy;
-
+        
         UNLITVERTEX *vv = verts+(vertct++);
         vv->x = x;
         vv->y = y*heightFactor;
@@ -107,25 +107,25 @@ class Grid {
         vv->v = v;
         return vv;
     }
-
+    
     // IN THIS ORDER UNSEPARATED - created in one call.
     GLuint vbo; // vertex buffer object
     GLuint ibo; // index buffer object
-
+    
     int modcount; // modifications since last resetModCount()
-
+    
     // materials
     std::vector<Material> materials;
     // material transition table for rendering
     std::vector<Transition> transitions;
-
+    
     // each material has a vector of ints, which store the triangle indices during
     // mesh generation.
     std::vector<std::vector<GLuint>> buckets;
-
+    
     // visibility edges structure
     VisLines vis;
-
+    
     // raise up at x,y (and neighbours if necessary) (internal, does the work)
     void _up(int x,int y);
     // lower at x,y (and neighbours if necessary) (internal, does the work)
@@ -141,7 +141,7 @@ class Grid {
 public:
     int cursorx,cursory; // selected point
     int centrex,centrey;
-
+    
     float heightFactor; // y is also multiplied by this
     
     /// an array of pointers to fixed objects
@@ -158,7 +158,7 @@ public:
     void addHouse(int x,int y,House *h);
     
     void removeHouse(House *h);
-        
+    
     /// is a given grid square visible
     bool isVisible(int x,int y){
         return true;
@@ -170,12 +170,17 @@ public:
         else
             return vis.getVisibility(x,y);
     }
-
+    
     Grid(int seed,float waterlevel);
     ~Grid();
-
+    
+    inline bool in(int x, int y) const {
+        return x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0;
+        
+    }
+    
     inline int get(int x,int y) const{
-        if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
+        if(in(x,y))
             return grid[x][y];
         else
             return 0;
@@ -184,13 +189,13 @@ public:
     // get head of linked list of people in this square, updated
     // every grid update.
     class Person *getPeople(int x,int y){
-        if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0)
+        if(in(x,y))
             return people[x][y];
         else
             return NULL;
     }
-        
-
+    
+    
     // called every update tick.
     void update(float t);
     // called to clean up after player house update
@@ -202,24 +207,24 @@ public:
             }
         }
     }
-
+    
     // call this every time the terrain changes to recalculate
     // the safe grid squares for pathing, and also to calculate which
     // squares are flat.
     void recalc();
-
+    
     // this is required for JPS pathing library - uses the gridsafe array
     // to see if a square is safe to walk on
     inline bool operator()(unsigned x, unsigned y) const {
-        if(x<GRIDSIZE && y<GRIDSIZE){
+        if(in(x,y))
             return gridsafe[x][y];
-        } else
+        else
             return false;
     }
     
     // get the material associated with a grid square
     inline int getmat(int x,int y){
-        if(x<GRIDSIZE && x>=0 && y<GRIDSIZE && y>=0){
+        if(in(x,y)){
             uint8_t t = gridterr[x][y];
             switch(t){
             default:
@@ -231,11 +236,27 @@ public:
         } else
             return 0;
     }
-
-
+    
+    // return true if any height next to this cell is dry
+    inline bool nextToDry(unsigned x,unsigned y,int atLeast=1) const {
+        int ct=0;
+//        printf("scan start\n");
+        for(unsigned xx=x-1;xx<=x+1;xx++){
+            for(unsigned yy=y-1;yy<=y+1;yy++){
+                if(xx!=x || yy!=y){
+//                    printf("Scanning %d,%d - %d\n",xx,yy,get(xx,yy));
+                    if(get(xx,yy)>0)ct++;
+                    if(ct>=atLeast)return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    
     // find point nearest ray from p1 in direction p2.
     int intersect(const glm::vec3& origin, const glm::vec3& ray);
-
+    
     // select a point by index
     void select(int idx);
     // recentre to the currently selected point
@@ -266,7 +287,7 @@ public:
         }
         return true;
     }
-        
+    
     
     // set terrain around a point IF it is grass (empty). Used
     // for houses. WILL ALSO SET THE OWNER TO ply.
@@ -322,22 +343,22 @@ public:
     
     // get the height at x,y doing bilinear interpolation between the corners
     float getinterp(float x,float y);
-
+    
     // push transform to this location with height offset
     void pushxform(float x,float y,float offset);
     // as pushxform, but does bilinear interp on heights
     void pushxforminterp(float x,float y,float offset);
-
+    
     /// generate triangles centred around centrex,centrey.
     void genTriangles(int range);
-
+    
     void render(glm::mat4 *world);
     void renderCursor();
-
+    
     void resetModCount(){modcount=0;}
     // return mods since last resetModCount()
     int getModCount(){return modcount;}
-
+    
     // raise up at x,y (and neighbours if necessary)
     void up(int x,int y){
         if(grid[x][y]<15){ // have to draw the line somewhere..
@@ -350,10 +371,10 @@ public:
         _down(x,y);
         recalc();
     }
-
+    
     // draw the objects (call after genTriangles())
     void renderObjects(int range);
-
+    
     // move cursor and move centre if required
     void moveCursor(int dx,int dy){
         if(cursorx+dx>=GRIDSIZE || cursorx+dx<0)dx=0;
@@ -364,7 +385,7 @@ public:
             centrex+=dx;centrey+=dy;
         }
     }
-
+    
 };
 
 

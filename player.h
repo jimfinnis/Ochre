@@ -37,9 +37,14 @@ class Player {
     MultipassBlur *blur; // potential field blurrer - takes several ticks
     MultipassBlur *blurClose; // potential field blurrer - takes several ticks
     PlayerMode mode;
+    static constexpr double AUTOLEVELDELAY = 1; // delay before autolevelling starts
+    static constexpr double AUTOLEVELMININTERVAL = 0.4; // interval between autolevelling events
+    static constexpr double AUTOLEVELMAXINTERVAL = 1.2; // interval between autolevelling events
     
+    double nextAutolevelTime;
     
 public:
+    int levelx,levely; // location near which we attempt to level
     int idx; // which player am I?
     Player *op; // opposing player
     Pool<Person> people;
@@ -79,7 +84,11 @@ public:
     
     // assumes grid transform is stacked.
     void render(const Colour& col);
-    void update(float t);
+    // time passed in is interval since last update
+    void update(double t);
+    
+    // performs automatic levelling
+    void autoLevel();
     
     void updateHouseTerrain();
     

@@ -28,8 +28,9 @@ struct Game {
     void togglePause(){
         paused=!paused;
     }
-
-    void update(float t){
+    
+    // time passed in is interval since last update
+    void update(double t){
         if(paused)return;
         // update grid first, to populate the "people" fields.
         profbar.start("G",0x00ff00ff);

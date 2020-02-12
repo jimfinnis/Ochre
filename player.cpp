@@ -14,6 +14,7 @@
 #include "prof.h"
 
 #include "time.h"
+#include "spiral.h"
 
 static int idxct=0;
 Player::Player() : people(MAXPOP), houses(MAXHOUSES){
@@ -25,7 +26,7 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     } else {
         basex=basey=30;
     }
-        
+    
     for(int i=0;i<4;i++){
         float x = drand48()*20+basex;
         float y = drand48()*20+basey;
@@ -40,8 +41,10 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     blur = new MultipassBlur(GRIDSIZE,GRIDSIZE,GRIDSIZE/4);
     blurClose = new MultipassBlur(GRIDSIZE,GRIDSIZE,2);
     
-    mode = PLAYER_SETTLE;
+    mode = PLAYER_ATTACK;
     anchorX=anchorY=-1;
+    nextAutolevelTime=Time::now()+AUTOLEVELDELAY; // autolevelling doesn't happen for a bit
+    levelx=levely=-1;
 }
 
 Player::~Player(){
@@ -56,7 +59,7 @@ void Player::renderPerson(Person *p){
     MatrixStack *ms = sm->getx();
     
     meshes::marker->startBatch();
-//    printf("Snark %f\n",snark);
+    //    printf("Snark %f\n",snark);
     g->pushxforminterp(p->x,p->y,snark); // grid pos
     ms->scale(0.2);
     ms->rotY(p->getSmoothedRot());
@@ -127,7 +130,7 @@ void Player::renderPerson(Person *p){
 
 void Player::render(const Colour& col){
     // draw all the little folk.
-
+    
     Game *game = globals::game;
     Grid *g = &game->grid;
     StateManager *sm = StateManager::getInstance();
@@ -175,14 +178,82 @@ void Player::updateHouseTerrain(){
     }
     // later code will remove non-flat farms
 }    
-    
+
 void Player::setMode(PlayerMode m){
     mode = m;
     resetToWander();
 }
-    
 
-void Player::update(float t){
+void Player::autoLevel(){
+    RandomSpiralSearch spiral;
+    printf("At start %d,%d\n",levelx,levely);
+    
+    // we assume that the "god" has a view of a particular location, and will always
+    // level close to that location. It starts at the average location of all the people.
+    double xx=0,yy=0;
+    if(levelx<0){ // need to reinit.
+        double n=0;
+        for(Person *p=people.first();p;p=people.next(p)){
+            xx+=p->x;yy+=p->y;n++;
+        }
+        if(n>0.000001){
+            xx/=n;yy/=n;
+            printf("%f %f - %f\n",xx,yy,n);
+        } else {
+            return; // shouldn't happen, there should be some players
+        }
+        levelx=(int)(xx+0.5);
+        levely=(int)(yy+0.5);
+    }
+    
+    // now find a candidate to level. What's the simplest thing that can possibly work?
+    // We just pull the location towards sea level+1.
+    
+    Game *game = globals::game;
+    Grid *g = &game->grid;
+    
+    // get the current height and modify it
+    int h = g->get(levelx,levely);
+    printf("Levelling at %d,%d: height is %d\n",levelx,levely,h);
+    if(h<1){
+        g->up(levelx,levely);
+    }
+    else if(h>1){
+        g->down(levelx,levely);
+    }
+    
+    // now get the next location by looking around for something which isn't at sea level
+    // but is next to something which is.
+    bool found=false;
+    for(spiral.start();spiral.layer<50;spiral.next()){
+        int gx = levelx+spiral.x;
+        int gy = levely+spiral.y;
+        if(g->in(gx,gy)){
+            h = g->get(gx,gy);
+            if(h!=1 && g->nextToDry(gx,gy,3)){
+                printf("Found at %d,%d\n",gx,gy);
+                levelx=gx;
+                levely=gy;
+                found=true;
+                break;
+            }
+        }
+    }
+    if(!found){
+        printf("Not found\n");
+        // damn, everything's level nearby. Delay for random seconds and restart
+        nextAutolevelTime=Time::now()+(rand()%2)+2;
+        levelx=-1;
+    } else if(!(rand()%100))
+        levelx=-1; // just randomly reset now and then
+    
+    
+    printf("At end %d,%d\n",levelx,levely);
+}
+
+
+// time passed in is interval since last update
+void Player::update(double t){
     Game *game = globals::game;
     Grid *g = &game->grid;
     
@@ -205,6 +276,14 @@ void Player::update(float t){
         if(!p->pop || p->zombie){ // houses die when their population hits zero
             houses.free(p);
         }
+    }
+    
+    // perform any auto-levelling
+    
+    if(Time::now() > nextAutolevelTime){
+        autoLevel();
+        double interval = drand48()*(AUTOLEVELMAXINTERVAL-AUTOLEVELMININTERVAL)+AUTOLEVELMININTERVAL;
+        nextAutolevelTime=Time::now()+interval;
     }
     
     // blur the potential field
