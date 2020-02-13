@@ -273,7 +273,6 @@ void Person::updateInfrequent(){
         int c = g->countFlatGrass(ix,iy);
         if(globals::rnd->getInt(6)<=c) { // higher chance if bigger result
             // make a new house if we can
-            globals::log->p(LOG_POP,"Making a house!");
             House *h = p->houses.alloc();
             if(h){
                 // note - player total population doesn't change
@@ -283,6 +282,7 @@ void Person::updateInfrequent(){
                 // "kill" the villager (he is now the houseowner and moves
                 // into the house)
                 state = ZOMBIE; 
+                globals::log->p(LOG_POP,"%s is making a house!",name);
             }
         }
     }
@@ -292,7 +292,7 @@ void Person::updateInfrequent(){
      */
     
     for(Person *pp = globals::game->grid.getPeople(ix,iy);pp;pp=pp->next){
-        if(pp != this){
+        if(pp != this && !pp->state==ZOMBIE){ // can't merge or fight zombies
             if(pp->p == p){ // same player as me
                 // we sometimes merge with the other person, if the
                 // combined strength would be sane.
@@ -300,6 +300,7 @@ void Person::updateInfrequent(){
                     // note - player total population doesn't change
                     pp->state = ZOMBIE;
                     strength += pp->strength;
+                    globals::log->p(LOG_POP,"Merge! %s is now part of %s with str=%d",pp->name,name,strength);
                 }
             } else { // different player
                 // Fight! There's a 50% chance of either player losing
@@ -319,7 +320,7 @@ void Person::updateInfrequent(){
     GridObj *obj=globals::game->grid.getObject(ix,iy);
     if(obj && obj->type == GO_HOUSE){
         House *h = (House *)obj;
-        if(h->p != p){
+        if(h->p != p && !h->zombie){ // can't attack zombie houses; that's silly.
             // FIGHT HOUSE - similar logic to the above, but houses
             // are tougher.
             

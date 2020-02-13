@@ -33,6 +33,8 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     for(int i=0;i<4;i++){
         int x = basex+rand()%20;
         int y = basey+rand()%20;
+//        int x = rand()%20+76;
+//        int y = rand()%20+91;
         if(!spawn(x,y,1))break;
     }
     
@@ -270,13 +272,13 @@ void Player::update(double t){
         q=people.next(p);
         p->update(t);
         potentialTmp[(int)p->x][(int)p->y]=1;
-        if(p->state == ZOMBIE)
+        if(p->state == ZOMBIE){
+            globals::log->p(LOG_POP,"Person %d/%d (%s): %d is a zombie, deleting",people.getidx(p),idx,p->getName(),p->strength);
             people.free(p);
-        else {
+        } else {
             totalPop+=p->strength;
             globals::log->p(LOG_POP,"Person %d/%d (%s): %d",people.getidx(p),idx,p->getName(),p->strength);
         }
-        
     }
     // update houses and add them to the potential field
     for(House *q,*p=houses.first();p;p=q){
@@ -295,10 +297,12 @@ void Player::update(double t){
         globals::log->p(LOG_POP,"End of update:");
         if(housePop+totalPop == pop)
             globals::log->p(LOG_POP,"Player %d pop = H%d/P%d = %d",
-                   idx,housePop,totalPop,pop);
-        else
+                            idx,housePop,totalPop,pop);
+        else {
             globals::log->p(LOG_POP,"Player %d pop = H%d/P%d = %d (WRONG)",
-                   idx,housePop,totalPop,pop);
+                            idx,housePop,totalPop,pop);
+        }
+        
     }
     // perform any auto-levelling
     

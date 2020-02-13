@@ -125,9 +125,9 @@ void House::update(float t){
 void House::evict(int n){
     if(n>pop)n=pop;
     if(pop>=n){
+        p->decPop(n); // make room first
         int spawned = p->spawn(x,y,n);
-        globals::log->p(LOG_POP,"Decrement in evict");
-        p->decPop(spawned); // do this first to make room
+        globals::log->p(LOG_POP,"Decrement in evict of %d",spawned);
         pop -= spawned;
     }
 }
