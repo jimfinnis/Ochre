@@ -13,6 +13,7 @@
 #define POP_GROW_RATE 0.1
 
 void House::init(int xx,int yy,Player *pl){
+    // total player pop. unchanged since spawning player destroyed
     pop = 1;
     p = pl;
     x=xx;
@@ -65,8 +66,6 @@ void House::queueRender(glm::mat4 *world){
     meshes::ico->queueRender(ms->top());
     ms->pop();
     
-    
-    
     ms->pop();
     sm->pop();
     
@@ -92,7 +91,10 @@ void House::update(float t){
     growcounter+=t*(float)capacity*POP_GROW_RATE;
     if(growcounter>1){
         growcounter=0;
-        pop++;
+        if(p->canIncPop()){
+            pop++;
+            p->incPop();
+        }
     }
     
     // evict excess population, which may destroy the house
@@ -103,14 +105,19 @@ void House::update(float t){
 }
 
 void House::evict(int n){
+    if(n>pop)n=pop;
     if(pop>=n){
-        pop -= n;
-        p->spawn(x,y,n);
+        p->decPop(n); // do this first to make room
+        int spawned = p->spawn(x,y,n);
+        p->incPop(spawned);
+        pop -= spawned;
     }
 }
 
 void House::damage(int n){
+    if(n>pop)n=pop;
     pop -= n;
+    p->decPop(n);
     if(pop<=0)
         globals::game->grid.removeHouse(this);
     

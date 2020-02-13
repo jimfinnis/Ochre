@@ -40,8 +40,10 @@ class Player {
     static constexpr double AUTOLEVELDELAY = 1; // delay before autolevelling starts
     static constexpr double AUTOLEVELMININTERVAL = 0.4; // interval between autolevelling events
     static constexpr double AUTOLEVELMAXINTERVAL = 1.2; // interval between autolevelling events
+    static constexpr int POPLIMIT = 200;
     
     double nextAutolevelTime;
+    int pop; // total population
     
 public:
     int levelx,levely; // location near which we attempt to level
@@ -93,7 +95,8 @@ public:
     void updateHouseTerrain();
     
     // spawn some peeps within a given square (at slightly random offsets within it)
-    void spawn(int x,int y,int n);
+    // returns number actually spawned
+    int spawn(int x,int y,int n);
     
     // set the anchor
     void setAnchor(int x,int y){
@@ -105,6 +108,22 @@ public:
     }
                                 
     static void renderPerson(Person *p);
+    
+    int getPop(){
+        return pop;
+    }
+    bool canIncPop(int n=1){
+        return pop+n < POPLIMIT;
+    }
+    
+    void incPop(int n=1){
+        pop+=n;
+    }
+    
+    void decPop(int n=1){
+        pop-=n;
+        if(pop<0)pop=0;
+    }
 };
 
 #endif /* __PLAYER_H */

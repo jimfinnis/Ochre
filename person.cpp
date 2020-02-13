@@ -254,6 +254,7 @@ void Person::updateInfrequent(){
             // make a new house if we can
             House *h = p->houses.alloc();
             if(h){
+                // note - player total population doesn't change
                 h->init(ix,iy,p);
                 h->pop = strength;
                 //            printf("House added at %d,%d  %p\n",ix,iy,p);
@@ -274,6 +275,7 @@ void Person::updateInfrequent(){
                 // we sometimes merge with the other person, if the
                 // combined strength would be sane.
                 if(pp->strength + strength < PERSON_MERGE_LIMIT && !(rand()%3)){
+                    // note - player total population doesn't change
                     pp->state = ZOMBIE;
                     strength += pp->strength;
                 }
@@ -422,6 +424,7 @@ void Person::update(float t){
 
 void Person::damage(int n){
     strength -= n;
+    p->decPop(n); //  decrease player total pop.
     if(strength<0){
         strength=0;
         state = ZOMBIE;

@@ -260,23 +260,30 @@ void Player::update(double t){
     float potentialTmp[GRIDSIZE][GRIDSIZE];
     memset(potentialTmp,0,GRIDSIZE*GRIDSIZE*sizeof(float));
     
+    int housePop=0;
+    int totalPop=0;
     
     // update people and add them to the potential field
     for(Person *q,*p=people.first();p;p=q){
         q=people.next(p);
+        totalPop+=p->strength;
         p->update(t);
         potentialTmp[(int)p->x][(int)p->y]=1;
         if(p->state == ZOMBIE)people.free(p);
+        
     }
     // update houses and add them to the potential field
     for(House *q,*p=houses.first();p;p=q){
         q=houses.next(p);
+        housePop+=p->pop;
         p->update(t);
         potentialTmp[p->x][p->y]=2; // houses are more er.. targety.
         if(!p->pop || p->zombie){ // houses die when their population hits zero
             houses.free(p);
         }
     }
+    printf("Player %d pop = H%d/P%d = %d (hopefully)\n",
+           idx,housePop,totalPop,pop);
     
     // perform any auto-levelling
     
@@ -294,15 +301,18 @@ void Player::update(double t){
     
 }
 
-void Player::spawn(int x,int y,int n){
+int Player::spawn(int x,int y,int n){
     float fx = ((float)x)+0.5f;
     float fy = ((float)y)+0.5f;
     
     for(int i=0;i<n;i++){
-        Person *p = people.alloc();
-        if(!p)break; // ran out of slots!
-        float px = fx + (drand48()-0.5);
-        float py = fy + (drand48()-0.5);
-        p->init(this,people.getidx(p),px,py);
+        if(canIncPop()){
+            Person *p = people.alloc();
+            if(!p)break; // ran out of slots!
+            float px = fx + (drand48()-0.5);
+            float py = fy + (drand48()-0.5);
+            p->init(this,people.getidx(p),px,py);
+            incPop();
+        } else break;
     }
 }
