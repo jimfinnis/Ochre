@@ -99,6 +99,10 @@ struct Person {
     void resetToWander(){
         state = WANDER;
     }
+    
+    /// get the chance of winning a fight against another
+    /// person
+    double getChanceOfWinningAttack(Person *defender);
 
     void update(float t);
     

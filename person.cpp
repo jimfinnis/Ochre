@@ -216,6 +216,18 @@ void Person::setDirectionFromPotentialField(){
     }
 }
 
+double Person::getChanceOfWinningAttack(Person *defender){
+    if(!defender->strength)return 1; // if he's a corpse we always win!
+    double myStr = strength;
+    double theirStr = defender->strength;
+    
+    double diff = myStr-theirStr;
+    
+    // we use the logistic sigmoid here. Yeah, a lookup would be quicker.
+    return 1.0/(1.0+exp(-diff));
+}
+
+
 void Person::updateInfrequent(){
     // various infrequent things - repathing, picking a fight,
     // turning into a house etc.
@@ -303,12 +315,15 @@ void Person::updateInfrequent(){
                     globals::log->p(LOG_POP,"Merge! %s is now part of %s with str=%d",pp->name,name,strength);
                 }
             } else { // different player
-                // Fight! There's a 50% chance of either player losing
-                // a strength point; and if you get to zero you die.
-                if(rand()%2)
-                    damage(1);
-                else
+                // Fight! The chance of winning is based on strength;
+                // the loser loses a strength point. Yes, it's heavily
+                // weighted to the higher number.
+                
+                double chance = getChanceOfWinningAttack(pp);
+                if(drand48()<chance)
                     pp->damage(1);
+                else
+                    damage(1);
             }
         }
     }
