@@ -14,6 +14,7 @@
 #include "prof.h"
 
 #include "time.h"
+#include "logger.h"
 #include "spiral.h"
 
 static int idxct=0;
@@ -27,12 +28,12 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
         basex=basey=30;
     }
     
+    // set up initial peeps
+    
     for(int i=0;i<4;i++){
-        float x = drand48()*20+basex;
-        float y = drand48()*20+basey;
-        Person *p = people.alloc();
-        if(!p)break;
-        p->init(this,i,y,x);
+        int x = basex+rand()%20;
+        int y = basey+rand()%20;
+        if(!spawn(x,y,1))break;
     }
     
     memset(potential,0,GRIDSIZE*GRIDSIZE*sizeof(float));
@@ -186,7 +187,7 @@ void Player::setMode(PlayerMode m){
 
 void Player::autoLevel(){
     RandomSpiralSearch spiral;
-    printf("At start %d,%d\n",levelx,levely);
+    globals::log->p(LOG_LEVEL,"At start %d,%d",levelx,levely);
     
     // we assume that the "god" has a view of a particular location, and will always
     // level close to that location. It starts at the average location of all the people.
@@ -198,7 +199,7 @@ void Player::autoLevel(){
         }
         if(n>0.000001){
             xx/=n;yy/=n;
-            printf("%f %f - %f\n",xx,yy,n);
+            globals::log->p(LOG_LEVEL,"%f %f - %f",xx,yy,n);
         } else {
             return; // shouldn't happen, there should be some players
         }
@@ -214,7 +215,7 @@ void Player::autoLevel(){
     
     // get the current height and modify it
     int h = g->get(levelx,levely);
-    printf("Levelling at %d,%d: height is %d\n",levelx,levely,h);
+    globals::log->p(LOG_LEVEL,"Levelling at %d,%d: height is %d",levelx,levely,h);
     if(h<1){
         g->up(levelx,levely);
     }
@@ -231,7 +232,7 @@ void Player::autoLevel(){
         if(g->in(gx,gy)){
             h = g->get(gx,gy);
             if(h!=1 && g->nextToDry(gx,gy,3)){
-                printf("Found at %d,%d\n",gx,gy);
+                globals::log->p(LOG_LEVEL,"Found at %d,%d",gx,gy);
                 levelx=gx;
                 levely=gy;
                 found=true;
@@ -240,7 +241,7 @@ void Player::autoLevel(){
         }
     }
     if(!found){
-        printf("Not found\n");
+        globals::log->p(LOG_LEVEL,"Not found");
         // damn, everything's level nearby. Delay for random seconds and restart
         nextAutolevelTime=Time::now()+(rand()%2)+2;
         levelx=-1;
@@ -248,9 +249,8 @@ void Player::autoLevel(){
         levelx=-1; // just randomly reset now and then
     
     
-    printf("At end %d,%d\n",levelx,levely);
+    globals::log->p(LOG_LEVEL,"At end %d,%d",levelx,levely);
 }
-
 
 // time passed in is interval since last update
 void Player::update(double t){
@@ -263,28 +263,43 @@ void Player::update(double t){
     int housePop=0;
     int totalPop=0;
     
+    globals::log->p(LOG_POP,"Start of update: player %d pop = %d",idx,pop);
+    
     // update people and add them to the potential field
     for(Person *q,*p=people.first();p;p=q){
         q=people.next(p);
-        totalPop+=p->strength;
         p->update(t);
         potentialTmp[(int)p->x][(int)p->y]=1;
-        if(p->state == ZOMBIE)people.free(p);
+        if(p->state == ZOMBIE)
+            people.free(p);
+        else {
+            totalPop+=p->strength;
+            globals::log->p(LOG_POP,"Person %d/%d (%s): %d",people.getidx(p),idx,p->getName(),p->strength);
+        }
         
     }
     // update houses and add them to the potential field
     for(House *q,*p=houses.first();p;p=q){
         q=houses.next(p);
-        housePop+=p->pop;
         p->update(t);
         potentialTmp[p->x][p->y]=2; // houses are more er.. targety.
         if(!p->pop || p->zombie){ // houses die when their population hits zero
             houses.free(p);
+        } else {
+            housePop+=p->pop;
+            globals::log->p(LOG_POP,"House %d/%d: %d",houses.getidx(p),idx,p->pop);
         }
+        
     }
-    printf("Player %d pop = H%d/P%d = %d (hopefully)\n",
-           idx,housePop,totalPop,pop);
-    
+    if(globals::log->has(LOG_POP)){
+        globals::log->p(LOG_POP,"End of update:");
+        if(housePop+totalPop == pop)
+            globals::log->p(LOG_POP,"Player %d pop = H%d/P%d = %d",
+                   idx,housePop,totalPop,pop);
+        else
+            globals::log->p(LOG_POP,"Player %d pop = H%d/P%d = %d (WRONG)",
+                   idx,housePop,totalPop,pop);
+    }
     // perform any auto-levelling
     
     if(Time::now() > nextAutolevelTime){
@@ -304,6 +319,7 @@ void Player::update(double t){
 int Player::spawn(int x,int y,int n){
     float fx = ((float)x)+0.5f;
     float fy = ((float)y)+0.5f;
+    int ct=0;
     
     for(int i=0;i<n;i++){
         if(canIncPop()){
@@ -313,6 +329,9 @@ int Player::spawn(int x,int y,int n){
             float py = fy + (drand48()-0.5);
             p->init(this,people.getidx(p),px,py);
             incPop();
+            globals::log->p(LOG_POP,"New person %s, increment in spawn",p->getName());
+            ct++;
         } else break;
     }
+    return ct;
 }

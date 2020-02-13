@@ -18,10 +18,12 @@
 class Font;
 class Game;
 class RandomNumberGenerator;
+class Logger;
 
 namespace globals {
 extern Font *font;
 extern bool running;
+extern Logger *log;
 extern Game *game;
 extern double timeNow; // to save time calling now()
 void init();

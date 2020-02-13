@@ -47,6 +47,8 @@ struct Person {
     int pathidx; // current index of path
     // how many actual "people" this is - they merge and sometimes split!
     int strength; 
+    // pending damage
+    int pendDamage;
     float walkCycle; // where we are in the walk cycle. Just keeps increasing.
     float smoothRot;
     
@@ -60,6 +62,8 @@ struct Person {
     }
 
     void init(class Player *player, int idx, float xx,float yy);
+    
+    const char *getName(){return name;}
 
     // used in wandering - sets the direction to where no-one has been
     // and also to either attack or move away from the other player.
@@ -100,11 +104,15 @@ struct Person {
     
     JPS::PathVector path;
 private:
+    char name[32]; // just for fun
+    
     /// an update which doesn't happen very often, but at least once per traversed
     /// map square.
     void updateInfrequent();
     
     /// damage me by n points of strength; zombie me if <=0.
+    /// Damage is added to pending damage and applied in the next update by
+    /// the person itself.
     void damage(int n);
 
     class Player *p;

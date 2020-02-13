@@ -9,12 +9,14 @@
 #include "meshes.h"
 #include "house.h"
 #include "font.h"
+#include "logger.h"
 
 #define POP_GROW_RATE 0.1
 
 void House::init(int xx,int yy,Player *pl){
     // total player pop. unchanged since spawning player destroyed
     pop = 1;
+    pendDamage=0;
     p = pl;
     x=xx;
     y=yy;
@@ -78,11 +80,26 @@ void House::update(float t){
         1,2,4,5
     };
     
+    // pending damage?
+    if(pendDamage){
+        if(pendDamage>pop)pendDamage=pop;
+        pop -= pendDamage;
+        p->decPop(pendDamage);
+        pendDamage=0;
+        globals::log->p(LOG_POP,"Decrement in house damage");
+        if(pop<=0){
+            zombie=true;
+            return;
+        }
+    }
+    
     size = (size==255)?
           g->countFlatGrass(x,y) : g->countFlat(x,y);
     
     if(size<0){
+        globals::log->p(LOG_POP,"House destroyed due to size<0");
         zombie=true; // no room! 
+        return;
     }
     
     int capacity = capacities[size+1];
@@ -94,6 +111,7 @@ void House::update(float t){
         if(p->canIncPop()){
             pop++;
             p->incPop();
+            globals::log->p(LOG_POP,"Increment in grow");
         }
     }
     
@@ -107,18 +125,14 @@ void House::update(float t){
 void House::evict(int n){
     if(n>pop)n=pop;
     if(pop>=n){
-        p->decPop(n); // do this first to make room
         int spawned = p->spawn(x,y,n);
-        p->incPop(spawned);
+        globals::log->p(LOG_POP,"Decrement in evict");
+        p->decPop(spawned); // do this first to make room
         pop -= spawned;
     }
 }
 
 void House::damage(int n){
-    if(n>pop)n=pop;
-    pop -= n;
-    p->decPop(n);
-    if(pop<=0)
-        globals::game->grid.removeHouse(this);
-    
+    pendDamage+=n;
 }
+    

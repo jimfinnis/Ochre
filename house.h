@@ -15,8 +15,9 @@ struct House : public GridObj {
     /// and is typically 0,1,2 or 3. -1 means it shouldn't be there. 255 means
     /// it needs updating.
     
-    int size;
+    int size; // maximum people count
     int pop; // how many people
+    int pendDamage;
     uint16_t x,y; // position
     // when this hits a certain number we increase pop, when pop>=cap
     // we spawn.
@@ -27,6 +28,7 @@ struct House : public GridObj {
     void init(int x,int y,Player *pl);
     void update(float t);
     // take n point of damage (i.e. lose n people) and destroy if zero.
+    // This is added to pending damage and actually applied in the update.
     void damage(int n); 
     virtual void queueRender(glm::mat4 *world);
     virtual ~House();

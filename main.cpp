@@ -19,6 +19,7 @@
 #include "time.h"
 #include "game.h"
 #include "globals.h"
+#include "logger.h"
 
 #include "gamescreen.h"
 #include "prof.h"
@@ -172,6 +173,10 @@ int main(int argc, char** argv)
     meshes::load();
 
     double lastt = Time::now();
+    
+    printf("--\n--\n--\n--ENTERING MAIN LOOP\n--\n--\n--\n");
+    
+    globals::log->set(LOG_POP);
     while(globals::running)
     {
         Time::tick();
@@ -182,7 +187,7 @@ int main(int argc, char** argv)
         handleInput();
         render();
     
- //       Time::sleep(0.02); // yeah, frame rate cap.
+//       Time::sleep(0.1); // yeah, frame rate cap.
     };
 
     return 0;

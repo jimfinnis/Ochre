@@ -10,6 +10,7 @@
 #include "game.h"
 #include "player.h"
 #include "time.h"
+#include "logger.h"
 
 #include "spiral.h"
 
@@ -54,6 +55,23 @@
 
 static SpiralSearch spiral;
 
+static void genName(char *name,int pl){
+    static char cons[] = "tgbnrylmnttssfvc";
+    static char vwls[] = "aeiuow";
+    char *b = name;
+    
+    *b++ = cons[rand()%strlen(cons)];
+    *b++ = vwls[rand()%strlen(vwls)];
+    *b++ = cons[rand()%strlen(cons)];
+    *b++ = vwls[rand()%strlen(vwls)];
+    *b++ = cons[rand()%strlen(cons)];
+    *b++ = vwls[rand()%strlen(vwls)];
+    *b=0;
+    if(pl){
+        while(*name){*name = toupper(*name);name++;}
+    }
+}
+
 
 // table mapping direction onto rotation (in degrees, but gets
 // switched to radians)
@@ -67,12 +85,15 @@ float dirToRot[3][3] = {
 void Person::init(class Player *player, int idx, float xx,float yy){
     x=xx;y=yy;
     dx=dy=0;
+    pendDamage=0;
     p=player;
     strength=1;
     drowntime=0;
     walkCycle=0;
     speed = globals::rnd->range(0.9f,1.1f)*BASEPERSONSPEED;
     nextInfrequentUpdate = globals::timeNow+INFREQUENTUPDATEINTERVAL*0.2*(double)(idx%10);
+    
+    genName(name,player->idx);
 }
 
 Person *Person::locateEnemy(){
@@ -252,6 +273,7 @@ void Person::updateInfrequent(){
         int c = g->countFlatGrass(ix,iy);
         if(globals::rnd->getInt(6)<=c) { // higher chance if bigger result
             // make a new house if we can
+            globals::log->p(LOG_POP,"Making a house!");
             House *h = p->houses.alloc();
             if(h){
                 // note - player total population doesn't change
@@ -361,6 +383,21 @@ void Person::updateInfrequent(){
 void Person::update(float t){
     Grid *g = &globals::game->grid;
     PlayerMode mode = p->getMode();
+    
+    // deal with pending damage
+    if(pendDamage>0){
+        strength -= pendDamage;
+        p->decPop(pendDamage); //  decrease player total pop.
+        pendDamage=0;
+        globals::log->p(LOG_POP,"Decrement in person damage to %s, person now %d",name,strength);
+        if(strength<=0){
+            globals::log->p(LOG_POP,"Person %s has ceased to be",name);
+            strength=0;
+            state = ZOMBIE;
+            return; // terminate update here
+        }
+    }
+
     if(globals::timeNow > nextInfrequentUpdate){
         nextInfrequentUpdate = globals::timeNow + INFREQUENTUPDATEINTERVAL;
         updateInfrequent();
@@ -408,7 +445,7 @@ void Person::update(float t){
             // we're in the sea!
             drowntime+=t;
             if(drowntime>DROWNSURVIVALTIME){
-                state = ZOMBIE; // "Like tears in the rain. Time to die."
+                damage(1);
             } else {
                 path.clear(); // our path is useless, it goes into the sea
                 state = WANDER;
@@ -423,12 +460,7 @@ void Person::update(float t){
 }
 
 void Person::damage(int n){
-    strength -= n;
-    p->decPop(n); //  decrease player total pop.
-    if(strength<0){
-        strength=0;
-        state = ZOMBIE;
-    }
+    pendDamage+=n;
 }
 
 

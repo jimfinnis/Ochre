@@ -7,10 +7,12 @@
 #include "globals.h"
 #include "font.h"
 #include "maths.h"
+#include "logger.h"
 
 namespace globals {
 Font *font = NULL;
 Game *game = NULL;
+Logger *log = NULL;
 bool running = true;
 double timeNow = 0; 
 RandomNumberGenerator *rnd;
@@ -19,6 +21,7 @@ RandomNumberGenerator *rnd;
 void init(){
     font = new Font("media/fonts/Quicksand-Regular.otf",20);
     rnd = new RandomNumberGenerator();
+    log = new Logger(0);
 }
 
 }

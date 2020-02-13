@@ -11,7 +11,8 @@
 #include "person.h"
 #include "house.h"
 #include "blur.h"
-
+#include "globals.h"
+#include "logger.h"
 
 /// these are the modes available to the player
 enum PlayerMode {
@@ -118,11 +119,13 @@ public:
     
     void incPop(int n=1){
         pop+=n;
+        globals::log->p(LOG_POP,"Pop inc in player %d by %d to %d\n",idx,n,pop);
     }
     
     void decPop(int n=1){
         pop-=n;
         if(pop<0)pop=0;
+        globals::log->p(LOG_POP,"Pop dec in player %d by %d to %d\n",idx,n,pop);
     }
 };
 
