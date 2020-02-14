@@ -228,6 +228,17 @@ double Person::getChanceOfWinningAttack(Person *defender){
     return 1.0/(1.0+exp(-diff));
 }
 
+double Person::getChanceOfWinningAttack(House *defender){
+    if(!defender->pop)return 1; // if he's a corpse we always win!
+    double myStr = strength;
+    double theirStr = defender->pop;
+    
+    double diff = myStr-theirStr;
+    
+    // we use the logistic sigmoid here. Yeah, a lookup would be quicker.
+    return 1.0/(1.0+exp(-diff));
+}
+
 
 void Person::updateInfrequent(){
     // various infrequent things - repathing, picking a fight,
@@ -344,13 +355,14 @@ void Person::updateInfrequent(){
             // FIGHT HOUSE - similar logic to the above, but houses
             // are tougher.
             
-            if(rand()%3){ // more likely attacker will be damaged
+            double chance = getChanceOfWinningAttack(h);
+            if(drand48()<chance)
                 damage(1);
-            } else {
+            else
                 h->damage(1);
-            }
         }
     }
+    
     
     // repath - this runs infrequently.
     

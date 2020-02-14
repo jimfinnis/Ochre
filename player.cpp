@@ -77,8 +77,7 @@ void Player::renderPerson(Person *p){
     ms->pop();
     ms->scale(0.5);
     ms->translate(0,1.8,0); // head
-    if(p->debug)
-        meshes::toppivotcube->render(ms->top());
+    meshes::toppivotcube->render(ms->top());
     ms->pop();
     
     //arms

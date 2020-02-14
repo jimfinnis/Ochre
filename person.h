@@ -102,8 +102,10 @@ struct Person {
     }
     
     /// get the chance of winning a fight against another
-    /// person
+    /// person or house
+    
     double getChanceOfWinningAttack(Person *defender);
+    double getChanceOfWinningAttack(House *defender);
 
     void update(float t);
     
