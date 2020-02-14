@@ -577,13 +577,20 @@ void Grid::renderObjects(int range){
 
 void Grid::populatePeople(const Player &pl){
     for(Person *p=pl.people.first();p;p=pl.people.next(p)){
-        int x = p->x;
-        int y = p->y;
-        
+        int x = (int)(p->x);
+        int y = (int)(p->y);
         p->next = people[x][y];
         people[x][y] = p;
     }
 }
+
+Person *Grid::getPeople(int x,int y){
+   if(in(x,y))
+       return people[x][y];
+   else
+       return NULL;
+}
+
 
 void Grid::update(float t){
     // populate the people lists

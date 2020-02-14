@@ -77,7 +77,8 @@ void Player::renderPerson(Person *p){
     ms->pop();
     ms->scale(0.5);
     ms->translate(0,1.8,0); // head
-    meshes::toppivotcube->render(ms->top());
+    if(p->debug)
+        meshes::toppivotcube->render(ms->top());
     ms->pop();
     
     //arms
@@ -273,11 +274,11 @@ void Player::update(double t){
         p->update(t);
         potentialTmp[(int)p->x][(int)p->y]=1;
         if(p->state == ZOMBIE){
-            globals::log->p(LOG_POP,"Person %d/%d (%s): %d is a zombie, deleting",people.getidx(p),idx,p->getName(),p->strength);
+            globals::log->p(LOG_PEEP,"Person %d/%d (%s) (debug %d): %d is a zombie, deleting",people.getidx(p),idx,p->getName(),p->debug,p->strength);
             people.free(p);
         } else {
             totalPop+=p->strength;
-            globals::log->p(LOG_POP,"Person %d/%d (%s): %d",people.getidx(p),idx,p->getName(),p->strength);
+            globals::log->p(LOG_PEEP,"Person %d/%d (%s) (debug %d): %d",people.getidx(p),idx,p->getName(),p->debug,p->strength);
         }
     }
     // update houses and add them to the potential field
@@ -289,7 +290,7 @@ void Player::update(double t){
             houses.free(p);
         } else {
             housePop+=p->pop;
-            globals::log->p(LOG_POP,"House %d/%d: %d",houses.getidx(p),idx,p->pop);
+            globals::log->p(LOG_HOUSE,"House %d/%d: %d",houses.getidx(p),idx,p->pop);
         }
         
     }

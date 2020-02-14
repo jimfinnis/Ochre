@@ -70,7 +70,8 @@ void GameScreen::onKeyDown(int k){
     case 'x':
         g->recentre();
         break;
-    case SDLK_TAB:
+//    case SDLK_TAB:
+        case '1':
         globals::game->togglePause();
         break;
     case SDLK_SPACE:

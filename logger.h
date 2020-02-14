@@ -13,6 +13,8 @@
 
 #define LOG_POP 1
 #define LOG_LEVEL 2
+#define LOG_HOUSE 4
+#define LOG_PEEP 8
 
 class Logger {
     unsigned flags;

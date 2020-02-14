@@ -188,12 +188,7 @@ public:
     
     // get head of linked list of people in this square, updated
     // every grid update.
-    class Person *getPeople(int x,int y){
-        if(in(x,y))
-            return people[x][y];
-        else
-            return NULL;
-    }
+    class Person *getPeople(int x,int y);
     
     
     // called every update tick.

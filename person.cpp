@@ -84,6 +84,7 @@ float dirToRot[3][3] = {
 
 void Person::init(class Player *player, int idx, float xx,float yy){
     x=xx;y=yy;
+    debug=0;
     dx=dy=0;
     pendDamage=0;
     p=player;
@@ -232,6 +233,8 @@ void Person::updateInfrequent(){
     // various infrequent things - repathing, picking a fight,
     // turning into a house etc.
     
+    debug=0;
+    
     Grid *g = &globals::game->grid;
     int ix = (int)x;
     int iy = (int)y;
@@ -295,16 +298,18 @@ void Person::updateInfrequent(){
                 // into the house)
                 state = ZOMBIE; 
                 globals::log->p(LOG_POP,"%s is making a house!",name);
+                return; // abort processing
             }
         }
     }
+    
     
     /*
      * Picking a fight with a person, OR merging with a person!
      */
     
     for(Person *pp = globals::game->grid.getPeople(ix,iy);pp;pp=pp->next){
-        if(pp != this && !pp->state==ZOMBIE){ // can't merge or fight zombies
+        if(pp != this && pp->state!=ZOMBIE){ // can't merge or fight zombies
             if(pp->p == p){ // same player as me
                 // we sometimes merge with the other person, if the
                 // combined strength would be sane.
@@ -400,6 +405,9 @@ void Person::update(float t){
     Grid *g = &globals::game->grid;
     PlayerMode mode = p->getMode();
     
+    if(state==ZOMBIE)
+        return;
+    
     // deal with pending damage
     if(pendDamage>0){
         strength -= pendDamage;
@@ -413,7 +421,7 @@ void Person::update(float t){
             return; // terminate update here
         }
     }
-
+    
     if(globals::timeNow > nextInfrequentUpdate){
         nextInfrequentUpdate = globals::timeNow + INFREQUENTUPDATEINTERVAL;
         updateInfrequent();

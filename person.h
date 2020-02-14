@@ -51,6 +51,7 @@ struct Person {
     int pendDamage;
     float walkCycle; // where we are in the walk cycle. Just keeps increasing.
     float smoothRot;
+    int debug;
     
     PersonState state;
     double nextInfrequentUpdate;
