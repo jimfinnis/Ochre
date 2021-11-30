@@ -39,8 +39,8 @@ class Player {
     MultipassBlur *blurClose; // potential field blurrer - takes several ticks
     PlayerMode mode;
     static constexpr double AUTOLEVELDELAY = 1; // delay before autolevelling starts
-    static constexpr double AUTOLEVELMININTERVAL = 0.4; // interval between autolevelling events
-    static constexpr double AUTOLEVELMAXINTERVAL = 1.2; // interval between autolevelling events
+    static constexpr double AUTOLEVELMININTERVAL = 0.1; // interval between autolevelling events
+    static constexpr double AUTOLEVELMAXINTERVAL = 0.2; // interval between autolevelling events
     static constexpr int POPLIMIT = 10000;
     
     double nextAutolevelTime;

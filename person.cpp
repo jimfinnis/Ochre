@@ -30,7 +30,7 @@
 
 // how likely we are to make a house in settle mode
 // This is an N-sided dice roll, so 10 is one chance in 10.
-#define HOUSE_CHANCE_SETTLE 1
+#define HOUSE_CHANCE_SETTLE 3
 // how likely we are to make a house in other modes
 // This is an N-sided dice roll, so 10 is one chance in 10.
 #define HOUSE_CHANCE_OTHER 20

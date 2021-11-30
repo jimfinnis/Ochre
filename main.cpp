@@ -176,7 +176,7 @@ int main(int argc, char** argv)
     
     printf("--\n--\n--\n--ENTERING MAIN LOOP\n--\n--\n--\n");
     
-//    globals::log->set(LOG_PEEP);
+    globals::log->set(LOG_POP);
     while(globals::running)
     {
         Time::tick();
