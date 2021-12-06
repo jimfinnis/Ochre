@@ -21,7 +21,7 @@ RandomNumberGenerator *rnd;
 void init(){
     font = new Font("media/fonts/Quicksand-Regular.otf",20);
     rnd = new RandomNumberGenerator();
-    log = new Logger(0);
+    log = new Logger(LOG_POP);
 }
 
 }

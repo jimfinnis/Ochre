@@ -27,6 +27,7 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES){
     } else {
         basex=basey=30;
     }
+    winfactor=1;
     
     // set up initial peeps
     
@@ -262,10 +263,7 @@ void Player::update(double t){
     float potentialTmp[GRIDSIZE][GRIDSIZE];
     memset(potentialTmp,0,GRIDSIZE*GRIDSIZE*sizeof(float));
     
-    int housePop=0;
-    int totalPop=0;
-    
-    globals::log->p(LOG_POP,"Start of update: player %d pop = %d",idx,pop);
+    globals::log->p(LOG_POP,"Start of update: player %d pop = %d",idx,population);
     
     // update people and add them to the potential field
     for(Person *q,*p=people.first();p;p=q){
@@ -276,7 +274,6 @@ void Player::update(double t){
             globals::log->p(LOG_PEEP,"Person %d/%d (%s) (debug %d): %d is a zombie, deleting",people.getidx(p),idx,p->getName(),p->debug,p->strength);
             people.free(p);
         } else {
-            totalPop+=p->strength;
             globals::log->p(LOG_PEEP,"Person %d/%d (%s) (debug %d): %d",people.getidx(p),idx,p->getName(),p->debug,p->strength);
         }
     }
@@ -288,19 +285,34 @@ void Player::update(double t){
         if(!p->pop || p->zombie){ // houses die when their population hits zero
             houses.free(p);
         } else {
-            housePop+=p->pop;
             globals::log->p(LOG_HOUSE,"House %d/%d: %d",houses.getidx(p),idx,p->pop);
         }
-        
     }
+    
+    // count pops
+    int housePop=0;
+    int totalPop=0;
+    
+    for(Person *q,*p=people.first();p;p=q){
+        q=people.next(p);
+        if(p->state!=ZOMBIE){
+            totalPop+=p->strength;
+        }
+    }
+    for(House *q,*p=houses.first();p;p=q){
+        q=houses.next(p);
+        if(!p->zombie)housePop+=p->pop;
+    }
+    
+    
     if(globals::log->has(LOG_POP)){
-        globals::log->p(LOG_POP,"End of update:");
-        if(housePop+totalPop == pop)
-            globals::log->p(LOG_POP,"Player %d pop = H%d/P%d = %d",
-                            idx,housePop,totalPop,pop);
+        if(housePop+totalPop == population)
+            globals::log->p(LOG_POP,"  End of update: Player %d pop = H%d+P%d = %d",
+                            idx,housePop,totalPop,population);
         else {
-            globals::log->p(LOG_POP,"Player %d pop = H%d/P%d = %d (WRONG)",
-                            idx,housePop,totalPop,pop);
+            globals::log->p(LOG_POP,"  End of update: Player %d pop = H%d+P%d = %d, should be %d (WRONG)",
+                            idx,housePop,totalPop,housePop+totalPop,population);
+            exit(1);
         }
         
     }
@@ -318,6 +330,15 @@ void Player::update(double t){
     blurClose->pass((float*)potentialTmp,(float*)potentialClose);
     profbar.end();
     
+    // work out who's "winning" - there's a one frame lag here. Ah well.
+    float diff = (population - op->population)*0.001;
+    if(diff>1)diff=1;
+    if(diff<-1)diff=-1;
+    // use that to determine the "winfactor" - an advantage given to the winner,
+    // to help avoid stalemate.
+    winfactor = 1+diff*0.5;
+    
+    
 }
 
 int Player::spawn(int x,int y,int n){
@@ -328,14 +349,19 @@ int Player::spawn(int x,int y,int n){
     for(int i=0;i<n;i++){
         if(canIncPop()){
             Person *p = people.alloc();
-            if(!p)break; // ran out of slots!
+            if(!p){
+                globals::log->p(LOG_POP,"Spawn failure, out of slots");
+                break; // ran out of slots!
+            }
             float px = fx + (drand48()-0.5);
             float py = fy + (drand48()-0.5);
             p->init(this,people.getidx(p),px,py);
-            incPop();
+            incPop("spawn");
             globals::log->p(LOG_POP,"New person %s, increment in spawn",p->getName());
             ct++;
-        } else break;
+        } else {
+            globals::log->p(LOG_POP,"Spawn failure, cannot inc (not slots)");
+        }
     }
     return ct;
 }

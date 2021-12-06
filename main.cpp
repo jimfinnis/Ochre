@@ -161,8 +161,10 @@ int main(int argc, char** argv)
     // 132,8: archipelago, away
     // 
     
-    int map = 130;
-    int water = 10;
+    //    int map = 130;
+    //    int water = 10;
+    int map = 0;
+    int water = 2;
     
     if(argc>2){
         map = atoi(argv[1]);

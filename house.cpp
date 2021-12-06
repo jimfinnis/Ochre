@@ -84,7 +84,7 @@ void House::update(float t){
     if(pendDamage){
         if(pendDamage>pop)pendDamage=pop;
         pop -= pendDamage;
-        p->decPop(pendDamage);
+        p->decPop("housedamage",pendDamage);
         pendDamage=0;
         globals::log->p(LOG_POP,"Decrement in house damage");
         if(pop<=0){
@@ -97,6 +97,8 @@ void House::update(float t){
           g->countFlatGrass(x,y) : g->countFlat(x,y);
     
     if(size<0){
+        p->decPop("size<0",pop);
+        pop=0;
         globals::log->p(LOG_POP,"House destroyed due to size<0");
         zombie=true; // no room! 
         return;
@@ -105,13 +107,12 @@ void House::update(float t){
     int capacity = capacities[size+1];
     
     //    printf("cap %d, pop %d, gc %f\n",capacity,pop,growcounter);
-    growcounter+=t*(float)capacity*POP_GROW_RATE;
+    growcounter+=t*(float)capacity*POP_GROW_RATE*p->winfactor;
     if(growcounter>1){
         growcounter=0;
         if(p->canIncPop()){
             pop++;
-            p->incPop();
-            globals::log->p(LOG_POP,"Increment in grow");
+            p->incPop("grow");
         }
     }
     
@@ -125,10 +126,9 @@ void House::update(float t){
 void House::evict(int n){
     if(n>pop)n=pop;
     if(pop>=n){
-        p->decPop(n); // make room first
         int spawned = p->spawn(x,y,n);
-        globals::log->p(LOG_POP,"Decrement in evict of %d",spawned);
         pop -= spawned;
+        p->decPop("evict",spawned); 
     }
 }
 

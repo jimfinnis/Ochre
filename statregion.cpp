@@ -30,12 +30,15 @@ void StatRegion::render(){
 
     Grid *g = &globals::game->grid;
 
-    globals::font->render(10,50,20,"curs[%d %d] peeps %d+%d pop %d+%d fps %d tick %08u",
+    globals::font->render(10,50,20,"curs[%d %d] peeps %d+%d pop %d+%d winf %.2f/%.2f fps %d tick %08u",
                           g->cursorx,g->cursory,
                           globals::game->p[0].people.size(),
                           globals::game->p[1].people.size(),
                           globals::game->p[0].getPop(),
                           globals::game->p[1].getPop(),
+                          globals::game->p[0].winfactor,
+                          globals::game->p[1].winfactor,
+                          
                           
                           (int)(1.0/ft),
                           Time::ticks()

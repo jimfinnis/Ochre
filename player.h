@@ -41,10 +41,10 @@ class Player {
     static constexpr double AUTOLEVELDELAY = 1; // delay before autolevelling starts
     static constexpr double AUTOLEVELMININTERVAL = 0.1; // interval between autolevelling events
     static constexpr double AUTOLEVELMAXINTERVAL = 0.2; // interval between autolevelling events
-    static constexpr int POPLIMIT = 10000;
+    static constexpr int POPLIMIT = 1000;
     
     double nextAutolevelTime;
-    int pop; // total population
+    int population; // total population
     
 public:
     int levelx,levely; // location near which we attempt to level
@@ -61,6 +61,11 @@ public:
     // potential field produced by my people, this one blurred less - 
     // it's for close range avoidance/attraction.
     float potentialClose[GRIDSIZE][GRIDSIZE];
+    
+    // a weird hack to give an advantage to the winning player.
+    float winfactor;
+    
+    
     
     Player();
     virtual ~Player();
@@ -111,21 +116,21 @@ public:
     static void renderPerson(Person *p);
     
     int getPop(){
-        return pop;
+        return population;
     }
     bool canIncPop(int n=1){
-        return pop+n < POPLIMIT;
+        return population+n < POPLIMIT;
     }
     
-    void incPop(int n=1){
-        pop+=n;
-        globals::log->p(LOG_POP,"Pop inc in player %d by %d to %d\n",idx,n,pop);
+    void incPop(const char *where, int n=1){
+        population+=n;
+        globals::log->p(LOG_POP,"Pop inc in player %d %s by %d to %d",idx, where, n,population);
     }
     
-    void decPop(int n=1){
-        pop-=n;
-        if(pop<0)pop=0;
-        globals::log->p(LOG_POP,"Pop dec in player %d by %d to %d\n",idx,n,pop);
+    void decPop(const char *where, int n=1){
+        population-=n;
+        if(population<0)population=0;
+        globals::log->p(LOG_POP,"Pop dec in player %d %s by %d to %d",idx, where, n,population);
     }
 };
 

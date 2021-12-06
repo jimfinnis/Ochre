@@ -422,13 +422,14 @@ void Person::update(float t){
     
     // deal with pending damage
     if(pendDamage>0){
+        if(pendDamage>strength)
+            pendDamage=strength;
         strength -= pendDamage;
-        p->decPop(pendDamage); //  decrease player total pop.
+        p->decPop("persondamage",pendDamage); //  decrease player total pop.
         pendDamage=0;
         globals::log->p(LOG_POP,"Decrement in person damage to %s, person now %d",name,strength);
         if(strength<=0){
             globals::log->p(LOG_POP,"Person %s has ceased to be",name);
-            strength=0;
             state = ZOMBIE;
             return; // terminate update here
         }
