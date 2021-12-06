@@ -41,7 +41,7 @@ class Player {
     static constexpr double AUTOLEVELDELAY = 1; // delay before autolevelling starts
     static constexpr double AUTOLEVELMININTERVAL = 0.1; // interval between autolevelling events
     static constexpr double AUTOLEVELMAXINTERVAL = 0.2; // interval between autolevelling events
-    static constexpr int POPLIMIT = 1000;
+    static constexpr int POPLIMIT = 30000;
     
     double nextAutolevelTime;
     int population; // total population

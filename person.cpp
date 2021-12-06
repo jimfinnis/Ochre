@@ -308,7 +308,8 @@ void Person::updateInfrequent(){
                 // "kill" the villager (he is now the houseowner and moves
                 // into the house)
                 state = ZOMBIE; 
-                globals::log->p(LOG_POP,"%s is making a house!",name);
+                strength=0;
+                globals::log->p(LOG_POP,"%s is making a house; strength %d",name,strength);
                 return; // abort processing
             }
         }
