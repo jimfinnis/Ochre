@@ -10,7 +10,7 @@
 #include "house.h"
 #include "font.h"
 
-#define POP_GROW_RATE 0.1
+#define HOUSE_POP_GROW_RATE 0.7
 
 void House::init(int xx,int yy,Player *pl){
     pop = 1;
@@ -48,6 +48,7 @@ void House::queueRender(glm::mat4 *world){
     ms->push();
     ms->rotY(globals::timeNow);
     
+    // blue dot shows population
     State *s = sm->push();
     s->overrides |= STO_DIFFUSE;
     s->diffuse = Colour(0.1,0.1,0.5);
@@ -57,7 +58,7 @@ void House::queueRender(glm::mat4 *world){
     meshes::ico->queueRender(ms->top());
     ms->pop();
     
-    
+    // red dot shows size
     s->diffuse = Colour(0.5,0.1,0.1);
     ms->push();
     ms->translate(0,size+0.6,0);
@@ -75,8 +76,10 @@ void House::queueRender(glm::mat4 *world){
 void House::update(float t){
     Grid *g = &globals::game->grid;
     static const int capacities[]={
-        0,
         1,2,4,5
+    };
+    static const float growrates[]={
+        1,1,2,2
     };
     
     size = (size==255)?
@@ -86,10 +89,10 @@ void House::update(float t){
         zombie=true; // no room! 
     }
     
-    int capacity = capacities[size+1];
+    int capacity = capacities[size];
     
     //    printf("cap %d, pop %d, gc %f\n",capacity,pop,growcounter);
-    growcounter+=t*(float)capacity*POP_GROW_RATE;
+    growcounter+=t*growrates[size]*HOUSE_POP_GROW_RATE;
     if(growcounter>1){
         growcounter=0;
         pop++;
@@ -105,7 +108,10 @@ void House::update(float t){
 void House::evict(int n){
     if(pop>=n){
         pop -= n;
-        p->spawn(x,y,n);
+        // we can't spawn if the local population is too high, but
+        // the house empties (they just die!)
+        if(p->potentialClose[x][y]<0.1)
+            p->spawn(x,y,n);
     }
 }
 

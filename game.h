@@ -51,12 +51,29 @@ struct Game {
         p[1].update(t);
         profbar.end();
         
+        
     }
 
     Grid grid;
     bool paused;
 
     Player p[2];
+    
+    Player *getOther(Player *pl){
+        if(&p[0]==pl)
+            return &p[1];
+        else
+            return &p[0];
+    }
+    
+    float getAdvantage(Player *me, int gridx, int gridy){
+        Player *other = getOther(me);
+        float adv = me->potential[gridx][gridy] - other->potential[gridx][gridy];
+        float otherinf = (other->influence<1) ? 1 : other->influence;
+        float infadv = me->influence / otherinf;
+        return adv+infadv;
+    }
+        
 };
 
 #endif /* __GAME_H */

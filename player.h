@@ -47,6 +47,7 @@ public:
     int levelx,levely; // location near which we attempt to level
     int idx; // which player am I?
     Player *op; // opposing player
+    int pop; // total population including in houses
     Pool<Person> people;
     Pool<House> houses;
     
@@ -58,6 +59,11 @@ public:
     // potential field produced by my people, this one blurred less - 
     // it's for close range avoidance/attraction.
     float potentialClose[GRIDSIZE][GRIDSIZE];
+    
+    // the total potential - since each square maxes out at 1,
+    // this gets higher the more squares we are present in. As such
+    // it acts as a measure of "influence".
+    float influence;
     
     Player();
     virtual ~Player();

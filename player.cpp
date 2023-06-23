@@ -17,7 +17,7 @@
 #include "spiral.h"
 
 static int idxct=0;
-Player::Player() : people(MAXPOP), houses(MAXHOUSES){
+Player::Player() : people(MAXPOP), houses(MAXHOUSES), influence(0) {
     idx=idxct++;
     float basex,basey;
     
@@ -260,19 +260,31 @@ void Player::update(double t){
     float potentialTmp[GRIDSIZE][GRIDSIZE];
     memset(potentialTmp,0,GRIDSIZE*GRIDSIZE*sizeof(float));
     
+    // keep total "potential", this acts as a measure
+    // of influence on the map.
+    influence = 0;
+    
+    // count people including house populations
+    pop = people.size();
+    for(House *q,*p=houses.first();p;p=q){
+        pop+=p->pop;
+    }
+    
     
     // update people and add them to the potential field
     for(Person *q,*p=people.first();p;p=q){
         q=people.next(p);
         p->update(t);
-        potentialTmp[(int)p->x][(int)p->y]=1;
+        potentialTmp[(int)p->x][(int)p->y]=0.2;
+        influence+=0.2;
         if(p->state == ZOMBIE)people.free(p);
     }
     // update houses and add them to the potential field
     for(House *q,*p=houses.first();p;p=q){
         q=houses.next(p);
         p->update(t);
-        potentialTmp[p->x][p->y]=2; // houses are more er.. targety.
+        potentialTmp[p->x][p->y]=1; // houses are more significant
+        influence+=1;
         if(!p->pop || p->zombie){ // houses die when their population hits zero
             houses.free(p);
         }

@@ -105,14 +105,17 @@ Context::Context(int ww,int hh) : stat("stat"), tool("tool") {
     // this doesn't appear to work...
     SDL_SetWindowMinimumSize(wnd,640,480);
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 5);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
     SDL_GL_SetSwapInterval(0);
 
     glc = SDL_GL_CreateContext(wnd);
 
+    printf("Blart1\n");fflush(stdout);
+//    rdr = SDL_CreateRenderer(wnd, -1,  SDL_RENDERER_TARGETTEXTURE);
     rdr = SDL_CreateRenderer(wnd, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+    printf("Blart2\n");fflush(stdout);
 
 #if GLDEBUG
     // call to enable debug

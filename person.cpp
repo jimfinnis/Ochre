@@ -278,12 +278,17 @@ void Person::updateInfrequent(){
                     strength += pp->strength;
                 }
             } else { // different player
-                // Fight! There's a 50% chance of either player losing
-                // a strength point; and if you get to zero you die.
-                if(rand()%2)
-                    damage(1);
+                
+                // get our advantage - should be 0-1.
+                float adv = globals::game->getAdvantage(p,ix,iy);
+                
+                // this is our chance of winning
+                float winchance = 0.5f + adv*0.2f;
+                
+                if(drand48()<winchance)
+                    pp->damage(1); // we won!
                 else
-                    pp->damage(1);
+                    damage(1);
             }
         }
     }
@@ -299,11 +304,15 @@ void Person::updateInfrequent(){
             // FIGHT HOUSE - similar logic to the above, but houses
             // are tougher.
             
-            if(rand()%3){ // more likely attacker will be damaged
-                damage(1);
-            } else {
+            // get our advantage - should be 0-1.
+            float adv = globals::game->getAdvantage(p,ix,iy);
+            // this is our chance of winning (note the different base win chance)
+            float winchance = 0.3f + adv*0.2f;
+            
+            if(drand48()<winchance)
                 h->damage(1);
-            }
+            else
+                damage(1);
         }
     }
     
