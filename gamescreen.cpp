@@ -37,8 +37,6 @@ void GameScreen::render(){
     stat.render(); // render last if profiling!
 }
 
-extern float snark;
-
 void GameScreen::onKeyDown(int k){
     
     Grid *g = &globals::game->grid;
@@ -80,9 +78,6 @@ void GameScreen::onKeyDown(int k){
         game.rotAngle+=0.1f;break;
     case SDLK_COMMA:
         game.rotAngle-=0.1f;break;
-        
-    case 't':snark+=0.1f;break;
-    case 'g':snark-=0.1f;break;
         
     default:
         printf("%d\n",k);

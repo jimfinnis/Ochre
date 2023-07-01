@@ -42,7 +42,7 @@ public:
     }
     
     /// a copy of the error string
-    char error[1024];
+    char error[3000];
 };
 
 class FatalException : public Exception {
@@ -57,7 +57,7 @@ public:
             strcpy(fileName,"<unknown>");
         line = l;
         
-        snprintf(error,1024,"%s(%d):  %s",fileName,line,brief);
+        snprintf(error,2070,"%s(%d):  %s",fileName,line,brief);
     }
     int line;
     char fileName[1024];

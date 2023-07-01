@@ -11,7 +11,7 @@
 #include "person.h"
 #include "house.h"
 #include "blur.h"
-
+#include "leveller.h"
 
 /// these are the modes available to the player
 enum PlayerMode {
@@ -28,6 +28,8 @@ enum PlayerMode {
           
 };
 
+#define LEVELLERS 3
+
 
 /// a player in the game, computer or human. Contains information about
 /// their people and the player themselves. House information will probably
@@ -37,14 +39,9 @@ class Player {
     MultipassBlur *blur; // potential field blurrer - takes several ticks
     MultipassBlur *blurClose; // potential field blurrer - takes several ticks
     PlayerMode mode;
-    static constexpr double AUTOLEVELDELAY = 1; // delay before autolevelling starts
-    static constexpr double AUTOLEVELMININTERVAL = 0.4; // interval between autolevelling events
-    static constexpr double AUTOLEVELMAXINTERVAL = 1.2; // interval between autolevelling events
-    
-    double nextAutolevelTime;
     
 public:
-    int levelx,levely; // location near which we attempt to level
+    Leveller *lev[LEVELLERS];
     int idx; // which player am I?
     Player *op; // opposing player
     int pop; // total population including in houses

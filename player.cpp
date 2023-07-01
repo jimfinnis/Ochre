@@ -21,6 +21,10 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES), influence(0) {
     idx=idxct++;
     float basex,basey;
     
+    for(int i=0;i<LEVELLERS;i++){
+        lev[i] = new Leveller(this);
+    }
+    
     if(idx){
         basex=basey=GRIDSIZE-30;
     } else {
@@ -43,24 +47,22 @@ Player::Player() : people(MAXPOP), houses(MAXHOUSES), influence(0) {
     
     mode = PLAYER_ATTACK;
     anchorX=anchorY=-1;
-    nextAutolevelTime=Time::now()+AUTOLEVELDELAY; // autolevelling doesn't happen for a bit
-    levelx=levely=-1;
 }
 
 Player::~Player(){
+    for(int i=0;i<LEVELLERS;i++){
+        delete lev[i];
+    }
     delete blur;
     delete blurClose;
 }
 
-float snark = 3.2;
 void Player::renderPerson(Person *p){
     Grid *g = &globals::game->grid;
     StateManager *sm = StateManager::getInstance();
     MatrixStack *ms = sm->getx();
     
     meshes::marker->startBatch();
-    //    printf("Snark %f\n",snark);
-    g->pushxforminterp(p->x,p->y,snark); // grid pos
     ms->scale(0.2);
     ms->rotY(p->getSmoothedRot());
     
@@ -184,73 +186,6 @@ void Player::setMode(PlayerMode m){
     resetToWander();
 }
 
-void Player::autoLevel(){
-    RandomSpiralSearch spiral;
-    printf("At start %d,%d\n",levelx,levely);
-    
-    // we assume that the "god" has a view of a particular location, and will always
-    // level close to that location. It starts at the average location of all the people.
-    double xx=0,yy=0;
-    if(levelx<0){ // need to reinit.
-        double n=0;
-        for(Person *p=people.first();p;p=people.next(p)){
-            xx+=p->x;yy+=p->y;n++;
-        }
-        if(n>0.000001){
-            xx/=n;yy/=n;
-            printf("%f %f - %f\n",xx,yy,n);
-        } else {
-            return; // shouldn't happen, there should be some players
-        }
-        levelx=(int)(xx+0.5);
-        levely=(int)(yy+0.5);
-    }
-    
-    // now find a candidate to level. What's the simplest thing that can possibly work?
-    // We just pull the location towards sea level+1.
-    
-    Game *game = globals::game;
-    Grid *g = &game->grid;
-    
-    // get the current height and modify it
-    int h = g->get(levelx,levely);
-    printf("Levelling at %d,%d: height is %d\n",levelx,levely,h);
-    if(h<1){
-        g->up(levelx,levely);
-    }
-    else if(h>1){
-        g->down(levelx,levely);
-    }
-    
-    // now get the next location by looking around for something which isn't at sea level
-    // but is next to something which is.
-    bool found=false;
-    for(spiral.start();spiral.layer<50;spiral.next()){
-        int gx = levelx+spiral.x;
-        int gy = levely+spiral.y;
-        if(g->in(gx,gy)){
-            h = g->get(gx,gy);
-            if(h!=1 && g->nextToDry(gx,gy,3)){
-                printf("Found at %d,%d\n",gx,gy);
-                levelx=gx;
-                levely=gy;
-                found=true;
-                break;
-            }
-        }
-    }
-    if(!found){
-        printf("Not found\n");
-        // damn, everything's level nearby. Delay for random seconds and restart
-        nextAutolevelTime=Time::now()+(rand()%2)+2;
-        levelx=-1;
-    } else if(!(rand()%100))
-        levelx=-1; // just randomly reset now and then
-    
-    
-    printf("At end %d,%d\n",levelx,levely);
-}
-
 
 // time passed in is interval since last update
 void Player::update(double t){
@@ -292,10 +227,8 @@ void Player::update(double t){
     
     // perform any auto-levelling
     
-    if(Time::now() > nextAutolevelTime){
-        autoLevel();
-        double interval = drand48()*(AUTOLEVELMAXINTERVAL-AUTOLEVELMININTERVAL)+AUTOLEVELMININTERVAL;
-        nextAutolevelTime=Time::now()+interval;
+    for(int i=0;i<LEVELLERS;i++){
+        lev[i]->run();
     }
     
     // blur the potential field

@@ -19,7 +19,7 @@ add_executable(${PROJECT_NAME} state.cpp context.cpp
     effect.cpp obj.cpp maths.cpp grid.cpp meshes.cpp prof.cpp
     gameregion.cpp gamescreen.cpp main.cpp screen.cpp globals.cpp
     statregion.cpp toolregion.cpp person.cpp house.cpp blur.cpp
-    button.cpp
+    button.cpp leveller.cpp
     videofile.cpp texture.cpp
 )
 

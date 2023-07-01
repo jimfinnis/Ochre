@@ -10,7 +10,7 @@
 #include "house.h"
 #include "font.h"
 
-#define HOUSE_POP_GROW_RATE 0.7
+#define HOUSE_POP_GROW_RATE 0.1
 
 void House::init(int xx,int yy,Player *pl){
     pop = 1;
@@ -110,7 +110,7 @@ void House::evict(int n){
         pop -= n;
         // we can't spawn if the local population is too high, but
         // the house empties (they just die!)
-        if(p->potentialClose[x][y]<0.1)
+        if(p->potentialClose[x][y]<0.08)
             p->spawn(x,y,n);
     }
 }

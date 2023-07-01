@@ -98,8 +98,11 @@ void MapTex::writePlayer(Player *pl,uint32_t col){
     }
     
     // for debugging, write the levelling points
-    if(pl->levelx>0)
-        image[pl->levely][pl->levelx]= 0xffffffff;
+    for(int i=0;i<LEVELLERS;i++){
+        Leveller *lev = pl->lev[i];
+        if(lev->levelx>0)
+            image[lev->levely][lev->levelx]= 0xffffffff;
+    }
 
 }
 
@@ -124,7 +127,7 @@ void MapTex::make(Grid *g,bool writeframe){
     // add peeps
     
     if(1 && globals::game){
-        writePlayer(&globals::game->p[0],0xffff0000);
+        writePlayer(&globals::game->p[0],0xffffff00);
         writePlayer(&globals::game->p[1],0xff00ffff);
     }
     copy();

@@ -448,28 +448,29 @@ void Grid::renderCursor(){
 }
 
 void Grid::_up(int x,int y){
-    if(x<0 || x>=GRIDSIZE || y<0 || y>=GRIDSIZE)return;
-    
-    grid[x][y]++;
-    int h = grid[x][y];
-    modcount++;
-    for(int xx=x-1;xx<=x+1;xx++){
-        for(int yy=y-1;yy<=y+1;yy++){
-            if(h-get(xx,yy)>1)_up(xx,yy); // recursion oh god.
+    if(in(x,y)){
+        grid[x][y]++;
+        int h = grid[x][y];
+        modcount++;
+        for(int xx=x-1;xx<=x+1;xx++){
+            for(int yy=y-1;yy<=y+1;yy++){
+                if(h-get(xx,yy)>1)_up(xx,yy); // recursion oh god.
+            }
         }
     }
 }
 
 void Grid::_down(int x,int y){
-    if(x<0 || x>=GRIDSIZE || y<0 || y>=GRIDSIZE)return;
-    if(grid[x][y]==0)return;
-    
-    grid[x][y]--;
-    modcount++;
-    int h = grid[x][y];
-    for(int xx=x-1;xx<=x+1;xx++){
-        for(int yy=y-1;yy<=y+1;yy++){
-            if(get(xx,yy)-h>1)_down(xx,yy); // recursion oh god.
+    if(in(x,y)){
+        if(grid[x][y]==0)return;
+        
+        grid[x][y]--;
+        modcount++;
+        int h = grid[x][y];
+        for(int xx=x-1;xx<=x+1;xx++){
+            for(int yy=y-1;yy<=y+1;yy++){
+                if(get(xx,yy)-h>1)_down(xx,yy); // recursion oh god.
+            }
         }
     }
 }
@@ -547,7 +548,7 @@ float VisLines::getVisibility(float x,float y){
     }
     if(md>1)md=1;
     
-//    md = powf(md,0.2);
+    //    md = powf(md,0.2);
     
     
     return md;

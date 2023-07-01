@@ -67,6 +67,9 @@ struct Game {
     }
     
     float getAdvantage(Player *me, int gridx, int gridy){
+        
+        return 0;
+        
         Player *other = getOther(me);
         float adv = me->potential[gridx][gridy] - other->potential[gridx][gridy];
         float otherinf = (other->influence<1) ? 1 : other->influence;

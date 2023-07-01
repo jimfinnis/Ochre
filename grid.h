@@ -364,7 +364,7 @@ public:
     
     // raise up at x,y (and neighbours if necessary)
     void up(int x,int y){
-        if(grid[x][y]<15){ // have to draw the line somewhere..
+        if(get(x,y)<15){ // have to draw the line somewhere..
             _up(x,y);
             recalc();
         }
