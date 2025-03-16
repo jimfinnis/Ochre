@@ -75,7 +75,6 @@ private:
     static StateManager *instance;
     /// the stack of saved render states
     State statestack[128];
-    int stackct;
     
     /// the transform stack
     MatrixStack xformstack;
@@ -99,6 +98,7 @@ public:
         return &cur;
     }
     
+    int stackct;
     MatrixStack *getx(){
         return &xformstack;
     }

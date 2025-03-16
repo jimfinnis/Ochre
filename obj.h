@@ -33,10 +33,12 @@ class ObjMesh {
     GLuint buffers[2];
     std::vector<Transition> transitions; // material transitions
     std::vector<QueueEntry> queue; // queued renders
-    
+    const char *name;
 public:
     ObjMesh(const char *dir,const char *name);
     virtual ~ObjMesh();
+    
+    const char *getName();
     
     // standard render method
     void render(glm::mat4 *world);

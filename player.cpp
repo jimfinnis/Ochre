@@ -63,6 +63,7 @@ void Player::renderPerson(Person *p){
     MatrixStack *ms = sm->getx();
     
     meshes::marker->startBatch();
+    g->pushxforminterp(p->x, p->y, 3.2);
     ms->scale(0.2);
     ms->rotY(p->getSmoothedRot());
     

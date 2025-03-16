@@ -36,10 +36,11 @@ static int addvert(std::vector<UNLITVERTEX>& verts,UNLITVERTEX &v){
     return verts.size()-1;
 }
 
-ObjMesh::ObjMesh(const char *dir,const char *name){
+ObjMesh::ObjMesh(const char *dir,const char *_name){
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
+    name = _name;
     printf("Loading OBJ %s/%s\n",dir,name);
     
     char wd[PATH_MAX];

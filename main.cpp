@@ -174,13 +174,18 @@ int main(int argc, char** argv)
     double lastt = Time::now();
     while(globals::running)
     {
-        Time::tick();
-        double t = Time::now();
-        profbar.startbar();
-        update(t-lastt);
-        lastt=t;
-        handleInput();
-        render();
+        try {
+            Time::tick();
+            double t = Time::now();
+            profbar.startbar();
+            update(t-lastt);
+            lastt=t;
+            handleInput();
+            render();
+        } catch(Exception& e) {
+            fflush(stdout);
+            throw e;
+        }
     
  //       Time::sleep(0.02); // yeah, frame rate cap.
     };

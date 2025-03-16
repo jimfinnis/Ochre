@@ -12,7 +12,7 @@
 //  Author        : $Author$
 //  Created By    : Jim Finnis
 //  Created       : Mon May 10 15:57:47 2010
-//  Last Modified : <180919.2117>
+//  Last Modified : <250105.2148>
 //
 //  Description	
 //
@@ -491,9 +491,9 @@ void Effect::setMaterial(const float *diffuse,GLuint texture)
         if(s->overrides & STO_DIFFUSE)
             diffuse = (float *)(&s->diffuse);
         if(s->overrides & STO_ALPHA){
-            col[0]=diffuse[0];
+            col[0]=diffuse[2];
             col[1]=diffuse[1];
-            col[2]=diffuse[2];
+            col[2]=diffuse[0];
             col[3]=s->alpha;
             diffuse = col;
         }
